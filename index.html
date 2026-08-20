@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Automation & Brand Setu </title>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="logo-icon"><i class="fa-brands fa-whatsapp"></i></div>
+      <div class="brand-text">
+        <h2>WA Automator <span>PRO</span></h2>
+        <p>Brand Setu & Management</p>
+      </div>
+    </div>
+
+    <!-- Connection Status Indicator -->
+    <div class="nav-status">
+      <div id="statusBadge" class="status-badge status-disconnected">
+        <span class="status-dot"></span>
+        <span id="statusText">Checking Connection...</span>
+      </div>
+      <button id="logoutBtn" class="btn btn-outline-secondary" title="Re-check Meta API Connection">
+        <i class="fa-solid fa-rotate"></i> Refresh Status
+      </button>
+    </div>
+  </header>
+
+  <!-- App Main Container -->
+  <main class="app-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <nav class="sidebar-menu">
+        <button class="nav-item active" data-tab="tab-session">
+          <i class="fa-solid fa-cloud"></i>
+          <span>Meta Cloud API</span>
+        </button>
+        <button class="nav-item" data-tab="tab-broadcast">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Bulk Sender</span>
+        </button>
+        <button class="nav-item" data-tab="tab-chatbot">
+          <i class="fa-solid fa-robot"></i>
+          <span>Rules Auto-Reply</span>
+        </button>
+        <button class="nav-item" data-tab="tab-ai-bot">
+          <i class="fa-solid fa-brain"></i>
+          <span>AI Chatbot Studio</span>
+        </button>
+        <button class="nav-item" data-tab="tab-hiring">
+          <i class="fa-solid fa-user-tie"></i>
+          <span>Hiring & Interviews</span>
+        </button>
+        <button class="nav-item" data-tab="tab-logs">
+          <i class="fa-solid fa-terminal"></i>
+          <span>Live Logs</span>
+        </button>
+      </nav>
+
+      <!-- System Quick Info Box -->
+      <div class="sidebar-info-card">
+        <div class="info-title"><i class="fa-solid fa-shield-halved"></i> Official Meta API</div>
+        <p>Powered by official Meta Graph API. No QR login required. Enterprise messaging compliance.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content Tab Views -->
+    <section class="content-area">
+
+      <!-- TAB 1: Meta WhatsApp Cloud API Connection Status -->
+      <div id="tab-session" class="tab-pane active">
+        <div class="card glass-card">
+          <div class="card-header flex-between">
+            <div>
+              <h3><i class="fa-solid fa-cloud-arrow-up"></i> Meta WhatsApp Cloud API Status</h3>
+              <p class="subtitle">Official Meta WhatsApp Business Cloud API Integration</p>
+            </div>
+            <button id="checkHealthBtn" class="btn btn-sm btn-primary">
+              <i class="fa-solid fa-arrows-rotate"></i> Test API Connection
+            </button>
+          </div>
+
+          <div class="card-body session-wrapper">
+            <!-- Meta Connection Status Box -->
+            <div id="metaStatusBox" class="meta-status-container">
+              <div class="meta-status-header">
+                <div class="meta-icon-wrapper">
+                  <i class="fa-brands fa-meta"></i>
+                </div>
+                <div>
+                  <h4 id="metaStatusTitle">Meta WhatsApp API Status</h4>
+                  <p id="metaStatusDesc">Verifying environment credentials...</p>
+                </div>
+              </div>
+
+              <!-- Meta API Details Grid -->
+              <div class="meta-info-grid mt-4">
+                <div class="meta-info-card">
+                  <span class="meta-info-label">API Provider</span>
+                  <strong class="meta-info-val">Meta Graph API v20.0</strong>
+                </div>
+                <div class="meta-info-card">
+                  <span class="meta-info-label">Phone Number ID</span>
+                  <strong id="metaPhoneIdVal" class="meta-info-val">Checking...</strong>
+                </div>
+                <div class="meta-info-card">
+                  <span class="meta-info-label">Display Phone Number</span>
+                  <strong id="metaDisplayPhoneVal" class="meta-info-val">--</strong>
+                </div>
+                <div class="meta-info-card">
+                  <span class="meta-info-label">Account Verified Name</span>
+                  <strong id="metaAccountNameVal" class="meta-info-val">--</strong>
+                </div>
+              </div>
+
+              <!-- Webhook Configuration Reference Card -->
+              <div class="webhook-helper-card mt-4">
+                <h4><i class="fa-solid fa-link"></i> Webhook Callback Configuration</h4>
+                <p>Configure these settings inside your <strong>Meta Developer Dashboard</strong> → <strong>WhatsApp</strong> → <strong>Configuration</strong>:</p>
+                <div class="webhook-field-box mt-3">
+                  <div class="webhook-field">
+                    <label>Callback URL (Public HTTPS / ngrok):</label>
+                    <code id="webhookUrlCode">https://your-domain.com/api/whatsapp/webhook</code>
+                  </div>
+                  <div class="webhook-field mt-2">
+                    <label>Verify Token (from .env):</label>
+                    <code id="webhookVerifyTokenCode">WHATSAPP_VERIFY_TOKEN</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Bulk Sender Broadcast -->
+      <div id="tab-broadcast" class="tab-pane">
+        <div class="grid-2col">
+
+          <!-- Left Column: Recipient Setup -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-users"></i> 1. Recipients List</h3>
+            </div>
+            <div class="card-body">
+              <!-- File Upload Dropzone -->
+              <div class="upload-zone" id="dropZone">
+                <i class="fa-solid fa-file-csv upload-icon"></i>
+                <h4>Upload CSV or Excel File</h4>
+                <p>Drag & drop your file here or <label for="csvFileInput" class="file-link">browse</label></p>
+                <input type="file" id="csvFileInput" accept=".csv, .xlsx, .xls" hidden>
+                <span class="file-name-display" id="fileNameDisplay"></span>
+              </div>
+
+              <div class="divider"><span>OR PASTE NUMBERS</span></div>
+
+              <!-- Manual Phone Input -->
+              <div class="form-group">
+                <label for="manualNumbers">Manual Phone Numbers (one per line with country code):</label>
+                <textarea id="manualNumbers" rows="4" placeholder="919876543210&#10;919123456789&#10;919988776655"></textarea>
+              </div>
+
+              <!-- Contact Counter Badge -->
+              <div class="contact-counter">
+                <span>Total Loaded Recipients:</span>
+                <strong id="recipientCount">0</strong>
+              </div>
+
+              <!-- Parsed Tags/Columns Display -->
+              <div class="tags-container" id="tagsContainer" style="display: none;">
+                <label>Available Merge Tags (click to insert):</label>
+                <div class="tags-list" id="tagsList"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Message & Media Setup -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-message"></i> 2. Message & Settings</h3>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <label for="messageTemplate">Message Template:</label>
+                <textarea id="messageTemplate" rows="6" placeholder="Hi {name}, your bill of {amount} for {city} is ready! Thank you for choosing us."></textarea>
+              </div>
+
+              <!-- Attachment Input -->
+              <div class="form-group">
+                <label for="mediaAttachment"><i class="fa-solid fa-paperclip"></i> Media Attachment (Optional Image/PDF):</label>
+                <input type="file" id="mediaAttachment" accept="image/*, application/pdf, .doc, .docx" class="form-control">
+              </div>
+
+              <!-- Delay Anti-Ban Settings -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="minDelay">Min Delay (sec):</label>
+                  <input type="number" id="minDelay" value="5" min="2" max="60" class="form-control">
+                </div>
+                <div class="form-group">
+                  <label for="maxDelay">Max Delay (sec):</label>
+                  <input type="number" id="maxDelay" value="12" min="3" max="120" class="form-control">
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="btn-group mt-4">
+                <button id="startCampaignBtn" class="btn btn-primary btn-lg">
+                  <i class="fa-solid fa-paper-plane"></i> Launch Campaign
+                </button>
+                <button id="stopCampaignBtn" class="btn btn-danger btn-lg" style="display: none;">
+                  <i class="fa-solid fa-circle-stop"></i> Stop Campaign
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: Auto-Reply Chatbot Rules -->
+      <div id="tab-chatbot" class="tab-pane">
+        <div class="grid-2col">
+          <!-- Add Rule Form -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-plus-circle"></i> Add Auto-Reply Rule</h3>
+            </div>
+            <div class="card-body">
+              <form id="autoReplyForm">
+                <div class="form-group">
+                  <label for="botTrigger">Trigger Keyword / Phrase:</label>
+                  <input type="text" id="botTrigger" placeholder="e.g. price, hi, info, offer" required class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label for="botMatchType">Match Type:</label>
+                  <select id="botMatchType" class="form-control">
+                    <option value="contains">Contains Keyword</option>
+                    <option value="exact">Exact Match</option>
+                    <option value="starts_with">Starts With</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="botReplyText">Auto Reply Message:</label>
+                  <textarea id="botReplyText" rows="4" placeholder="Hello! Thank you for reaching out. Here is our pricing catalog..." required class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="botAttachment"><i class="fa-solid fa-paperclip"></i> Optional Auto Attachment:</label>
+                  <input type="file" id="botAttachment" class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Bot Rule
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Existing Rules List -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-list-check"></i> Active Bot Rules</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Trigger</th>
+                      <th>Type</th>
+                      <th>Reply Snippet</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="botRulesTable">
+                    <tr>
+                      <td colspan="4" class="text-center">No auto-reply rules added yet.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: AI Chatbot Studio -->
+      <div id="tab-ai-bot" class="tab-pane">
+        <div class="grid-2col">
+          <!-- Business Knowledge Base & AI Config -->
+          <div class="card glass-card">
+            <div class="card-header flex-between">
+              <h3><i class="fa-solid fa-brain"></i> AI Business Knowledge Base</h3>
+              <label class="switch-container">
+                <input type="checkbox" id="aiEnabledToggle" checked>
+                <span class="switch-slider"></span>
+                <span class="switch-label" id="aiToggleText">AI Auto-Reply ON</span>
+              </label>
+            </div>
+            <div class="card-body">
+              <form id="aiConfigForm">
+                <div class="form-row">
+                  <div class="form-group flex-1">
+                    <label for="aiProvider">AI Provider Engine:</label>
+                    <select id="aiProvider" class="form-control">
+                      <option value="gemini">Google Gemini AI (Recommended)</option>
+                      <option value="openai">OpenAI ChatGPT (GPT-3.5)</option>
+                      <option value="fallback">Built-in Smart Engine (No Key Needed)</option>
+                    </select>
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="aiApiKey">API Key (Optional for Gemini/OpenAI):</label>
+                    <input type="password" id="aiApiKey" placeholder="Enter API Key" class="form-control">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="aiBusinessName">Business / Store Name:</label>
+                  <input type="text" id="aiBusinessName" placeholder="e.g. Arjun Store & Services" required class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label for="aiBusinessDesc">Business Overview / Short Description:</label>
+                  <input type="text" id="aiBusinessDesc" placeholder="e.g. We provide fast laptop repair, mobile accessories & same-day home delivery." class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label for="aiKnowledgeBase">Business Knowledge Base (Prices, Timings, Offers, FAQs):</label>
+                  <textarea id="aiKnowledgeBase" rows="5" placeholder="Working Hours: Mon-Sat 9 AM to 8 PM&#10;Products & Prices: Screen Guard - Rs. 150, Laptop Repair - Rs. 800, Mobile Cases - Rs. 299&#10;Location: Shop No. 12, Main Market, Delhi&#10;Offers: 10% discount on orders above Rs. 1000" class="form-control"></textarea>
+                </div>
+
+                <div class="form-group">
+                  <label for="aiSystemPrompt">AI Assistant Personality Prompt:</label>
+                  <textarea id="aiSystemPrompt" rows="3" class="form-control" placeholder="You are a polite, intelligent WhatsApp AI Assistant for {businessName}. Use the knowledge base to reply concisely in Hinglish or English."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save AI Knowledge Base
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Interactive AI Simulator -->
+          <div class="card glass-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-comments"></i> Test AI Chatbot Simulator</h3>
+              <p class="subtitle">Test how your AI bot responds to customer questions before going live.</p>
+            </div>
+            <div class="card-body">
+              <!-- Chat Box Window -->
+              <div class="chat-simulator-box" id="simChatBox">
+                <div class="chat-msg chat-msg-bot">
+                  <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+                  <div class="chat-bubble">
+                    Hello! I am your WhatsApp AI Assistant. Ask me anything about your business to test my responses!
+                  </div>
+                </div>
+              </div>
+
+              <!-- Test Input Form -->
+              <div class="sim-input-row">
+                <input type="text" id="simUserInput" placeholder="Type a test customer message..." class="form-control">
+                <button id="simSendBtn" class="btn btn-success">
+                  <i class="fa-solid fa-paper-plane"></i> Test
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: Hiring & Interviews Pipeline -->
+      <div id="tab-hiring" class="tab-pane">
+        <div class="card glass-card mb-4">
+          <div class="card-header flex-between flex-wrap gap-3">
+            <div>
+              <h3><i class="fa-solid fa-user-tie"></i> Candidates & Interview Pipeline</h3>
+              <p class="subtitle">Real-time candidate tracking, 4-hr resume reminders, 1-hr interview alerts & Excel export</p>
+            </div>
+            <div class="header-actions flex gap-2">
+              <a href="/api/hiring/export-excel" id="exportExcelBtn" class="btn btn-success" download>
+                <i class="fa-solid fa-file-excel"></i> Download Excel (.xlsx)
+              </a>
+              <button id="addCandidateBtn" class="btn btn-primary">
+                <i class="fa-solid fa-user-plus"></i> Add Candidate
+              </button>
+              <button id="refreshHiringBtn" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-rotate"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Hiring KPIs / Stats Grid -->
+            <div class="hiring-stats-grid mb-4">
+              <div class="hiring-kpi-card">
+                <div class="kpi-icon kpi-blue"><i class="fa-solid fa-users"></i></div>
+                <div class="kpi-content">
+                  <div class="kpi-label">Total Applicants</div>
+                  <div class="kpi-value" id="kpiTotal">0</div>
+                </div>
+              </div>
+
+              <div class="hiring-kpi-card">
+                <div class="kpi-icon kpi-orange"><i class="fa-solid fa-file-circle-question"></i></div>
+                <div class="kpi-content">
+                  <div class="kpi-label">Resume Pending (4hr Reminder)</div>
+                  <div class="kpi-value" id="kpiPending">0</div>
+                </div>
+              </div>
+
+              <div class="hiring-kpi-card">
+                <div class="kpi-icon kpi-purple"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="kpi-content">
+                  <div class="kpi-label">Interviews Scheduled Today</div>
+                  <div class="kpi-value" id="kpiToday">0</div>
+                </div>
+              </div>
+
+              <div class="hiring-kpi-card">
+                <div class="kpi-icon kpi-green"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="kpi-content">
+                  <div class="kpi-label">Total Scheduled / Active</div>
+                  <div class="kpi-value" id="kpiScheduled">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pipeline Filter Tabs -->
+            <div class="hiring-filter-tabs mb-3 flex-between flex-wrap gap-2">
+              <div class="filter-pills flex gap-2">
+                <button class="pill-btn active" data-filter="all">All Candidates (<span id="countAll">0</span>)</button>
+                <button class="pill-btn" data-filter="pending">Missing Resume (<span id="countPending">0</span>)</button>
+                <button class="pill-btn" data-filter="scheduled">Interviews (<span id="countScheduled">0</span>)</button>
+                <button class="pill-btn" data-filter="completed">Completed / Hired (<span id="countCompleted">0</span>)</button>
+              </div>
+              <div class="search-box">
+                <input type="text" id="candidateSearchInput" placeholder="Search by name, phone or role..." class="form-control form-control-sm">
+              </div>
+            </div>
+
+            <!-- Candidates Data Table -->
+            <div class="table-responsive">
+              <table class="table hiring-table">
+                <thead>
+                  <tr>
+                    <th>Candidate</th>
+                    <th>Role Applied</th>
+                    <th>Resume / Portfolio</th>
+                    <th>Interview Schedule</th>
+                    <th>Status</th>
+                    <th>Reminders</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="candidatesTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                      <i class="fa-solid fa-spinner fa-spin me-2"></i> Loading candidates data...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Live Logs & Console -->
+      <div id="tab-logs" class="tab-pane">
+        <div class="card glass-card">
+          <div class="card-header flex-between">
+            <h3><i class="fa-solid fa-terminal"></i> Live Dispatch Terminal & Logs</h3>
+            <button id="clearLogsBtn" class="btn btn-sm btn-outline-secondary">
+              <i class="fa-solid fa-trash-can"></i> Clear Terminal
+            </button>
+          </div>
+          <div class="card-body">
+
+            <!-- Progress Meter -->
+            <div class="progress-section mb-4">
+              <div class="progress-header">
+                <span>Campaign Progress:</span>
+                <span id="progressPercent">0%</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div id="progressBarFill" class="progress-bar-fill" style="width: 0%;"></div>
+              </div>
+              <div class="progress-stats">
+                <span class="stat-badge stat-total">Total: <strong id="statTotal">0</strong></span>
+                <span class="stat-badge stat-sent">Sent: <strong id="statSent">0</strong></span>
+                <span class="stat-badge stat-failed">Failed: <strong id="statFailed">0</strong></span>
+              </div>
+            </div>
+
+            <!-- Log Terminal Console Box -->
+            <div class="terminal-box" id="terminalConsole">
+              <div class="log-entry log-info">[System Initialized] Ready to automate WhatsApp messages.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Schedule Interview Modal -->
+  <div id="scheduleModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box glass-card">
+      <div class="modal-header flex-between">
+        <h3><i class="fa-solid fa-calendar-plus"></i> Schedule Interview</h3>
+        <button class="close-btn" id="closeScheduleModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleForm">
+          <input type="hidden" id="scheduleCandidateId">
+          <div class="form-group mb-3">
+            <label class="form-label">Candidate Name & Phone</label>
+            <input type="text" id="scheduleCandidateInfo" class="form-control" readonly>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Role Applied</label>
+            <select id="scheduleRole" class="form-control">
+              <option value="SEO Expert">SEO Expert</option>
+              <option value="Video Editor">Video Editor</option>
+              <option value="General Applicant">General Applicant</option>
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Interview Date & Time *</label>
+            <input type="datetime-local" id="scheduleDateTime" class="form-control" required>
+            <small class="form-hint">Candidate will automatically receive an instant confirmation on WhatsApp + a reminder 1 hour before the interview.</small>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Notes / Interviewer</label>
+            <input type="text" id="scheduleNotes" placeholder="e.g. In-office practical test / bring laptop" class="form-control">
+          </div>
+          <div class="form-check mb-3">
+            <label class="checkbox-container">
+              <input type="checkbox" id="scheduleSendWhatsApp" checked>
+              <span>Send instant WhatsApp confirmation message to candidate</span>
+            </label>
+          </div>
+          <div class="modal-footer flex-end gap-2">
+            <button type="button" class="btn btn-secondary" id="cancelScheduleBtn">Cancel</button>
+            <button type="submit" class="btn btn-success" id="confirmScheduleBtn">
+              <i class="fa-solid fa-check"></i> Confirm & Schedule
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Candidate Modal -->
+  <div id="addCandidateModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box glass-card">
+      <div class="modal-header flex-between">
+        <h3><i class="fa-solid fa-user-plus"></i> Add New Candidate</h3>
+        <button class="close-btn" id="closeAddCandidateModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addCandidateForm">
+          <div class="form-group mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" id="newCandName" placeholder="Candidate Name" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">WhatsApp Number *</label>
+            <input type="text" id="newCandPhone" placeholder="10-digit number or with 91 (e.g. 9329232025)" class="form-control" required>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Role Applied</label>
+            <select id="newCandRole" class="form-control">
+              <option value="SEO Expert">SEO Expert</option>
+              <option value="Video Editor">Video Editor</option>
+            </select>
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Portfolio / Drive Link (Optional)</label>
+            <input type="url" id="newCandPortfolio" placeholder="https://drive.google.com/..." class="form-control">
+          </div>
+          <div class="form-group mb-3">
+            <label class="form-label">Resume Received?</label>
+            <select id="newCandResumeStatus" class="form-control">
+              <option value="0">Pending (No Resume)</option>
+              <option value="1">Received (Yes)</option>
+            </select>
+          </div>
+          <div class="modal-footer flex-end gap-2">
+            <button type="button" class="btn btn-secondary" id="cancelAddCandBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="confirmAddCandBtn">
+              <i class="fa-solid fa-save"></i> Save Candidate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Socket.io Library -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const FormData = require('form-data');
+
+const GRAPH_API_VERSION = 'v20.0';
+
+/**
+ * Format phone number to Meta E.164 string (no '+' sign, digits only)
+ */
+function formatPhoneNumber(phone) {
+  let cleaned = String(phone).replace(/[^0-9]/g, '');
+  if (cleaned.length === 10) {
+    cleaned = '91' + cleaned; // Default country code if 10 digits
+  }
+  return cleaned;
+}
+
+/**
+ * Get base URL for WhatsApp Graph API calls
+ */
+function getMessagesUrl() {
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  return `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}/messages`;
+}
+
+/**
+ * Get authorization header
+ */
+function getHeaders() {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+}
+
+/**
+ * Send text message via Meta WhatsApp Cloud API
+ */
+async function sendWhatsAppText(to, message) {
+  const url = getMessagesUrl();
+  const recipient = formatPhoneNumber(to);
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'text',
+    text: {
+      preview_url: false,
+      body: message
+    }
+  };
+
+  const response = await axios.post(url, payload, { headers: getHeaders() });
+  return response.data;
+}
+
+/**
+ * Send template message via Meta WhatsApp Cloud API
+ */
+async function sendWhatsAppTemplate(to, templateName, languageCode = 'en_US', components = []) {
+  const url = getMessagesUrl();
+  const recipient = formatPhoneNumber(to);
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'template',
+    template: {
+      name: templateName,
+      language: {
+        code: languageCode
+      },
+      components: components
+    }
+  };
+
+  const response = await axios.post(url, payload, { headers: getHeaders() });
+  return response.data;
+}
+
+/**
+ * Upload local file to Meta Graph API Media endpoint
+ */
+async function uploadMediaToWhatsApp(filePath, mimeType) {
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  const url = `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}/media`;
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File not found at path: ${filePath}`);
+  }
+
+  const formData = new FormData();
+  formData.append('messaging_product', 'whatsapp');
+  formData.append('file', fs.createReadStream(filePath));
+  if (mimeType) {
+    formData.append('type', mimeType);
+  }
+
+  const response = await axios.post(url, formData, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      ...formData.getHeaders()
+    }
+  });
+
+  // Returns { id: "MEDIA_ID" }
+  return response.data;
+}
+
+/**
+ * Send Image message via Meta WhatsApp Cloud API
+ */
+async function sendWhatsAppImage(to, mediaIdOrUrl, caption = '') {
+  const url = getMessagesUrl();
+  const recipient = formatPhoneNumber(to);
+
+  const imageObj = {};
+  if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
+    imageObj.link = mediaIdOrUrl;
+  } else {
+    imageObj.id = mediaIdOrUrl;
+  }
+  if (caption) {
+    imageObj.caption = caption;
+  }
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'image',
+    image: imageObj
+  };
+
+  const response = await axios.post(url, payload, { headers: getHeaders() });
+  return response.data;
+}
+
+/**
+ * Send Document message via Meta WhatsApp Cloud API
+ */
+async function sendWhatsAppDocument(to, mediaIdOrUrl, filename = 'document.pdf', caption = '') {
+  const url = getMessagesUrl();
+  const recipient = formatPhoneNumber(to);
+
+  const docObj = { filename };
+  if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
+    docObj.link = mediaIdOrUrl;
+  } else {
+    docObj.id = mediaIdOrUrl;
+  }
+  if (caption) {
+    docObj.caption = caption;
+  }
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'document',
+    document: docObj
+  };
+
+  const response = await axios.post(url, payload, { headers: getHeaders() });
+  return response.data;
+}
+
+/**
+ * Send Video message via Meta WhatsApp Cloud API
+ */
+async function sendWhatsAppVideo(to, mediaIdOrUrl, caption = '') {
+  const url = getMessagesUrl();
+  const recipient = formatPhoneNumber(to);
+
+  const videoObj = {};
+  if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
+    videoObj.link = mediaIdOrUrl;
+  } else {
+    videoObj.id = mediaIdOrUrl;
+  }
+  if (caption) {
+    videoObj.caption = caption;
+  }
+
+  const payload = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to: recipient,
+    type: 'video',
+    video: videoObj
+  };
+
+  const response = await axios.post(url, payload, { headers: getHeaders() });
+  return response.data;
+}
+
+/**
+ * Check health / verification status of Meta Cloud API credentials
+ */
+async function checkMetaHealth() {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+
+  if (!token || !phoneNumberId) {
+    return {
+      configured: false,
+      status: 'not_configured',
+      message: 'WHATSAPP_ACCESS_TOKEN or WHATSAPP_PHONE_NUMBER_ID missing in environment variables.'
+    };
+  }
+
+  try {
+    const url = `https://graph.facebook.com/${GRAPH_API_VERSION}/${phoneNumberId}`;
+    const response = await axios.get(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+
+    return {
+      configured: true,
+      status: 'connected',
+      phoneNumberId: phoneNumberId,
+      displayPhoneNumber: response.data?.display_phone_number || phoneNumberId,
+      verifiedName: response.data?.verified_name || 'Meta WhatsApp Account',
+      qualityRating: response.data?.quality_rating || 'UNKNOWN'
+    };
+  } catch (err) {
+    const errMsg = err.response?.data?.error?.message || err.message;
+    return {
+      configured: true,
+      status: 'error',
+      message: `Meta API Error: ${errMsg}`,
+      error: err.response?.data || err.message
+    };
+  }
+}
+
+module.exports = {
+  GRAPH_API_VERSION,
+  formatPhoneNumber,
+  sendWhatsAppText,
+  sendWhatsAppTemplate,
+  uploadMediaToWhatsApp,
+  sendWhatsAppImage,
+  sendWhatsAppDocument,
+  sendWhatsAppVideo,
+  checkMetaHealth
+};

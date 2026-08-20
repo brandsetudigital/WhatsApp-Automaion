@@ -1,0 +1,15 @@
+[
+  
+  {
+    "id": "faq_location",
+    "trigger": "office address, office location, where is office, indore address, company location",
+    "matchType": "contains",
+    "replyText": "📍 *BrandSetu Digital Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Monday – Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025"
+  },
+  {
+    "id": "faq_contact",
+    "trigger": "contact number, hr phone, hr contact, helpline, call number",
+    "matchType": "contains",
+    "replyText": "📞 *BrandSetu Digital HR Contact:*\nPhone / WhatsApp: +91 9329232025 | +91 7389824231\nEmail: contact@brandsetudigital.com\n\nFeel free to connect during office hours (Mon-Sat, 10:00 AM - 7:00 PM)."
+  }
+]
