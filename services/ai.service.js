@@ -584,10 +584,61 @@ Reply directly as HR Assistant:
   return generateContextualFallbackResponse(candidate, userMessage, lang);
 }
 
+/**
+ * Generic AI Response Generator for test messages or non-candidate chats
+ */
+async function generateAIResponse(userMessage, context = '') {
+  loadAiConfig();
+
+  const rawKey = (aiConfig.apiKey && aiConfig.apiKey !== '••••••••' && aiConfig.apiKey.trim() !== '')
+    ? aiConfig.apiKey.trim()
+    : (process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '');
+
+  const lang = detectLanguage(userMessage);
+
+  const systemInstructions = (aiConfig.systemPrompt && aiConfig.systemPrompt.trim()) || `
+You are the professional, friendly HR & Recruitment Coordinator for BrandSetu Digital (Indore).
+  `.trim();
+
+  const prompt = `
+${systemInstructions}
+
+COMPANY INFORMATION & KNOWLEDGE BASE:
+${aiConfig.knowledgeBase}
+
+CRITICAL RULES:
+1. Sound polite, warm, and professional.
+2. If the user asks in Hindi/Hinglish, reply in natural Hinglish. If in English, reply in crisp English.
+3. Keep it brief (2 to 4 lines), clear, and structured with clean emojis.
+4. Address candidate naturally without appending "ji".
+
+${context ? `CONTEXT:\n${context}\n` : ''}
+
+USER MESSAGE:
+"${userMessage}"
+
+Reply directly as HR Assistant:
+`;
+
+  if (rawKey && rawKey.trim() !== '') {
+    try {
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.65, maxTokens: 400 });
+      if (result && result.text) {
+        return result.text;
+      }
+    } catch (err) {
+      console.warn('Gemini API call error in generateAIResponse:', err.message);
+    }
+  }
+
+  return generateContextualFallbackResponse({ name: 'Candidate' }, userMessage, lang);
+}
+
 module.exports = {
   getAiConfig,
   updateAiConfig,
   generateHiringAIResponse,
+  generateAIResponse,
   parseInterviewScheduleWithGemini,
   parseInterviewScheduleLocal,
   detectLanguage

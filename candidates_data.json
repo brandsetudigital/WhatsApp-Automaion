@@ -135,7 +135,7 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-08-20T10:40:26.242Z",
-    "updatedAt": "2026-08-20T10:40:26.242Z",
+    "updatedAt": "2026-08-20T12:23:17.048Z",
     "lastMessage": "[unsupported message received]",
     "chatHistory": [
       {
@@ -147,6 +147,16 @@
         "role": "assistant",
         "text": "Hello! 😊\nWelcome to BrandSetu Digital!\n\nWe are actively hiring for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Please share your *Name*, *Role you are applying for*, and your *Resume / Portfolio link* to proceed! 📄💼",
         "timestamp": "2026-08-20T10:40:57.755Z"
+      },
+      {
+        "role": "user",
+        "text": "[unsupported message received]",
+        "timestamp": "2026-08-20T12:23:17.060Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 😊 \n\nIt seems like your previous message didn't go",
+        "timestamp": "2026-08-20T12:23:42.443Z"
       }
     ]
   },
@@ -194,86 +204,16 @@
     "resumeReceived": true,
     "resumeFileName": "[Document received]",
     "status": "Interview Scheduled",
-    "interviewDateTime": "2026-08-20T08:30:00.000Z",
-    "notes": "Auto-scheduled via WhatsApp AI: \"Today 5 pm coming\"",
+    "interviewDateTime": "2026-08-22T05:30:00.000Z",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Me kal interview Dene a nhi ska tha to kya mera interview resedule kr skte ho\"",
     "resumeReminderSent": false,
     "resumeReminderSentAt": null,
-    "interviewReminderSent": true,
-    "interviewReminderSentAt": "2026-08-20T10:20:47.526Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
     "createdAt": "2026-08-20T08:42:26.350Z",
-    "updatedAt": "2026-08-20T11:07:58.415Z",
-    "lastMessage": "Selected",
+    "updatedAt": "2026-08-21T08:37:34.266Z",
+    "lastMessage": "Thank you",
     "chatHistory": [
-      {
-        "role": "user",
-        "text": "Apply",
-        "timestamp": "2026-08-20T10:33:40.176Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello coming today! 😊 \n\nYour interview for the **Video Editor**",
-        "timestamp": "2026-08-20T10:34:14.330Z"
-      },
-      {
-        "role": "user",
-        "text": "Ji ha",
-        "timestamp": "2026-08-20T10:34:25.332Z"
-      },
-      {
-        "role": "assistant",
-        "text": "/English mix):*\n        Bahut badhiya",
-        "timestamp": "2026-08-20T10:34:42.284Z"
-      },
-      {
-        "role": "user",
-        "text": "English",
-        "timestamp": "2026-08-20T10:34:50.072Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello coming today! 😊\n\nUnderstood! We will continue",
-        "timestamp": "2026-08-20T10:35:00.921Z"
-      },
-      {
-        "role": "user",
-        "text": "Interview kese  rha kis trha ke interview liya jata h apke yha",
-        "timestamp": "2026-08-20T10:35:19.463Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello coming today ji! 😊\n\nHumara interview process bahut simple aur",
-        "timestamp": "2026-08-20T10:35:27.756Z"
-      },
-      {
-        "role": "user",
-        "text": "Kitne round hote h",
-        "timestamp": "2026-08-20T10:36:23.504Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello coming today ji! 😊\n\nHumare y",
-        "timestamp": "2026-08-20T10:36:59.290Z"
-      },
-      {
-        "role": "user",
-        "text": "Starting se  start krte h",
-        "timestamp": "2026-08-20T10:37:37.494Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Namaste coming ji! 🙏\nBrandSetu Digital me aapka swagat hai!\n\nHum hiring kar rahe hain for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Kripya apna *Name*, *Role* (SEO Expert ya Video Editor) aur *Resume / Portfolio link* yahan share karein. 📄✨",
-        "timestamp": "2026-08-20T10:38:12.424Z"
-      },
-      {
-        "role": "user",
-        "text": "SEO expert",
-        "timestamp": "2026-08-20T10:38:27.362Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello coming today ji! 😊\n\nAapka SEO Expert role ke liye",
-        "timestamp": "2026-08-20T10:38:43.554Z"
-      },
       {
         "role": "user",
         "text": "Name Arjun Meena \nRole SEO expert",
@@ -303,6 +243,76 @@
         "role": "assistant",
         "text": "Hello Arjun! 😊\nWelcome to BrandSetu Digital!\n\nWe are actively hiring for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Please share your *Name*, *Role you are applying for*, and your *Resume / Portfolio link* to proceed! 📄💼",
         "timestamp": "2026-08-20T11:08:02.667Z"
+      },
+      {
+        "role": "user",
+        "text": "Apply",
+        "timestamp": "2026-08-21T08:34:51.643Z"
+      },
+      {
+        "role": "user",
+        "text": "Apply",
+        "timestamp": "2026-08-21T08:35:04.987Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊 \n\nYour interview is already confirmed for **August",
+        "timestamp": "2026-08-21T08:35:13.739Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\nYour application for the **Video Editor** role is",
+        "timestamp": "2026-08-21T08:35:22.605Z"
+      },
+      {
+        "role": "user",
+        "text": "Okay",
+        "timestamp": "2026-08-21T08:35:31.785Z"
+      },
+      {
+        "role": "user",
+        "text": "Kb ka h mera interview time h date",
+        "timestamp": "2026-08-21T08:35:47.243Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great, Arjun! 😊 \n\nWe look forward to meeting you",
+        "timestamp": "2026-08-21T08:36:04.964Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\nAapka interview **20 August",
+        "timestamp": "2026-08-21T08:36:08.900Z"
+      },
+      {
+        "role": "user",
+        "text": "Time",
+        "timestamp": "2026-08-21T08:36:19.642Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\nAapka interview **20 August 20",
+        "timestamp": "2026-08-21T08:36:47.608Z"
+      },
+      {
+        "role": "user",
+        "text": "Me kal interview Dene a nhi ska tha to kya mera interview resedule kr skte ho",
+        "timestamp": "2026-08-21T08:37:22.232Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🔄\n\nYour interview for the *Video Editor* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* Sat, 22 Aug, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-08-21T08:37:23.163Z"
+      },
+      {
+        "role": "user",
+        "text": "Thank you",
+        "timestamp": "2026-08-21T08:37:34.266Z"
+      },
+      {
+        "role": "assistant",
+        "text": "You are most welcome, Arjun! 😊 \n\nWe look forward to meeting you",
+        "timestamp": "2026-08-21T08:37:42.131Z"
       }
     ]
   }
