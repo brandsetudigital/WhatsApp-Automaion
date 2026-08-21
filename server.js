@@ -130,6 +130,35 @@ async function processIncomingWhatsAppMessage(messageData) {
   let candidate = null;
   try {
     candidate = hiringService.trackCandidateFromMessage(messageData);
+
+    // If candidate sent a media file (PDF resume, document, image)
+    if (candidate && messageData.mediaId) {
+      const resumesDir = path.join(__dirname, 'uploads', 'resumes');
+      const safeName = (messageData.mediaFilename || `resume_${Date.now()}.pdf`).replace(/[^a-zA-Z0-9._-]/g, '_');
+      const uniqueFileName = `${candidate.phone}_${Date.now()}_${safeName}`;
+      const destPath = path.join(resumesDir, uniqueFileName);
+
+      console.log(`📥 Downloading candidate media (${messageData.mediaId}) -> ${destPath}...`);
+      whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath)
+        .then(() => {
+          candidate.resumeReceived = true;
+          candidate.resumeFileName = safeName;
+          candidate.resumePath = destPath;
+          candidate.resumeUrl = `/uploads/resumes/${uniqueFileName}`;
+          if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
+            candidate.status = 'Resume Received';
+          }
+          hiringService.saveCandidatesAndSyncExcel();
+          console.log(`✅ Candidate resume file saved: ${uniqueFileName}`);
+          io.emit('log', {
+            type: 'success',
+            text: `📄 Resume saved for ${candidate.name} (+${candidate.phone}): ${safeName}`
+          });
+        })
+        .catch(dlErr => {
+          console.error('Error downloading candidate media:', dlErr.message);
+        });
+    }
   } catch (candErr) {
     console.error('Error tracking candidate from message:', candErr);
   }

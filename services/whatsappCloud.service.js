@@ -239,6 +239,52 @@ async function checkMetaHealth() {
   }
 }
 
+/**
+ * Download Media file from Meta Graph API (e.g. candidate resume PDF / image)
+ */
+async function downloadMediaFromWhatsApp(mediaId, destinationPath) {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN;
+  if (!token || !mediaId) {
+    throw new Error('Missing access token or media ID for downloading media');
+  }
+
+  // 1. Get the media download URL from Meta
+  const metaUrl = `https://graph.facebook.com/${GRAPH_API_VERSION}/${mediaId}`;
+  const metaRes = await axios.get(metaUrl, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  const fileUrl = metaRes.data?.url;
+  const mimeType = metaRes.data?.mime_type;
+  if (!fileUrl) {
+    throw new Error('Could not retrieve media download URL from Meta');
+  }
+
+  // Ensure destination directory exists
+  const dir = path.dirname(destinationPath);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+
+  // 2. Download the binary stream
+  const response = await axios({
+    method: 'GET',
+    url: fileUrl,
+    responseType: 'stream',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    const writer = fs.createWriteStream(destinationPath);
+    response.data.pipe(writer);
+    writer.on('finish', () => resolve({ destinationPath, mimeType }));
+    writer.on('error', reject);
+  });
+}
+
 module.exports = {
   GRAPH_API_VERSION,
   formatPhoneNumber,
@@ -248,5 +294,6 @@ module.exports = {
   sendWhatsAppImage,
   sendWhatsAppDocument,
   sendWhatsAppVideo,
+  downloadMediaFromWhatsApp,
   checkMetaHealth
 };

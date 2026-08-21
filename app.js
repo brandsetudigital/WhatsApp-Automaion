@@ -702,13 +702,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if ((c.role || '').toLowerCase().includes('seo')) roleClass = 'badge-role-seo';
       else if ((c.role || '').toLowerCase().includes('video')) roleClass = 'badge-role-video';
 
-      // Resume Badge
+      // Resume Badge & Links
       let resumeBadge = c.resumeReceived
         ? `<span class="badge-status badge-status-received"><i class="fa-solid fa-check"></i> Received</span>`
         : `<span class="badge-status badge-status-pending"><i class="fa-solid fa-clock"></i> Missing</span>`;
 
+      let resumePdfBtn = c.resumeUrl
+        ? `<a href="${c.resumeUrl}" target="_blank" class="btn btn-sm btn-outline-primary mt-1 d-inline-block" style="font-size:0.72rem; padding: 2px 6px;"><i class="fa-solid fa-file-pdf"></i> Open PDF</a>`
+        : '';
+
       let portfolioBtn = c.portfolio
-        ? `<a href="${c.portfolio}" target="_blank" class="btn-icon-action mt-1" style="font-size:0.72rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Work</a>`
+        ? `<a href="${c.portfolio}" target="_blank" class="btn-icon-action mt-1 d-inline-block" style="font-size:0.72rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i> View Work</a>`
         : '';
 
       // Interview Date & Time
@@ -749,6 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <div>${resumeBadge}</div>
+            ${resumePdfBtn}
             ${portfolioBtn}
           </td>
           <td>

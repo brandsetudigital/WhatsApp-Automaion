@@ -202,7 +202,7 @@
     "experience": "",
     "portfolio": "",
     "resumeReceived": true,
-    "resumeFileName": "[Document received]",
+    "resumeFileName": "manisha_meena.pdf",
     "status": "Interview Scheduled",
     "interviewDateTime": "2026-08-22T05:30:00.000Z",
     "notes": "Auto-scheduled via WhatsApp AI: \"Me kal interview Dene a nhi ska tha to kya mera interview resedule kr skte ho\"",
@@ -211,19 +211,9 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-08-20T08:42:26.350Z",
-    "updatedAt": "2026-08-21T08:37:34.266Z",
-    "lastMessage": "Thank you",
+    "updatedAt": "2026-08-21T10:49:21.900Z",
+    "lastMessage": "manisha meena.pdf",
     "chatHistory": [
-      {
-        "role": "user",
-        "text": "Name Arjun Meena \nRole SEO expert",
-        "timestamp": "2026-08-20T10:38:45.130Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Namaste Arjun Meena ji! 😊\n\nSEO Expert role ke",
-        "timestamp": "2026-08-20T10:38:56.777Z"
-      },
       {
         "role": "user",
         "text": "Interview kb rhega",
@@ -313,7 +303,19 @@
         "role": "assistant",
         "text": "You are most welcome, Arjun! 😊 \n\nWe look forward to meeting you",
         "timestamp": "2026-08-21T08:37:42.131Z"
+      },
+      {
+        "role": "user",
+        "text": "manisha meena.pdf",
+        "timestamp": "2026-08-21T10:49:21.901Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nWelcome to BrandSetu Digital!\n\nWe are actively hiring for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Please share your *Name*, *Role you are applying for*, and your *Resume / Portfolio link* to proceed! 📄💼",
+        "timestamp": "2026-08-21T10:49:23.373Z"
       }
-    ]
+    ],
+    "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1787309361915_manisha_meena.pdf",
+    "resumeUrl": "/uploads/resumes/918357977322_1787309361915_manisha_meena.pdf"
   }
 ]

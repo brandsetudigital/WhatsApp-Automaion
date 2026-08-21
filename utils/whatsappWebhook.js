@@ -76,16 +76,31 @@ function parseWebhookPayload(body) {
     const customerName = contact?.profile?.name || 'Customer';
 
     let messageText = '';
+    let mediaId = null;
+    let mediaFilename = null;
+    let mimeType = null;
+
     if (messageType === 'text') {
       messageText = message.text?.body || '';
     } else if (messageType === 'image') {
       messageText = message.image?.caption || '[Image received]';
+      mediaId = message.image?.id || null;
+      mediaFilename = `image_${Date.now()}.jpg`;
+      mimeType = message.image?.mime_type || 'image/jpeg';
     } else if (messageType === 'document') {
-      messageText = message.document?.caption || '[Document received]';
+      messageText = message.document?.filename || message.document?.caption || '[Document received]';
+      mediaId = message.document?.id || null;
+      mediaFilename = message.document?.filename || `document_${Date.now()}.pdf`;
+      mimeType = message.document?.mime_type || 'application/pdf';
     } else if (messageType === 'video') {
       messageText = message.video?.caption || '[Video received]';
+      mediaId = message.video?.id || null;
+      mediaFilename = `video_${Date.now()}.mp4`;
+      mimeType = message.video?.mime_type || 'video/mp4';
     } else if (messageType === 'audio') {
       messageText = '[Audio message received]';
+      mediaId = message.audio?.id || null;
+      mimeType = message.audio?.mime_type || 'audio/ogg';
     } else if (messageType === 'button') {
       messageText = message.button?.text || '';
     } else if (messageType === 'interactive') {
@@ -100,6 +115,9 @@ function parseWebhookPayload(body) {
       messageType,
       messageText,
       customerName,
+      mediaId,
+      mediaFilename,
+      mimeType,
       timestamp: message.timestamp
     };
   } catch (err) {
