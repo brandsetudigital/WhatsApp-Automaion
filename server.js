@@ -138,26 +138,26 @@ async function processIncomingWhatsAppMessage(messageData) {
       const uniqueFileName = `${candidate.phone}_${Date.now()}_${safeName}`;
       const destPath = path.join(resumesDir, uniqueFileName);
 
+      candidate.resumeReceived = true;
+      candidate.resumeFileName = safeName;
+      candidate.resumePath = destPath;
+      candidate.resumeUrl = `/uploads/resumes/${uniqueFileName}`;
+      if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
+        candidate.status = 'Resume Received';
+      }
+
       console.log(`📥 Downloading candidate media (${messageData.mediaId}) -> ${destPath}...`);
-      whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath)
-        .then(() => {
-          candidate.resumeReceived = true;
-          candidate.resumeFileName = safeName;
-          candidate.resumePath = destPath;
-          candidate.resumeUrl = `/uploads/resumes/${uniqueFileName}`;
-          if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
-            candidate.status = 'Resume Received';
-          }
-          hiringService.saveCandidatesAndSyncExcel();
-          console.log(`✅ Candidate resume file saved: ${uniqueFileName}`);
-          io.emit('log', {
-            type: 'success',
-            text: `📄 Resume saved for ${candidate.name} (+${candidate.phone}): ${safeName}`
-          });
-        })
-        .catch(dlErr => {
-          console.error('Error downloading candidate media:', dlErr.message);
+      try {
+        await whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath);
+        console.log(`✅ Candidate resume file saved: ${uniqueFileName}`);
+        io.emit('log', {
+          type: 'success',
+          text: `📄 Resume saved for ${candidate.name} (+${candidate.phone}): ${safeName}`
         });
+      } catch (dlErr) {
+        console.error('Error downloading candidate media:', dlErr.message);
+      }
+      hiringService.saveCandidatesAndSyncExcel();
     }
   } catch (candErr) {
     console.error('Error tracking candidate from message:', candErr);

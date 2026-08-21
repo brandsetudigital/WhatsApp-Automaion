@@ -381,15 +381,17 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       appendChatHistory(candidate, 'assistant', confirmMsg);
       console.log(`✅ Interview Confirmation sent to candidate ${candidate.name} (+${candidate.phone}) for ${formattedTime} (Rescheduled: ${isRescheduled})`);
       
-      // Also Notify HR Phone
-      const hrPhone = process.env.HR_PHONE_NUMBER || '919329232025';
-      if (hrPhone && hrPhone !== candidate.phone) {
-        try {
-          const hrMsg = `📢 *HR ALERT: ${isRescheduled ? 'Interview Rescheduled' : 'New Interview Scheduled'}* 📅\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *${isRescheduled ? 'New ' : ''}Date & Time:* ${formattedTime}\n📄 *Resume:* ${candidate.resumeReceived ? 'Received (Available)' : 'Pending'}\n🔗 *Portfolio:* ${candidate.portfolio || 'N/A'}\n📝 *Notes:* ${candidate.notes || 'In-Office Interview'}`;
-          await whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg);
-          console.log(`📢 HR Alert sent to +${hrPhone} for scheduled candidate ${candidate.name}`);
-        } catch (hrErr) {
-          console.error(`Error sending HR scheduling alert to +${hrPhone}:`, hrErr.message);
+      // Also Notify HR Phone(s)
+      const hrPhones = (process.env.HR_PHONE_NUMBER || process.env.HR_PHONE_NUMBERS || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
+      for (const hrPhone of hrPhones) {
+        if (hrPhone && cleanPhone(hrPhone) !== cleanPhone(candidate.phone)) {
+          try {
+            const hrMsg = `📢 *HR ALERT: ${isRescheduled ? 'Interview Rescheduled' : 'New Interview Scheduled'}* 📅\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *${isRescheduled ? 'New ' : ''}Date & Time:* ${formattedTime}\n📄 *Resume:* ${candidate.resumeReceived ? 'Received (Available)' : 'Pending'}\n🔗 *Portfolio:* ${candidate.portfolio || 'N/A'}\n📝 *Notes:* ${candidate.notes || 'In-Office Interview'}`;
+            await whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg);
+            console.log(`📢 HR Alert sent to +${hrPhone} for scheduled candidate ${candidate.name}`);
+          } catch (hrErr) {
+            console.error(`Error sending HR scheduling alert to +${hrPhone}:`, hrErr.message);
+          }
         }
       }
 
