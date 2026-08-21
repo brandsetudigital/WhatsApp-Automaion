@@ -24,6 +24,10 @@ function verifyWebhook(req, res) {
   return res.status(400).json({ error: 'Missing hub parameters' });
 }
 
+// Buffer for debouncing rapid consecutive messages from the same user
+const messageBuffers = new Map();
+const DEBOUNCE_WAIT_MS = 1200; // 1.2s delay to collect rapid typing
+
 /**
  * Handle Meta Webhook Event Notifications (POST /api/whatsapp/webhook)
  */
@@ -51,12 +55,37 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
     return;
   }
 
-  // 5. Asynchronously process incoming message
-  if (typeof processIncomingFn === 'function') {
-    processIncomingFn(messageData).catch(err => {
-      console.error('❌ Error processing incoming WhatsApp message:', err.message || err);
+  // 5. Debounce & Batch Rapid Consecutive Messages from the same sender
+  const phone = messageData.customerPhone;
+  if (!messageBuffers.has(phone)) {
+    messageBuffers.set(phone, {
+      texts: [messageData.messageText],
+      lastData: { ...messageData },
+      timer: null
     });
+  } else {
+    const buf = messageBuffers.get(phone);
+    if (buf.timer) clearTimeout(buf.timer);
+    buf.texts.push(messageData.messageText);
+    if (messageData.messageType !== 'text') {
+      buf.lastData = { ...messageData };
+    }
   }
+
+  const userBuf = messageBuffers.get(phone);
+  userBuf.timer = setTimeout(() => {
+    messageBuffers.delete(phone);
+
+    // Combine distinct lines from rapid messages into one clean query
+    const combinedText = userBuf.texts.filter(Boolean).join('\n');
+    userBuf.lastData.messageText = combinedText;
+
+    if (typeof processIncomingFn === 'function') {
+      processIncomingFn(userBuf.lastData).catch(err => {
+        console.error('❌ Error processing incoming WhatsApp message:', err.message || err);
+      });
+    }
+  }, DEBOUNCE_WAIT_MS);
 }
 
 /**

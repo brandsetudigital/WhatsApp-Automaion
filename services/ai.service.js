@@ -119,7 +119,7 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
 
       const response = await axios.post(url, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: options.timeout ?? 15000
+        timeout: options.timeout ?? 3500
       });
 
       const candidates = response.data?.candidates;
@@ -128,8 +128,13 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
         return { text, model };
       }
     } catch (err) {
+      const is429 = err.response?.status === 429;
       const errDetail = err.response?.data?.error?.message || err.message;
       console.warn(`⚠️ Gemini model [${model}] error: ${errDetail}`);
+      if (is429) {
+        // Quota exceeded: fail fast to instant fallback engine without wasting time on subsequent models
+        break;
+      }
     }
   }
   return null;
@@ -268,6 +273,12 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
 
   const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|nahi\s*ho\s*payega)/i;
   if (negationPattern.test(userMessage)) {
+    return null;
+  }
+
+  // Fast pre-filter: Skip LLM call if message has no scheduling/time keywords
+  const scheduleKeywords = /(?:kal|tomorrow|today|aaj|parso|baje|am|pm|interview|schedule|reschedule|monday|tuesday|wednesday|thursday|friday|saturday|sunday|aunga|aungi|aa\s*raha|\b(?:1[0-2]|[1-9])\s*(?:baje|am|pm|o'?clock)?\b)/i;
+  if (!scheduleKeywords.test(userMessage)) {
     return null;
   }
 
@@ -492,6 +503,18 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   }
 }
 
+function cleanAiResponseText(rawText) {
+  if (!rawText) return '';
+  let text = rawText.trim();
+  // Strip markdown code block wrappers
+  text = text.replace(/^```(?:markdown)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  // Strip any prompt reasoning or checklist prefixes like "2 to 4 sentences? Yes", "candidate name without 'ji'? Yes"
+  text = text.replace(/^(?:(?:\d+\s+to\s+\d+|candidate\s+name|rule\s+\d+|check|yes|no|\*|\-|\#|address\s+candidate|sentences?\?)[\s\S]*?\n\n)+/i, '');
+  text = text.replace(/^(?:[A-Za-z0-9\s\?\'\"]+\?\s*Yes(?:\s*\([^\)]*\))?\.?\s*\n*)+/i, '');
+  text = text.replace(/^(?:Yes\s*\([^\)]*\)\.?\s*|No\s*\([^\)]*\)\.?\s*)+/i, '');
+  return text.trim();
+}
+
 /**
  * Generate Dynamic AI Response for Hiring Candidate Conversation
  */
@@ -535,27 +558,11 @@ ${systemInstructions}
 COMPANY INFORMATION & KNOWLEDGE BASE:
 ${aiConfig.knowledgeBase}
 
-CRITICAL RULES FOR HUMAN-LIKE RECRUITER CONVERSATION:
-1. TALK LIKE A REAL HUMAN HR RECRUITER: Sound polite, warm, natural, and helpful. Never sound like a robotic script.
-2. ADDRESS CANDIDATE BY ONLY NAME (NEVER ADD "ji"): Address the candidate naturally by only their name "${candidateSummary.name}" without adding "ji" (e.g., "Hello ${candidateSummary.name}!" or "Namaste ${candidateSummary.name}!"). Strictly do NOT append "ji" after their name.
-3. DIRECT ANSWER FIRST: If the candidate asks ANY question (e.g. salary, timings, office address, interview rounds, tools, eligibility, experience, work from home), answer THAT specific question directly, clearly, and concisely (1 to 3 sentences).
-4. SALARY RULE: If asked about salary, state that salary is completely negotiable and decided based on their in-person practical test, skills, and experience during the in-person interview.
-5. PREVENT REPETITION & STATE AWARENESS:
-   - If candidate's role is already "${candidateSummary.role}" (NOT Unknown), DO NOT ask them which role they are applying for!
-   - If Resume/Portfolio is already "${candidateSummary.resumeReceived}", DO NOT ask for their resume again! Instead, invite them to visit for an interview.
-   - If Interview is already "${candidateSummary.interviewScheduled}", do NOT ask them to schedule again; acknowledge warmly.
-   - If the candidate provided their Name/Role, acknowledge it and politely ask for their Resume/Portfolio or next step.
-   - NEVER repeat the full welcome message if the user has already messaged previously.
-6. LANGUAGE MATCHING:
-   - If candidate speaks in Hindi/Hinglish (e.g. "kaha aana h", "salary kitni h", "kal aa jaunga"), reply in natural, polite Hinglish.
-   - If candidate speaks in English, reply in crisp, professional English.
-7. FORMATTING: Keep it brief (2 to 4 lines), structured with clean line breaks and relevant emojis (😊, 📄, 💼, 📍).
-
 CANDIDATE CONTEXT:
-- Name: ${candidateSummary.name}
+- Candidate Name: ${candidateSummary.name}
 - Role Applied: ${candidateSummary.role}
-- Resume / Portfolio Status: ${candidateSummary.resumeReceived}
-- Interview Status: ${candidateSummary.interviewScheduled}
+- Resume / Portfolio: ${candidateSummary.resumeReceived}
+- Interview: ${candidateSummary.interviewScheduled}
 
 RECENT CHAT HISTORY:
 ${historyLines ? historyLines : '(Start of chat)'}
@@ -563,16 +570,27 @@ ${historyLines ? historyLines : '(Start of chat)'}
 LATEST CANDIDATE MESSAGE:
 "${userMessage}"
 
-Reply directly as HR Assistant:
+STRICT INSTRUCTIONS:
+1. Speak warmly and helpfully as the HR coordinator. Greet by name without adding "ji" (e.g. "Hello ${candidateSummary.name}!").
+2. Answer candidate's questions directly in 2 to 4 crisp lines with proper emojis.
+3. If candidate specified or applies for a role (SEO Expert / Video Editor), acknowledge it and ask for their Resume (PDF) or Portfolio link to schedule their interview.
+4. If candidate provided Resume/Portfolio or confirms availability, invite them to visit our Indore office for an in-person interview (Mon-Sat, 10 AM - 6 PM).
+5. If salary is asked, explain it is negotiable based on skills & interview test.
+6. OUTPUT ONLY the final WhatsApp message directly. Do NOT include any reasoning, checklist, verification notes, or extra meta-text.
+
+Direct WhatsApp Message:
 `;
 
   // 1. Call Gemini AI with active modern models
   if (rawKey && rawKey.trim() !== '') {
     try {
-      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.65, maxTokens: 400 });
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 350 });
       if (result && result.text) {
-        console.log(`✨ [Gemini AI (${result.model})] Generated response for ${candidateSummary.name} (+${candidate.phone})`);
-        return result.text;
+        const cleanedText = cleanAiResponseText(result.text);
+        if (cleanedText.length > 5) {
+          console.log(`✨ [Gemini AI (${result.model})] Generated response for ${candidateSummary.name} (+${candidate.phone})`);
+          return cleanedText;
+        }
       }
     } catch (err) {
       console.warn('Gemini API call error:', err.message);
