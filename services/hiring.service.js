@@ -19,9 +19,22 @@ function setHiringIo(io) {
 function loadCandidates() {
   if (fs.existsSync(CANDIDATES_JSON_FILE)) {
     try {
-      const data = JSON.parse(fs.readFileSync(CANDIDATES_JSON_FILE, 'utf8'));
-      if (Array.isArray(data)) {
-        candidates = data;
+      const data = fs.readFileSync(CANDIDATES_JSON_FILE, 'utf8');
+      const loaded = JSON.parse(data);
+      if (Array.isArray(loaded)) {
+        candidates = loaded.filter(c => {
+          const name = (c.name || '').trim().toLowerCase();
+          if (name === 'candidate' || name === 'customer' || name === '') return false;
+          if (name.includes('dainik bhaskar') || name.includes('news') || name.includes('bct consulting') || name.includes('web developer')) return false;
+          if (['ritz', 'bhumi', 'abhi', 'sunshine ✨', 'manuuu😎', 'ultramodern technologies pvt ltd', 'rounak jain', 'rahul indore', 'priyanshu', 'viney dubey hr'].includes(name)) return false;
+          return true;
+        });
+
+        candidates.forEach(candidate => {
+          if (candidate.unreadCount === undefined) {
+            candidate.unreadCount = (candidate.chatHistory || []).some(message => message.role === 'user') ? 1 : 0;
+          }
+        });
       }
     } catch (err) {
       console.error('Error reading candidates_data.json:', err);
@@ -179,6 +192,10 @@ function appendChatHistory(candidate, role, text) {
     timestamp: new Date().toISOString()
   });
 
+  if (role === 'user') {
+    candidate.unreadCount = (Number(candidate.unreadCount) || 0) + 1;
+  }
+
   // Keep last 20 messages for memory efficiency
   if (candidate.chatHistory.length > 20) {
     candidate.chatHistory = candidate.chatHistory.slice(-20);
@@ -209,7 +226,7 @@ function trackCandidateFromMessage(messageData) {
   const lower = text.toLowerCase().trim();
   const msgType = messageData.messageType;
 
-  let candidate = candidates.find(c => c.phone === phone);
+  let candidate = candidates.find(c => c.whatsappChatId === messageData.chatId || c.phone === phone);
   const nowIso = new Date().toISOString();
 
   // Extract drive / portfolio / doc link if present
@@ -238,12 +255,41 @@ function trackCandidateFromMessage(messageData) {
 
   const hasResumeSignal = hasValidDocumentUpload || hasPortfolioLink;
 
-  // Detect role
+  // Detect role from 6 active job ad openings (handles numbers 1-6 or role keywords)
+  const cleanTrimmed = lower.replace(/[^\w\s]/g, '').trim();
   let detectedRole = null;
-  if (lower.includes('seo') || lower.includes('search engine') || lower.includes('ranking') || lower.includes('on-page') || lower.includes('off-page')) {
-    detectedRole = 'SEO Expert';
-  } else if (lower.includes('video') || lower.includes('editor') || lower.includes('reels') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
+
+  if (cleanTrimmed === '1' || cleanTrimmed.startsWith('1 ') || lower.includes('video editor') || lower.includes('video editing') || lower.includes('reels edit') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
     detectedRole = 'Video Editor';
+  } else if (cleanTrimmed === '2' || cleanTrimmed.startsWith('2 ') || lower.includes('ai video') || lower.includes('ai reels') || lower.includes('runway') || lower.includes('kling') || lower.includes('midjourney') || lower.includes('pika') || lower.includes('heygen')) {
+    detectedRole = 'AI Video Expert';
+  } else if (cleanTrimmed === '3' || cleanTrimmed.startsWith('3 ') || lower.includes('graphic') || lower.includes('designer') || lower.includes('designing') || lower.includes('photoshop') || lower.includes('illustrator') || lower.includes('figma') || lower.includes('canva')) {
+    detectedRole = 'Graphic Designer';
+  } else if (cleanTrimmed === '4' || cleanTrimmed.startsWith('4 ') || lower.includes('seo') || lower.includes('aeo') || lower.includes('search engine') || lower.includes('ranking') || lower.includes('backlink')) {
+    detectedRole = 'SEO & AEO Expert';
+  } else if (cleanTrimmed === '5' || cleanTrimmed.startsWith('5 ') || lower.includes('social media') || lower.includes('smm') || lower.includes('instagram manager') || lower.includes('social manager')) {
+    detectedRole = 'Social Media Manager';
+  } else if (cleanTrimmed === '6' || cleanTrimmed.startsWith('6 ') || lower.includes('digital marketing') || lower.includes('performance marketing') || lower.includes('meta ads') || lower.includes('facebook ads') || lower.includes('google ads') || lower.includes('media buyer')) {
+    detectedRole = 'Digital Marketing Manager';
+  }
+
+  // Detect Experience / Fresher status
+  let detectedExperience = null;
+  const isFresherOrIntern = lower.includes('fresher') || lower.includes('freshor') || lower.includes('internship') || lower.includes('intern') || lower.includes('no experience') || lower.includes('learning');
+  const isFullTimeOrExp = lower.includes('full time') || lower.includes('full-time') || lower.includes('fulltime') || lower.includes('experienced') || lower.includes('experience');
+
+  const expMatch = text.match(/(\d+(?:\.\d+)?\s*(?:year|yr|saal|month|mahine|yrs|mths)\b(?:[^\n,]*experience)?)/i) ||
+                   text.match(/(?:experience|exp|experience:)\s*(\d+(?:\.\d+)?(?:\s*(?:year|yr|saal|month|mahine|yrs|mths))?)/i) ||
+                   text.match(/^\s*(\d+(?:\.\d+)?)\s*$/m);
+
+  if (isFresherOrIntern) {
+    detectedExperience = 'Fresher (Paid Internship)';
+  } else if (expMatch) {
+    const rawExp = expMatch[1] || expMatch[0];
+    const formattedExp = (rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`;
+    detectedExperience = isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp;
+  } else if (isFullTimeOrExp) {
+    detectedExperience = 'Experienced (Full-Time)';
   }
 
   // Detect Candidate Name if sent in message (e.g. "My name is Arjun", "Mera naam Arjun hai", "I am Arjun Meena", "Name: Arjun")
@@ -275,9 +321,11 @@ function trackCandidateFromMessage(messageData) {
   const initialName = extractedName || validProfileName || 'Candidate';
 
   if (!candidate) {
+    if (!text && !hasValidDocumentUpload) return null;
     candidate = {
       id: `cand_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       phone: phone,
+      whatsappChatId: messageData.chatId || null,
       name: initialName,
       role: detectedRole || 'General Applicant',
       city: 'Indore',
@@ -302,6 +350,7 @@ function trackCandidateFromMessage(messageData) {
     console.log(`📋 New Candidate Registered: ${candidate.name} (+${candidate.phone}) for ${candidate.role}`);
   } else {
     // Update existing candidate
+    if (messageData.chatId) candidate.whatsappChatId = messageData.chatId;
     candidate.updatedAt = nowIso;
     candidate.lastMessage = text;
     appendChatHistory(candidate, 'user', text);
@@ -316,6 +365,10 @@ function trackCandidateFromMessage(messageData) {
       candidate.role = detectedRole;
     }
 
+    if (detectedExperience && (!candidate.experience || candidate.experience === '')) {
+      candidate.experience = detectedExperience;
+    }
+
     if (extractedLink) {
       candidate.portfolio = extractedLink;
     }
@@ -328,8 +381,30 @@ function trackCandidateFromMessage(messageData) {
       }
       console.log(`📄 Resume / Portfolio Received from candidate: ${candidate.name} (+${candidate.phone})`);
     }
+
+    // Move candidate with latest message to the top of the pipeline list
+    const candIdx = candidates.findIndex(c => c.id === candidate.id);
+    if (candIdx > 0) {
+      candidates.splice(candIdx, 1);
+      candidates.unshift(candidate);
+    }
   }
 
+  saveCandidatesAndSyncExcel();
+  return candidate;
+}
+
+/**
+ * Mark all incoming messages for a candidate as read.
+ */
+function markCandidateMessagesRead(candidateId) {
+  const candidate = candidates.find(c => c.id === candidateId || c.phone === cleanPhone(candidateId));
+  if (!candidate) {
+    throw new Error('Candidate not found');
+  }
+
+  candidate.unreadCount = 0;
+  candidate.updatedAt = new Date().toISOString();
   saveCandidatesAndSyncExcel();
   return candidate;
 }
@@ -377,7 +452,8 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
         ? `Dear ${candidate.name}! 🔄\n\nYour interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
         : `Dear ${candidate.name}! 🎉\n\nYour interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
 
-      await whatsappCloudService.sendWhatsAppText(candidate.phone, confirmMsg);
+      const candidateRecipient = candidate.whatsappChatId || candidate.phone;
+      await whatsappCloudService.sendWhatsAppText(candidateRecipient, confirmMsg);
       appendChatHistory(candidate, 'assistant', confirmMsg);
       console.log(`✅ Interview Confirmation sent to candidate ${candidate.name} (+${candidate.phone}) for ${formattedTime} (Rescheduled: ${isRescheduled})`);
       
@@ -386,7 +462,7 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       for (const hrPhone of hrPhones) {
         if (hrPhone && cleanPhone(hrPhone) !== cleanPhone(candidate.phone)) {
           try {
-            const hrMsg = `📢 *HR ALERT: ${isRescheduled ? 'Interview Rescheduled' : 'New Interview Scheduled'}* 📅\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *${isRescheduled ? 'New ' : ''}Date & Time:* ${formattedTime}\n📄 *Resume:* ${candidate.resumeReceived ? 'Received (Available)' : 'Pending'}\n🔗 *Portfolio:* ${candidate.portfolio || 'N/A'}\n📝 *Notes:* ${candidate.notes || 'In-Office Interview'}`;
+            const hrMsg = `📢 *HR ALERT: ${isRescheduled ? 'Interview Rescheduled' : 'Naya Interview Schedule Hua Hai!'}* 📅\n\n👤 *Candidate Name:* ${candidate.name}\n💼 *Role Applied:* ${candidate.role}\n📞 *Candidate Phone:* +${candidate.phone}\n🕒 *Scheduled Date & Time:* ${formattedTime}\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n🔗 *Portfolio:* ${candidate.portfolio || 'N/A'}\n\n👉 Kripya is time par candidate ke interview ke liye available rahein. 👍`;
             await whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg);
             console.log(`📢 HR Alert sent to +${hrPhone} for scheduled candidate ${candidate.name}`);
           } catch (hrErr) {
@@ -418,7 +494,8 @@ async function sendResumeReminder(candidateId) {
 
   const reminderText = `Hello ${candidate.name}! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *${candidate.role || 'Job'}* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)`;
 
-  await whatsappCloudService.sendWhatsAppText(candidate.phone, reminderText);
+  const candidateRecipient = candidate.whatsappChatId || candidate.phone;
+  await whatsappCloudService.sendWhatsAppText(candidateRecipient, reminderText);
   appendChatHistory(candidate, 'assistant', reminderText);
   candidate.resumeReminderSent = true;
   candidate.resumeReminderSentAt = new Date().toISOString();
@@ -444,27 +521,34 @@ async function sendInterview1HrReminder(candidate) {
     const interviewDate = new Date(candidate.interviewDateTime);
     const formattedTime = interviewDate.toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
     });
 
-    // 1. Send Reminder to Candidate (in English)
-    const candidateReminderMsg = `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nThis is a quick reminder that your interview for the *${candidate.role}* position is scheduled today at *${formattedTime}* at the BrandSetu Digital office.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\nPlease arrive on time. For location assistance, call/WhatsApp: +91 9329232025. 👍\n\nSee you soon!\n- HR Team, BrandSetu Digital`;
+    // 1. Send Reminder to Candidate
+    const candidateReminderMsg = `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye interview scheduled hai at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Kya aap interview ke liye office aa rahe hain? Kripya confirm karein. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital`;
 
-    await whatsappCloudService.sendWhatsAppText(candidate.phone, candidateReminderMsg);
+    const candidateRecipient = candidate.whatsappChatId || candidate.phone;
+    await whatsappCloudService.sendWhatsAppText(candidateRecipient, candidateReminderMsg);
     appendChatHistory(candidate, 'assistant', candidateReminderMsg);
     console.log(`🔔 1-Hour Interview Reminder sent to candidate ${candidate.name} (+${candidate.phone})`);
 
     // 2. Send Alert Notification to HR (1 Hour Before)
-    const hrPhone = process.env.HR_PHONE_NUMBER || '919329232025';
-    try {
-      const hrAlertMsg = `🔔 *HR ALERT: Interview in 1 Hour!* ⏰\n\nInterview scheduled today at *${formattedTime}*:\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Interview Time:* ${formattedTime}\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n🔗 *Portfolio/Work:* ${candidate.portfolio || 'N/A'}\n📝 *Notes:* ${candidate.notes || 'In-Office'}`;
-
-      await whatsappCloudService.sendWhatsAppText(hrPhone, hrAlertMsg);
-      console.log(`📢 1-Hour HR Alert dispatched to HR (+${hrPhone}) for candidate ${candidate.name}`);
-    } catch (hrErr) {
-      console.error(`Error sending 1-hr alert to HR (+${hrPhone}):`, hrErr.message);
+    const hrPhones = (process.env.HR_PHONE_NUMBER || process.env.HR_PHONE_NUMBERS || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
+    for (const hrPhone of hrPhones) {
+      if (hrPhone && cleanPhone(hrPhone) !== cleanPhone(candidate.phone)) {
+        try {
+          const hrAlertMsg = `🔔 *HR ALERT: Candidate Interview in 1 Hour!* ⏰\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Interview Time:* ${formattedTime}\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore\n\n👉 Kripya interview assessment setup ready rakhein.`;
+          await whatsappCloudService.sendWhatsAppText(hrPhone, hrAlertMsg);
+          console.log(`📢 1-Hour HR Alert dispatched to HR (+${hrPhone}) for candidate ${candidate.name}`);
+        } catch (hrErr) {
+          console.error(`Error sending 1-hr alert to HR (+${hrPhone}):`, hrErr.message);
+        }
+      }
     }
 
     candidate.interviewReminderSent = true;
@@ -475,7 +559,7 @@ async function sendInterview1HrReminder(candidate) {
     if (ioInstance) {
       ioInstance.emit('log', {
         type: 'success',
-        text: `🔔 1-Hour Interview Alert sent to Candidate (+${candidate.phone}) & HR (+${hrPhone}) for ${formattedTime}`
+        text: `🔔 1-Hour Interview Alert sent to Candidate (+${candidate.phone}) for ${formattedTime}`
       });
     }
   } catch (err) {
@@ -522,6 +606,9 @@ function runHiringAutomationCheck() {
     }
   });
 }
+
+// Start Background Automation Scheduler (runs every 60 seconds)
+setInterval(runHiringAutomationCheck, 60 * 1000);
 
 /**
  * Check if the sender is an authorized HR / Admin phone number
@@ -629,18 +716,67 @@ async function handleHrWhatsAppCommand(senderPhone, messageText) {
   return null;
 }
 
+/**
+ * Send custom message to candidate via WhatsApp and record in history
+ */
+async function sendMessageToCandidate(candidateId, messageText) {
+  const candidate = candidates.find(c => c.id === candidateId || c.phone === cleanPhone(candidateId));
+  if (!candidate) {
+    throw new Error('Candidate not found');
+  }
+
+  const cleanText = String(messageText || '').trim();
+  if (!cleanText) {
+    throw new Error('Message text cannot be empty');
+  }
+
+  const res = await whatsappCloudService.sendWhatsAppText(candidate.whatsappChatId || candidate.phone, cleanText);
+  appendChatHistory(candidate, 'assistant', cleanText);
+  candidate.updatedAt = new Date().toISOString();
+  saveCandidatesAndSyncExcel();
+
+  if (ioInstance) {
+    ioInstance.emit('hiring-updated', {
+      candidates: candidates,
+      candidateId: candidate.id,
+      candidate: candidate,
+      newMessage: {
+        role: 'assistant',
+        text: cleanText,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+
+  return { candidate, message: cleanText, res };
+}
+
 module.exports = {
   setHiringIo,
   loadCandidates,
-  getCandidates: () => candidates,
+  getCandidates: () => {
+    return [...candidates].sort((a, b) => {
+      const getLatestTime = (cand) => {
+        if (cand.chatHistory && cand.chatHistory.length > 0) {
+          const last = cand.chatHistory[cand.chatHistory.length - 1];
+          if (last.timestamp) return new Date(last.timestamp).getTime();
+        }
+        return new Date(cand.updatedAt || cand.createdAt || 0).getTime();
+      };
+      return getLatestTime(b) - getLatestTime(a);
+    });
+  },
   getHiringStats,
   saveCandidatesAndSyncExcel,
   trackCandidateFromMessage,
   appendChatHistory,
+  markCandidateMessagesRead,
   scheduleInterview,
   sendResumeReminder,
   sendInterview1HrReminder,
   getCandidateDisplayName,
   handleHrWhatsAppCommand,
+  sendMessageToCandidate,
   CANDIDATES_EXCEL_FILE
 };
+

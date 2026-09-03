@@ -11,6 +11,16 @@ function getCandidates(req, res) {
   }
 }
 
+function markCandidateMessagesRead(req, res) {
+  try {
+    const candidate = hiringService.markCandidateMessagesRead(req.params.id);
+    res.json({ success: true, candidate });
+  } catch (err) {
+    const status = err.message === 'Candidate not found' ? 404 : 500;
+    res.status(status).json({ success: false, error: err.message });
+  }
+}
+
 async function scheduleCandidateInterview(req, res) {
   try {
     const { candidateId, interviewDateTime, role, notes, sendInstantConfirmation } = req.body;
@@ -141,12 +151,29 @@ function exportExcel(req, res) {
   }
 }
 
+async function sendCandidateMessage(req, res) {
+  try {
+    const { candidateId, message } = req.body;
+    if (!candidateId || !message) {
+      return res.status(400).json({ success: false, error: 'Candidate ID and message are required' });
+    }
+
+    const result = await hiringService.sendMessageToCandidate(candidateId, message);
+    res.json({ success: true, message: 'Message sent successfully via WhatsApp!', candidate: result.candidate });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 module.exports = {
   getCandidates,
+  markCandidateMessagesRead,
   scheduleCandidateInterview,
   sendCandidateReminder,
+  sendCandidateMessage,
   updateCandidate,
   createCandidate,
   deleteCandidate,
   exportExcel
 };
+

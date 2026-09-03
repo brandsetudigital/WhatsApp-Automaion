@@ -1,5 +1,6 @@
 const { verifyWebhookSignature, parseWebhookPayload, isDuplicateMessage } = require('../utils/whatsappWebhook');
 const whatsappCloudService = require('../services/whatsappCloud.service');
+const whatsappWebService = require('../services/whatsappWeb.service');
 
 /**
  * Handle Meta Webhook Verification (GET /api/whatsapp/webhook)
@@ -60,7 +61,7 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
   if (!messageBuffers.has(phone)) {
     messageBuffers.set(phone, {
       texts: [messageData.messageText],
-      lastData: { ...messageData },
+      lastData: { ...messageData, source: 'meta' },
       timer: null
     });
   } else {
@@ -93,6 +94,9 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
  */
 async function getWhatsAppStatus(req, res) {
   try {
+    if ((process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web') {
+      return res.json({ success: true, ...whatsappWebService.getStatus() });
+    }
     const health = await whatsappCloudService.checkMetaHealth();
     const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
     const maskedPhoneId = phoneId ? `${phoneId.substring(0, 4)}...${phoneId.substring(phoneId.length - 4)}` : '';

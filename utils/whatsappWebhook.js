@@ -109,15 +109,32 @@ function parseWebhookPayload(body) {
       messageText = `[${messageType} message received]`;
     }
 
+    // Extract Instagram / Facebook Ad Referral data if user came from Ad click
+    const referral = message.referral;
+    let referralData = null;
+    if (referral) {
+      referralData = {
+        headline: referral.headline || '',
+        body: referral.body || '',
+        sourceType: referral.source_type || 'ad',
+        sourceUrl: referral.source_url || '',
+        imageUrl: referral.image_url || ''
+      };
+      if (!messageText || messageText === '[Image received]' || messageText === '""') {
+        messageText = referral.headline || 'Apply';
+      }
+    }
+
     return {
       customerPhone,
       messageId,
       messageType,
-      messageText,
+      messageText: messageText.trim(),
       customerName,
       mediaId,
       mediaFilename,
       mimeType,
+      referral: referralData,
       timestamp: message.timestamp
     };
   } catch (err) {

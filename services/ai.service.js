@@ -8,8 +8,8 @@ let aiConfig = {
   enabled: true,
   apiKey: process.env.GEMINI_API_KEY || '',
   provider: 'gemini',
-  businessName: 'BrandSetu Digital - HR & Recruitment',
-  businessDescription: 'BrandSetu Digital is hiring talented professionals for SEO Expert and Video Editor roles for our Indore office.',
+  businessName: 'Brand Setu Digital - HR & Recruitment',
+  businessDescription: 'Brand Setu Digital is hiring for 6 active roles: Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, and Digital Marketing Manager for our Indore office.',
   knowledgeBase: '',
   systemPrompt: ''
 };
@@ -98,8 +98,7 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
   const candidateModels = [
     'gemini-3.6-flash',
     'gemini-3.7-flash',
-    'gemini-3.5-flash',
-    'gemini-flash-latest'
+    'gemini-3.5-flash'
   ];
 
   for (const model of candidateModels) {
@@ -119,7 +118,7 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
 
       const response = await axios.post(url, payload, {
         headers: { 'Content-Type': 'application/json' },
-        timeout: options.timeout ?? 3500
+        timeout: options.timeout ?? 10000
       });
 
       const candidates = response.data?.candidates;
@@ -132,7 +131,7 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
       const errDetail = err.response?.data?.error?.message || err.message;
       console.warn(`⚠️ Gemini model [${model}] error: ${errDetail}`);
       if (is429) {
-        // Quota exceeded: fail fast to instant fallback engine without wasting time on subsequent models
+        // Quota exceeded: fail fast to instant fallback engine
         break;
       }
     }
@@ -161,16 +160,19 @@ function parseInterviewScheduleLocal(userMessage) {
   const rawText = String(userMessage).trim();
   const text = rawText.toLowerCase();
 
-  // 1. Check for general questions that shouldn't trigger automatic scheduling
-  if (text.includes('timing') || text.includes('salary') || text.includes('address') || text.includes('kaha') || text.includes('where') || text.includes('package') || text.includes('tool') || text.includes('skill')) {
-    return null;
+  // 1. Filter out non-scheduling queries (salary, experience, portfolio, general questions)
+  if (text.includes('timing') || text.includes('salary') || text.includes('address') || text.includes('kaha') || text.includes('where') || text.includes('package') || text.includes('tool') || text.includes('skill') || text.includes('exp') || text.includes('year') || text.includes('portfolio') || text.includes('resume')) {
+    // Only proceed if explicit scheduling verb is present
+    if (!text.includes('aa sakta') && !text.includes('aa jaunga') && !text.includes('aunga') && !text.includes('aungi') && !text.includes('reschedule') && !text.includes('visit kar')) {
+      return null;
+    }
   }
 
   // 2. Detect Negation (e.g. "kal nahi aa sakta", "cannot come tomorrow", "sry i not coming", "cancel")
   const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|nahi\s*ho\s*payega)/i;
   const hasNegation = negationPattern.test(text);
 
-  // 3. Determine working text: if there's negation with reschedule clause (e.g. "not coming tomorrow, reschedule today 5 pm")
+  // 3. Determine working text: if there's negation with reschedule clause
   let schedulingText = text;
   if (hasNegation) {
     const rescheduleMatch = text.match(/(?:reschedule|shift|instead|naya\s*time|dusre\s*din|phir|ab)\s*(?:my\s*interview|to|for|ko)?\s*(.*)/i);
@@ -186,9 +188,13 @@ function parseInterviewScheduleLocal(userMessage) {
     }
   }
 
-  // 4. Must have time or day indicator
-  const hasTimeIndicator = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'clock)?\b|\btomorrow\b|\bkal\b|\baaj\b|\btoday\b|\bmonday\b|\btuesday\b|\bwednesday\b|\bthursday\b|\bfriday\b|\bsaturday\b)/i.test(schedulingText);
-  if (!hasTimeIndicator) return null;
+  // 4. Must have day indicator OR explicit time keyword (am/pm/baje)
+  const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
+  const hasExplicitTimeModifier = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(schedulingText);
+
+  if (!hasDayIndicator && !hasExplicitTimeModifier) {
+    return null;
+  }
 
   const now = new Date();
   const istOffsetMs = 5.5 * 60 * 60 * 1000;
@@ -360,22 +366,21 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 1. OTHER ROLE CHECK (e.g. Website Developer, Graphic Designer, Content Writer, etc.)
-  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|graphic|designer|ui\s*\/?\s*ux|content|writer|telecaller|caller|calling|sales|bpo|receptionist|accountant|marketing|digital\s*marketing)/i;
-  const isOtherRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('video') && !text.includes('editor');
+  // 1. OTHER ROLE CHECK (Roles not in current 6 active openings e.g. Website Developer, Telecaller, Accountant, etc.)
+  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|telecaller|caller|calling|sales|bpo|receptionist|accountant|data\s*entry)/i;
+  const isExcludedRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media') && !text.includes('digital marketing');
 
-  if (isOtherRole) {
+  if (isExcludedRole) {
     let mentionedRole = 'this role';
     if (text.includes('web') || text.includes('developer')) mentionedRole = 'Website Developer';
-    else if (text.includes('graphic') || text.includes('designer')) mentionedRole = 'Graphic Designer';
     else if (text.includes('content') || text.includes('writer')) mentionedRole = 'Content Writer';
     else if (text.includes('telecaller') || text.includes('caller')) mentionedRole = 'Telecaller';
     else if (text.includes('accountant')) mentionedRole = 'Accountant';
 
     if (isHinglish) {
-      return `${greetingHi}\n\nFilhal BrandSetu Digital me sirf 1️⃣ *SEO Expert* aur 2️⃣ *Video Editor* (In-Office, Indore) ke liye hiring chal rahi hai.\n\nAbhi hamare paas *${mentionedRole}* ke liye vacancy open nahi hai. Humne aapki profile note kar li hai, future me vacancy aane par hum aapse zaroor contact karenge. 👍✨`;
+      return `${greetingHi}\n\nFilhal Brand Setu Digital me in 6 active roles ke liye hiring chal rahi hai:\n🎬 1. Video Editor (5 Openings)\n🤖 2. AI Video Expert (3 Openings)\n🎨 3. Graphic Designer (2 Openings)\n🔎 4. SEO & AEO Expert (2 Openings)\n📱 5. Social Media Manager (6 Openings)\n📢 6. Digital Marketing Manager (3 Openings)\n\nAbhi hamare paas *${mentionedRole}* ke liye vacancy open nahi hai. Humne aapki details note kar li hain, future opening aane par contact karenge! 👍✨`;
     } else {
-      return `${greetingEn}\n\nCurrently, BrandSetu Digital is actively hiring ONLY for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor* (In-Office, Indore)\n\nWe do not have active openings for *${mentionedRole}* at the moment. We have saved your details on file and will reach out to you if a relevant position opens up in the future! 👍✨`;
+      return `${greetingEn}\n\nCurrently, Brand Setu Digital is actively hiring for these 6 positions:\n🎬 1. Video Editor (5 Openings)\n🤖 2. AI Video Expert (3 Openings)\n🎨 3. Graphic Designer (2 Openings)\n🔎 4. SEO & AEO Expert (2 Openings)\n📱 5. Social Media Manager (6 Openings)\n📢 6. Digital Marketing Manager (3 Openings)\n\nWe do not have active openings for *${mentionedRole}* at the moment. We have saved your profile on file for future opportunities! 👍✨`;
     }
   }
 
@@ -391,6 +396,7 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     text.includes('docs.google.com') ||
     text.includes('behance.net') ||
     text.includes('github.com') ||
+    text.includes('dribbble.com') ||
     text.includes('bhej diya') ||
     text.includes('share kar diya') ||
     text.includes('sent') ||
@@ -417,29 +423,60 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 4. TARGET ROLE SELECTION (SEO Expert / Video Editor)
-  const isSeo = text.includes('seo') || text.includes('search engine') || text.includes('ranking');
-  const isVideo = text.includes('video') || text.includes('editor') || text.includes('editing') || text.includes('reels');
+  // 4. TARGET ROLE SELECTION (Matches any of the 6 Active Roles)
+  const isAiVideo = text.includes('ai video') || text.includes('ai reels') || text.includes('runway') || text.includes('kling') || text.includes('midjourney') || text.includes('pika') || (text.includes('ai') && text.includes('video'));
+  const isVideo = !isAiVideo && (text.includes('video') || text.includes('editor') || text.includes('editing') || text.includes('reels') || text.includes('premiere') || text.includes('davinci'));
+  const isGraphic = text.includes('graphic') || text.includes('designer') || text.includes('designing') || text.includes('photoshop') || text.includes('illustrator') || text.includes('figma') || text.includes('canva');
+  const isSeo = text.includes('seo') || text.includes('aeo') || text.includes('search engine') || text.includes('ranking') || text.includes('on-page') || text.includes('off-page');
+  const isSmm = text.includes('social media') || text.includes('smm') || text.includes('instagram manager') || text.includes('content manager');
+  const isDigital = text.includes('digital marketing') || text.includes('performance marketing') || text.includes('meta ads') || text.includes('google ads') || text.includes('media buyer');
 
-  if (isSeo || isVideo) {
-    const roleName = isVideo ? 'Video Editor' : 'SEO Expert';
+  if (isAiVideo) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *AI Video Expert* (3 Vacancies) ke liye apply karne ke liye shukriya! 🤖✨\n\nKripya apna updated *Resume (PDF)* aur apne create kiye hue AI video samples / Drive link yahan share karein taaki hum interview schedule kar sakein. 📄🎥`
+      : `${greetingEn}\nThank you for applying for the *AI Video Expert* (3 Vacancies) role at Brand Setu Digital! 🤖✨\n\nPlease share your updated *Resume (PDF)* and your AI video work samples / Drive link here so we can schedule your in-person interview. 📄🎥`;
+  }
+
+  if (isVideo) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *Video Editor* (5 Vacancies) ke liye apply karne ke liye shukriya! 🎬✨\n\nKripya apna updated *Resume (PDF)* aur Video Portfolio/Drive link yahan share karein taaki hum interview schedule kar sakein. 📄🎥`
+      : `${greetingEn}\nThank you for applying for the *Video Editor* (5 Vacancies) role at Brand Setu Digital! 🎬✨\n\nPlease share your updated *Resume (PDF)* and Video Portfolio/Drive link here so we can schedule your in-person interview. 📄🎥`;
+  }
+
+  if (isGraphic) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *Graphic Designer* (2 Vacancies) ke liye apply karne ke liye shukriya! 🎨✨\n\nKripya apna updated *Resume (PDF)* aur Graphic Design Portfolio (Behance / Drive link) yahan share karein taaki hum interview schedule kar sakein. 📄🎨`
+      : `${greetingEn}\nThank you for applying for the *Graphic Designer* (2 Vacancies) role at Brand Setu Digital! 🎨✨\n\nPlease share your updated *Resume (PDF)* and Graphic Design Portfolio (Behance / Drive link) here so we can schedule your in-person interview. 📄🎨`;
+  }
+
+  if (isSeo) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *SEO & AEO Expert* (2 Vacancies) ke liye apply karne ke liye shukriya! 🔎✨\n\nKripya apna updated *Resume (PDF)* aur SEO case studies / live rankings proof yahan share karein taaki hum interview schedule kar sakein. 📄📊`
+      : `${greetingEn}\nThank you for applying for the *SEO & AEO Expert* (2 Vacancies) role at Brand Setu Digital! 🔎✨\n\nPlease share your updated *Resume (PDF)* and SEO case studies / ranking samples here so we can schedule your in-person interview. 📄📊`;
+  }
+
+  if (isSmm) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *Social Media Manager* (6 Vacancies) ke liye apply karne ke liye shukriya! 📱✨\n\nKripya apna updated *Resume (PDF)* aur past managed social media profiles / growth portfolio share karein taaki hum interview schedule kar sakein. 📄🚀`
+      : `${greetingEn}\nThank you for applying for the *Social Media Manager* (6 Vacancies) role at Brand Setu Digital! 📱✨\n\nPlease share your updated *Resume (PDF)* and past managed social media handles / growth portfolio here so we can schedule your in-person interview. 📄🚀`;
+  }
+
+  if (isDigital) {
+    return isHinglish
+      ? `${greetingHi}\nBrand Setu Digital me *Digital Marketing Manager* (3 Vacancies) ke liye apply karne ke liye shukriya! 📢✨\n\nKripya apna updated *Resume (PDF)* aur Ad Campaign / ROAS case studies yahan share karein taaki hum interview schedule kar sakein. 📄💼`
+      : `${greetingEn}\nThank you for applying for the *Digital Marketing Manager* (3 Vacancies) role at Brand Setu Digital! 📢✨\n\nPlease share your updated *Resume (PDF)* and Ad Campaign / ROAS case studies here so we can schedule your in-person interview. 📄💼`;
+  }
+
+  // 1. FAQ: SALARY / STIPEND / PAID INTERNSHIP QUESTIONS
+  if (text.includes('salary') || text.includes('package') || text.includes('kitna milega') || text.includes('ctc') || text.includes('stipend') || text.includes('paise') || text.includes('per month') || text.includes('pay') || text.includes('internship') || text.includes('certificate')) {
     if (isHinglish) {
-      return `${greetingHi}\n\nBrandSetu Digital me *${roleName}* post ke liye apply karne ke liye shukriya! 😊\n\nKripya apna updated *Resume (PDF)* ${roleName === 'Video Editor' ? 'ya Video Portfolio/Drive link ' : ''}yahan share karein taaki hum aapka in-person interview schedule kar sakein. 📄✨`;
+      return `${greetingHi}\n\n💰 *Internship & Salary Details:*\nHamare yahan Paid Internship (3-6 Months) & Full-Time opportunities dono hain. Deserving candidates ko performance ke base par stipend/salary, Certificate of Completion, expert mentorship aur Full-Time placement offer milta hai. 🤝\n\nFinal stipend/salary practical assessment aur in-person interview ke baad decide hoti hai.\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? 'Aap in-person interview ke liye kab visit kar sakte hain? (Mon-Sat, 10 AM - 6 PM)' : (candidate.role && candidate.role !== 'General Applicant' ? 'Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄' : 'Aap kis role (1 to 6) ke liye apply karna chahte hain?'))}`;
     } else {
-      return `${greetingEn}\n\nThank you for applying for the *${roleName}* position at BrandSetu Digital! 😊\n\nPlease share your updated *Resume (PDF)* ${roleName === 'Video Editor' ? 'or Video Portfolio/Drive link ' : ''}here so we can schedule your in-person interview at our Indore office. 📄💼`;
+      return `${greetingEn}\n\n💰 *Internship & Compensation Details:*\nWe offer Paid Internships (3-6 Months) as well as Full-Time roles. Deserving candidates receive a performance-based stipend/salary, Certificate of Completion, industry mentorship, and full-time placement opportunities. 🤝\n\nFinal compensation is negotiable and decided based on your practical skills and in-person interview.\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? 'When would you like to schedule your in-person interview? (Mon-Sat, 10 AM - 6 PM)' : (candidate.role && candidate.role !== 'General Applicant' ? 'Please share your updated Resume or Portfolio link so we can schedule your interview. 📄' : 'Which position (1 to 6) would you like to apply for?'))}`;
     }
   }
 
-  // 4. SALARY / PACKAGE / EARNINGS QUESTION
-  if (text.includes('salary') || text.includes('package') || text.includes('kitna milega') || text.includes('ctc') || text.includes('stipend') || text.includes('paise') || text.includes('per month') || text.includes('pay')) {
-    if (isHinglish) {
-      return `${greetingHi}\n\n💰 *Salary Details:*\nHamare yahan salary fixed nahi hai. Salary puri tarah negotiable hai aur aapke *skills, practical test, experience aur in-person interview performance* ke basis par decide hoti hai. 🤝\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? 'Aap in-person interview ke liye kab visit kar sakte hain? (Mon-Sat, 10 AM - 6 PM)' : 'Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄')}`;
-    } else {
-      return `${greetingEn}\n\n💰 *Salary Details:*\nSalary is not fixed and is completely negotiable based on your *in-person interview performance, practical skills, and experience*. 🤝\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? 'When would you like to schedule your in-person interview? (Mon-Sat, 10 AM - 6 PM)' : 'Please share your updated Resume or Portfolio link so we can schedule your interview. 📄')}`;
-    }
-  }
-
-  // 5. OFFICE ADDRESS / LOCATION QUESTION
+  // 2. FAQ: OFFICE ADDRESS / LOCATION
   if (text.includes('location') || text.includes('address') || text.includes('kahan') || text.includes('kaha') || text.includes('where') || text.includes('office') || text.includes('bhawarkua') || text.includes('apple hospital')) {
     if (isHinglish) {
       return `${greetingHi}\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Mon–Sat (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
@@ -448,7 +485,27 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 6. RESCHEDULE REQUEST / INABILITY TO COME
+  // 3. FAQ: WORK FROM HOME / REMOTE
+  if (text.includes('wfh') || text.includes('work from home') || text.includes('remote') || text.includes('online') || text.includes('ghar se')) {
+    if (isHinglish) {
+      return `${greetingHi}\n\n🏢 Yeh Onsite *In-Office* role hai hamare Indore office (103 Orange Business Park, Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna Resume share karein. 👍`;
+    } else {
+      return `${greetingEn}\n\n🏢 This is an Onsite *In-Office* position at our Indore office (103 Orange Business Park, Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available for an in-office role in Indore, please share your resume or portfolio to proceed. 👍`;
+    }
+  }
+
+  // 4. RESCHEDULE REQUEST / DAY GIVEN WITHOUT EXACT TIME
+  const hasDayOnly = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(text);
+  const hasExplicitTime = /(?:\b\d{1,2}(?::\d{1,2})?\s*(?:am|pm|baje|mint|min)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b|\d{1,2}:\d{2})/i.test(text);
+
+  if ((hasDayOnly && !hasExplicitTime) || text.includes('kab aana') || text.includes('kis time') || text.includes('aata hu') || text.includes('aa jaunga') || text.includes('aaunga') || text.includes('aa sakta hu')) {
+    if (isHinglish) {
+      return `${greetingHi}\n\nBahut badiya! 🕒 Hamare interview slots Monday to Saturday subah *10:00 AM se shaam 6:00 PM* ke beech available hain.\n\nAap kis time (jaise *11:00 AM, 2:00 PM ya 4:00 PM*) aana chahenge? Kripya apna exact time batayein taaki hum aapka slot confirm kar sakein! 📅`;
+    } else {
+      return `${greetingEn}\n\nGreat! 🕒 Our interview slots are open Monday to Saturday between *10:00 AM and 6:00 PM*.\n\nWhat time would you prefer to come (e.g., *11:00 AM, 2:00 PM, or 4:00 PM*)? Please share your exact time so we can confirm your slot! 📅`;
+    }
+  }
+
   const unablePhrases = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|reschedule|postpone)/i;
   if (unablePhrases.test(text)) {
     if (isHinglish) {
@@ -458,95 +515,84 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 7. OFFICE TIMINGS / WORKING HOURS
-  if (text.includes('timing') || text.includes('working hour') || text.includes('hours') || text.includes('sunday') || text.includes('kab aana') || text.includes('time')) {
+  // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET ──
+  if (!candidate.role || candidate.role === 'General Applicant') {
     if (isHinglish) {
-      return `${greetingHi}\n\n⏰ Hamare office timings Monday to Saturday subah 10:00 AM se shaam 7:00 PM tak hain (Sunday closed).\n\nInterview slots subah 10:00 AM se shaam 6:00 PM ke beech available hain. Aap kis din aur time visit karna chahenge?`;
+      return `${greetingHi}\nBrand Setu Digital me aapka swagat hai! 🎉\n\nHum in positions ke liye hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (Reply me 1 to 6 number ya post ka naam likhein) 📝`;
     } else {
-      return `${greetingEn}\n\n⏰ Our office timings are Monday to Saturday, 10:00 AM to 7:00 PM (Sunday is off).\n\nIn-person interview slots are open from 10:00 AM to 6:00 PM. Please let us know what time works best for you! 💼`;
+      return `${greetingEn}\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
     }
   }
 
-  // 8. WORK FROM HOME / REMOTE
-  if (text.includes('wfh') || text.includes('work from home') || text.includes('remote') || text.includes('online') || text.includes('ghar se')) {
+  // Check if incoming text mentions experience/fresher/full-time
+  const hasExpInMsg = text.includes('full time') || text.includes('full-time') || text.includes('fulltime') ||
+                      text.includes('fresher') || text.includes('intern') || text.includes('internship') ||
+                      text.includes('experienced') || text.includes('experience') || text.includes('exp') ||
+                      /\b\d+(?:\.\d+)?\s*(?:year|yr|saal|month|mahine|yrs|mths)\b/i.test(text) ||
+                      /^\s*\d+(?:\.\d+)?\s*$/m.test(text);
+
+  // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER STATUS NOT PROVIDED YET ──
+  if (!hasExpInMsg && (!candidate.experience || candidate.experience === '')) {
     if (isHinglish) {
-      return `${greetingHi}\n\n🏢 Yeh full-time *In-Office* role hai hamare Indore office (Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna Resume share karein. 👍`;
+      return `${greetingHi}\nGreat! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
     } else {
-      return `${greetingEn}\n\n🏢 This is a full-time *In-Office* position at our Indore office (Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available to work in-office in Indore, please share your resume or portfolio to proceed. 👍`;
+      return `${greetingEn}\nGreat! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
     }
   }
 
-  // 9. TOOLS / SKILLS / RESPONSIBILITIES
-  if (text.includes('tool') || text.includes('skill') || text.includes('software') || text.includes('responsibilit') || text.includes('kaam kya') || text.includes('karna padega')) {
-    const role = candidate.role || 'SEO Expert';
-    if (role.toLowerCase().includes('seo')) {
-      if (isHinglish) {
-        return `${greetingHi}\n\n🔍 *SEO Expert Role & Tools:*\n- Key Tools: Google Search Console, Ahrefs / SEMrush, Screaming Frog, WordPress\n- Responsibilities: On-Page, Off-Page, Technical SEO, Keyword Research, and Google Page 1 Ranking.\n\nKripya apna updated resume yahan share karein! 📄`;
-      } else {
-        return `${greetingEn}\n\n🔍 *SEO Expert Role & Tools:*\n- Key Tools: Google Search Console, Ahrefs, SEMrush, Screaming Frog, WordPress\n- Scope: On-Page, Off-Page, Technical SEO, Backlink Strategy, and Google Rankings.\n\nPlease share your updated resume to proceed! 📄`;
-      }
-    } else {
-      if (isHinglish) {
-        return `${greetingHi}\n\n🎬 *Video Editor Role & Tools:*\n- Key Tools: Adobe Premiere Pro, After Effects, Photoshop (or DaVinci Resolve)\n- Scope: High-retention Instagram Reels, YouTube videos, Commercial ads, and Motion graphics.\n\nKripya apna Portfolio / Drive link share karein! 🎥`;
-      } else {
-        return `${greetingEn}\n\n🎬 *Video Editor Role & Tools:*\n- Key Tools: Adobe Premiere Pro, After Effects, Photoshop (or DaVinci Resolve)\n- Scope: Viral Reels editing, YouTube content, Commercial client ads, sound design & motion graphics.\n\nPlease share your Portfolio or Google Drive link of past work! 🎥`;
-      }
-    }
-  }
-
-  // 10. ACKNOWLEDGEMENTS
-  const ackPhrases = ['ok', 'okay', 'will do', 'theek hai', 'thik h', 'sure', 'thanks', 'thank you', 'done', 'aata hu', 'aa jaunga', 'ha', 'haa', 'yes', 'got it', 'bilkul', 'alright'];
-  if (ackPhrases.includes(clean) || clean.startsWith('ok ') || clean.startsWith('sure ')) {
-    if (candidate.interviewDateTime) {
-      if (isHinglish) {
-        return `${greetingHi} Bohot badhiya! Aapka interview scheduled hai for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Hum aapse milne ke liye eager hain! 😊📍`;
-      } else {
-        return `${greetingEn} Great! Your interview is confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍`;
-      }
-    } else if (candidate.resumeReceived) {
-      if (isHinglish) {
-        return `${greetingHi} Aap interview ke liye kis din aur time visit karna chahenge? (Mon-Sat, 10 AM se 6 PM ke beech) 📅`;
-      } else {
-        return `${greetingEn} When would you like to visit our Indore office for your in-person interview? (Mon-Sat, 10 AM - 6 PM) 📅`;
-      }
-    } else {
-      if (isHinglish) {
-        return `${greetingHi} Kripya apna updated *Resume (PDF)* ya *Portfolio link* share karein taaki hum interview schedule kar sakein. 📄✨`;
-      } else {
-        return `${greetingEn} Please share your updated *Resume (PDF)* or *Portfolio link* whenever ready so we can schedule your interview! 📄✨`;
-      }
-    }
-  }
-
-  // 11. CANDIDATE HAS EXISTING HISTORY (Follow-up greeting)
-  if (candidate.chatHistory && candidate.chatHistory.length > 2) {
-    if (candidate.resumeReceived && !candidate.interviewDateTime) {
+  // ── STEP 3: EXPERIENCE PROVIDED, BUT RESUME / PORTFOLIO PENDING ──
+  if (!candidate.resumeReceived) {
+    if (candidate.role === 'AI Video Expert') {
       return isHinglish
-        ? `${greetingHi}\nAap in-person interview ke liye kab visit karna chahenge? (Mon-Sat, 10:00 AM – 6:00 PM) 📅`
-        : `${greetingEn}\nWhen would you like to visit our Indore office for an in-person interview? (Mon-Sat, 10:00 AM – 6:00 PM) 📅`;
-    }
-    if (candidate.role && candidate.role !== 'General Applicant') {
+        ? `${greetingHi}\nAwesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Midjourney, Kling, Pika, etc.) se create kiye hue samples ka *Google Drive link* yahan share karein. 📄🎥`
+        : `${greetingEn}\nAwesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
+    } else if (candidate.role === 'Graphic Designer') {
       return isHinglish
-        ? `${greetingHi}\nKripya apna updated *Resume (PDF)* ya *Portfolio link* share karein taaki hum aapka interview process aage badhayein! 📄✨`
-        : `${greetingEn}\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼`;
+        ? `${greetingHi}\nPerfect! 🎨 Kripya apna updated *Resume (PDF)* aur *Design Portfolio (Behance / Drive / Figma link)* yahan share karein. 📄🎨`
+        : `${greetingEn}\nPerfect! 🎨 Please share your updated *Resume (PDF)* and your *Design Portfolio (Behance / Drive / Figma link)* here. 📄🎨`;
+    } else if (candidate.role === 'SEO & AEO Expert') {
+      return isHinglish
+        ? `${greetingHi}\nGreat! 🔎 Kripya apna updated *Resume (PDF)* aur live SEO rankings / case studies details yahan share karein. 📄📊`
+        : `${greetingEn}\nGreat! 🔎 Please share your updated *Resume (PDF)* and your live SEO rankings / case studies proof here. 📄📊`;
+    } else if (candidate.role === 'Social Media Manager') {
+      return isHinglish
+        ? `${greetingHi}\nSuper! 📱 Kripya apna updated *Resume (PDF)* aur past managed social media handles / growth proof share karein. 📄🚀`
+        : `${greetingEn}\nSuper! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀`;
+    } else if (candidate.role === 'Digital Marketing Manager') {
+      return isHinglish
+        ? `${greetingHi}\nExcellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
+        : `${greetingEn}\nExcellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
+    } else {
+      return isHinglish
+        ? `${greetingHi}\nBahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
+        : `${greetingEn}\nGreat! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
     }
   }
 
-  // 12. DEFAULT WELCOME GREETING (Only for fresh start)
-  if (isHinglish) {
-    return `${greetingHi}\nBrandSetu Digital me aapka swagat hai!\n\nHum hiring kar rahe hain for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Kripya apna *Name*, *Role* (SEO Expert ya Video Editor) aur *Resume / Portfolio link* yahan share karein. 📄✨`;
-  } else {
-    return `${greetingEn}\nWelcome to BrandSetu Digital!\n\nWe are actively hiring for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Please share your *Name*, *Role you are applying for*, and your *Resume / Portfolio link* to proceed! 📄💼`;
+  // ── STEP 4: RESUME / PORTFOLIO RECEIVED, ASK FOR INTERVIEW DATE & TIME ──
+  if (candidate.resumeReceived && !candidate.interviewDateTime) {
+    if (isHinglish) {
+      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\nAap *in-person practical interview* ke liye hamare Indore office kab visit karna chahenge?\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore\n⏰ *Interview Slots:* Monday to Saturday (10:00 AM se 6:00 PM ke beech)\n\nKripya apna preferred *Date aur Time* batayein (e.g. *Kal 2 baje* ya *Monday 11 AM*). 📅`;
+    } else {
+      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\nWhen would you like to visit our Indore office for an in-person practical interview?\n📍 *Office:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore\n⏰ *Timings:* Monday to Saturday (10:00 AM – 6:00 PM)\n\nPlease share your preferred *Day and Time* (e.g. *Tomorrow 2 PM* or *Monday 11 AM*). 📅`;
+    }
+  }
+
+  // ── STEP 5: INTERVIEW ALREADY CONFIRMED ──
+  if (candidate.interviewDateTime) {
+    if (isHinglish) {
+      return `${greetingHi}\nAapka interview already confirmed hai for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Hum aapse milne ke liye eager hain! 😊📍`;
+    } else {
+      return `${greetingEn}\nYour interview is already confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍`;
+    }
   }
 }
 
 function cleanAiResponseText(rawText) {
   if (!rawText) return '';
   let text = rawText.trim();
-  text = text.replace(/^```(?:markdown)?\s*/i, '').replace(/```\s*$/i, '').trim();
-  text = text.replace(/^(?:(?:\d+\s+to\s+\d+|candidate\s+name|rule\s+\d+|check|yes|no|\*|\-|\#|address\s+candidate|sentences?\?)[\s\S]*?\n\n)+/i, '');
-  text = text.replace(/^(?:[A-Za-z0-9\s\?\'\"]+\?\s*Yes(?:\s*\([^\)]*\))?\.?\s*\n*)+/i, '');
-  text = text.replace(/^(?:Yes\s*\([^\)]*\)\.?\s*|No\s*\([^\)]*\)\.?\s*)+/i, '');
+  text = text.replace(/^```(?:markdown|json|text)?\s*/i, '').replace(/```\s*$/i, '').trim();
+  text = text.replace(/^(?:Direct\s*WhatsApp\s*Message|HR\s*Assistant\s*Reply|Reply):\s*/i, '').trim();
   return text.trim();
 }
 
@@ -570,7 +616,8 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
 
   const candidateSummary = {
     name: candName,
-    role: candidate.role && candidate.role !== 'General Applicant' ? candidate.role : 'Unknown',
+    role: candidate.role && candidate.role !== 'General Applicant' ? candidate.role : 'None (Pending selection)',
+    experience: candidate.experience || 'None (Pending)',
     city: candidate.city || 'Indore',
     resumeReceived: candidate.resumeReceived ? 'Yes (Received)' : 'No (Pending)',
     portfolio: candidate.portfolio || 'None',
@@ -584,7 +631,7 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
   }).join('\n');
 
   const systemInstructions = (aiConfig.systemPrompt && aiConfig.systemPrompt.trim()) || `
-You are the professional, friendly HR & Recruitment Coordinator for BrandSetu Digital (Indore).
+You are the professional, friendly HR & Recruitment Coordinator for Brand Setu Digital (Indore).
   `.trim();
 
   const prompt = `
@@ -593,28 +640,41 @@ ${systemInstructions}
 COMPANY INFORMATION & KNOWLEDGE BASE:
 ${aiConfig.knowledgeBase}
 
-CANDIDATE CONTEXT:
-- Candidate Name: ${candidateSummary.name}
-- Role Applied: ${candidateSummary.role}
-- Resume / Portfolio Status: ${candidateSummary.resumeReceived}
+CANDIDATE PROFILE:
+- Name: ${candidateSummary.name}
+- Current Role Applied: ${candidateSummary.role}
+- Experience / Status: ${candidateSummary.experience}
+- Resume / Portfolio: ${candidateSummary.resumeReceived}
 - Interview Status: ${candidateSummary.interviewScheduled}
 
-RECENT CHAT HISTORY:
+RECENT CONVERSATION HISTORY:
 ${historyLines ? historyLines : '(Start of chat)'}
 
 LATEST CANDIDATE MESSAGE:
 "${userMessage}"
 
-STRICT HIRING INSTRUCTIONS:
-1. ONLY HIRING FOR: 1. SEO Expert and 2. Video Editor (In-Office at Bhawarkua, Indore).
-2. IF CANDIDATE APPLIES FOR ANY OTHER ROLE (e.g. Website Developer, Graphic Designer, Content Writer, Sales, Telecaller, etc.):
-   Politely state that we are currently ONLY hiring for SEO Expert and Video Editor, we do not have openings for that role right now, and we will keep their profile on file for future opportunities.
-3. IF CANDIDATE SELECTS SEO EXPERT OR VIDEO EDITOR:
-   Acknowledge the role warmly and ask them to share their Resume (PDF) or Portfolio link to schedule their in-person interview.
-4. IF CANDIDATE HAS SHARED RESUME/PORTFOLIO:
-   Thank them and invite them for an in-person interview at our Indore office (Mon-Sat, 10 AM - 6 PM). Ask what day and time works best for them.
-5. PREVENT REPETITIVE GREETINGS: Do NOT repeat the full welcome message if chat has already started. Greet warmly by name without "ji".
-6. OUTPUT ONLY the final WhatsApp message directly. No thinking, no checklists, no notes.
+STRICT STEP-BY-STEP RECRUITMENT FUNNEL INSTRUCTIONS:
+Follow these 4 sequential qualification steps strictly:
+
+👉 STEP 1 (If candidate has NOT chosen a role yet):
+Greet candidate by name and present the 6 active openings (1. Video Editor, 2. AI Video Expert, 3. Graphic Designer, 4. SEO & AEO Expert, 5. Social Media Manager, 6. Digital Marketing Manager). Ask which position (1 to 6) they want to apply for.
+
+👉 STEP 2 (If role is chosen, but Experience / Fresher status is not known yet):
+Acknowledge the chosen role and ask:
+1. Are they applying as a Fresher (Paid Internship) or Experienced (Full-Time)?
+2. If experienced, how many months/years of experience do they have?
+
+👉 STEP 3 (If role & experience are known, but Resume / Portfolio is pending):
+Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link based on the job requirements.
+
+👉 STEP 4 (If Resume / Portfolio has been received):
+Thank them and invite them for an in-person practical interview at our Indore office (103 Orange Business Park, Bhawarkua, Mon-Sat 10 AM - 6 PM). Ask which day and time works best for them.
+
+RULES:
+- If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.
+- If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
+- If candidate writes in Hindi/Hinglish, reply in natural Hinglish. If in English, reply in crisp English.
+- OUTPUT ONLY the direct WhatsApp reply. No thinking, no extra notes.
 
 Direct WhatsApp Message:
 `;

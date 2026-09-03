@@ -42,27 +42,32 @@
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
       <nav class="sidebar-menu">
-        <button class="nav-item active" data-tab="tab-session">
+        <button class="nav-item nav-desktop-only active" data-tab="tab-session">
           <i class="fa-solid fa-cloud"></i>
           <span>Meta Cloud API</span>
         </button>
-        <button class="nav-item" data-tab="tab-broadcast">
+        <button class="nav-item nav-desktop-only" data-tab="tab-broadcast">
           <i class="fa-solid fa-paper-plane"></i>
           <span>Bulk Sender</span>
         </button>
-        <button class="nav-item" data-tab="tab-chatbot">
+        <button class="nav-item nav-desktop-only" data-tab="tab-chatbot">
           <i class="fa-solid fa-robot"></i>
           <span>Rules Auto-Reply</span>
         </button>
-        <button class="nav-item" data-tab="tab-ai-bot">
+        <button class="nav-item nav-desktop-only" data-tab="tab-ai-bot">
           <i class="fa-solid fa-brain"></i>
           <span>AI Chatbot Studio</span>
         </button>
-        <button class="nav-item" data-tab="tab-hiring">
+        <button class="nav-item nav-mobile-tab" data-tab="tab-chats">
+          <i class="fa-brands fa-whatsapp text-success"></i>
+          <span>WhatsApp Chats</span>
+          <span class="nav-chat-count-badge" id="navChatCountBadge">0</span>
+        </button>
+        <button class="nav-item nav-mobile-tab" data-tab="tab-hiring">
           <i class="fa-solid fa-user-tie"></i>
           <span>Hiring & Interviews</span>
         </button>
-        <button class="nav-item" data-tab="tab-logs">
+        <button class="nav-item nav-desktop-only" data-tab="tab-logs">
           <i class="fa-solid fa-terminal"></i>
           <span>Live Logs</span>
         </button>
@@ -102,6 +107,12 @@
                   <h4 id="metaStatusTitle">Meta WhatsApp API Status</h4>
                   <p id="metaStatusDesc">Verifying environment credentials...</p>
                 </div>
+              </div>
+
+              <div id="whatsappWebQrPanel" class="web-qr-panel" style="display: none;">
+                <h4><i class="fa-solid fa-qrcode"></i> Scan WhatsApp Web</h4>
+                <p>Mobile WhatsApp खोलें → Linked devices → Link a device</p>
+                <img id="whatsappWebQr" alt="WhatsApp Web QR code">
               </div>
 
               <!-- Meta API Details Grid -->
@@ -385,6 +396,170 @@
         </div>
       </div>
 
+      <!-- TAB: WhatsApp Inbox & Live Chats -->
+      <div id="tab-chats" class="tab-pane">
+        <div class="card glass-card wa-inbox-card">
+          
+          <div class="card-header flex-between flex-wrap gap-2 wa-inbox-header">
+            <div>
+              <h3><i class="fa-brands fa-whatsapp text-success"></i> WhatsApp Inbox & Live Chats</h3>
+              <p class="subtitle">Real-time WhatsApp conversations, candidate interactions, and two-way messaging</p>
+            </div>
+            <div class="header-actions flex gap-2">
+              <button id="refreshInboxBtn" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-rotate"></i> Refresh
+              </button>
+              <button id="inboxPopMobileBtn" class="btn btn-outline-success btn-sm">
+                <i class="fa-solid fa-mobile-screen-button"></i> Mobile Phone View
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body p-0">
+            <!-- 2-Column Split Inbox Layout -->
+            <div class="wa-inbox-layout">
+              
+              <!-- LEFT: Conversations List Panel -->
+              <aside class="wa-inbox-list-panel">
+                <!-- Search & Filters -->
+                <div class="wa-inbox-search-box">
+                  <div class="wa-search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="inboxSearchInput" placeholder="Search contacts or messages...">
+                  </div>
+                  <div class="wa-inbox-filter-pills mt-2">
+                    <button class="inbox-filter-pill active" data-filter="all">All (<span id="inboxFilterAllCount">0</span>)</button>
+                    <button class="inbox-filter-pill" data-filter="with-history">Active (<span id="inboxFilterMsgCount">0</span>)</button>
+                    <button class="inbox-filter-pill" data-filter="interviews">Interviews (<span id="inboxFilterSchedCount">0</span>)</button>
+                    <button class="inbox-filter-pill" data-filter="pending-resume">Missing Resume (<span id="inboxFilterResumeCount">0</span>)</button>
+                  </div>
+                </div>
+
+                <!-- Contact Chats List -->
+                <div class="wa-inbox-conversations-list" id="inboxConversationsList">
+                  <div class="inbox-loading-state">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading conversations...
+                  </div>
+                </div>
+              </aside>
+
+              <!-- RIGHT: Chat Conversation Canvas -->
+              <section class="wa-inbox-chat-panel" id="inboxChatPanel">
+                
+                <!-- Empty State (No Chat Selected) -->
+                <div class="wa-inbox-empty-state" id="inboxEmptyState">
+                  <div class="empty-icon-wrap">
+                    <i class="fa-brands fa-whatsapp"></i>
+                  </div>
+                  <h3>WhatsApp Live Chat Inbox</h3>
+                  <p>Left side se kisi bhi candidate ya contact par click karein unka complete chat history dekhne aur instant reply bhejne ke liye.</p>
+                  <div class="empty-features-grid">
+                    <div class="empty-feature-item">
+                      <i class="fa-solid fa-check-double text-success"></i> Real-time Meta Sync
+                    </div>
+                    <div class="empty-feature-item">
+                      <i class="fa-solid fa-file-pdf text-danger"></i> Resume & Docs View
+                    </div>
+                    <div class="empty-feature-item">
+                      <i class="fa-solid fa-bolt text-warning"></i> 1-Click Quick Replies
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Active Chat Container (Hidden when none selected) -->
+                <div class="wa-inbox-active-chat" id="inboxActiveChat" style="display: none;">
+                  
+                  <!-- Top Conversation Header -->
+                  <header class="wa-inbox-chat-header">
+                    <div class="wa-inbox-chat-user">
+                      <button class="inbox-back-to-list-btn" id="inboxBackToListBtn" title="Back to Contact List">
+                        <i class="fa-solid fa-arrow-left"></i>
+                      </button>
+                      <div class="wa-inbox-avatar" id="inboxActiveAvatar">M</div>
+                      <div class="wa-inbox-meta">
+                        <h4 id="inboxActiveName">Candidate Name</h4>
+                        <div class="wa-inbox-sub" id="inboxActiveSub">
+                          <span class="wa-online-dot"></span> online • <span id="inboxActiveRoleTag" class="badge-role badge-role-seo">SEO Expert</span> • <span id="inboxActivePhone">+91 0000000000</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="wa-inbox-actions">
+                      <button class="btn-icon-action" id="inboxScheduleBtn" title="Schedule Interview">
+                        <i class="fa-solid fa-calendar-plus"></i> <span class="d-none d-md-inline">Schedule</span>
+                      </button>
+                      <button class="btn-icon-action" id="inboxOpenMobileBtn" title="Open in Mobile Phone Frame">
+                        <i class="fa-solid fa-mobile-screen-button"></i> <span class="d-none d-md-inline">Phone View</span>
+                      </button>
+                      <button class="btn-icon-action" id="inboxCallBtn" title="WhatsApp Call">
+                        <i class="fa-brands fa-whatsapp text-success"></i>
+                      </button>
+                    </div>
+                  </header>
+
+                  <!-- Quick Candidate Info Strip -->
+                  <div class="wa-inbox-info-strip" id="inboxInfoStrip">
+                    <div class="info-pill" id="inboxInfoResume"><i class="fa-solid fa-file-pdf"></i> Resume: Pending</div>
+                    <div class="info-pill" id="inboxInfoInterview"><i class="fa-solid fa-calendar-check"></i> Interview: Not Set</div>
+                    <div class="info-pill" id="inboxInfoStatus"><i class="fa-solid fa-tag"></i> Status: Applied</div>
+                  </div>
+
+                  <!-- Chat Messages Stream (Doodle Wallpaper) -->
+                  <div class="wa-inbox-chat-canvas" id="inboxChatCanvas">
+                    <div class="wa-encryption-card">
+                      <i class="fa-solid fa-lock"></i>
+                      <span>Messages and calls are end-to-end encrypted. No one outside of this chat can read them.</span>
+                    </div>
+                    <div class="wa-date-pill"><span>TODAY</span></div>
+                    <div class="wa-messages-container" id="inboxChatStream">
+                      <!-- Message bubbles will be injected here -->
+                    </div>
+                  </div>
+
+                  <!-- Quick Action Template Chips -->
+                  <div class="wa-inbox-quick-chips">
+                    <div class="wa-chips-scroll">
+                      <button class="wa-quick-chip inbox-quick-chip" data-template="address">
+                        <i class="fa-solid fa-location-dot"></i> Send Office Location
+                      </button>
+                      <button class="wa-quick-chip inbox-quick-chip" data-template="resume">
+                        <i class="fa-solid fa-file-arrow-up"></i> Request Resume Link
+                      </button>
+                      <button class="wa-quick-chip inbox-quick-chip" data-template="confirm">
+                        <i class="fa-solid fa-circle-check"></i> Confirm Interview
+                      </button>
+                      <button class="wa-quick-chip inbox-quick-chip" data-template="reminder">
+                        <i class="fa-solid fa-bell"></i> 1-Hr Reminder
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Bottom Chat Input Bar -->
+                  <footer class="wa-inbox-input-bar">
+                    <button class="wa-input-btn" title="Emoji">
+                      <i class="fa-regular fa-face-smile"></i>
+                    </button>
+                    <div class="wa-input-wrapper">
+                      <input type="text" id="inboxMessageInput" placeholder="Type a WhatsApp message to candidate..." autocomplete="off">
+                      <button class="wa-input-btn" id="inboxAttachBtn" title="Attach Document">
+                        <i class="fa-solid fa-paperclip"></i>
+                      </button>
+                    </div>
+                    <button class="wa-send-circle-btn" id="inboxSendBtn" title="Send WhatsApp Message">
+                      <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                  </footer>
+
+                </div>
+
+              </section>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- TAB: Hiring & Interviews Pipeline -->
       <div id="tab-hiring" class="tab-pane">
         <div class="card glass-card mb-4">
@@ -394,6 +569,9 @@
               <p class="subtitle">Real-time candidate tracking, 4-hr resume reminders, 1-hr interview alerts & Excel export</p>
             </div>
             <div class="header-actions flex gap-2">
+              <button id="openMobilePreviewBtn" class="btn btn-outline-success">
+                <i class="fa-solid fa-mobile-screen-button"></i> WhatsApp Mobile View
+              </button>
               <a href="/api/hiring/export-excel" id="exportExcelBtn" class="btn btn-success" download>
                 <i class="fa-solid fa-file-excel"></i> Download Excel (.xlsx)
               </a>
@@ -540,8 +718,12 @@
           <div class="form-group mb-3">
             <label class="form-label">Role Applied</label>
             <select id="scheduleRole" class="form-control">
-              <option value="SEO Expert">SEO Expert</option>
-              <option value="Video Editor">Video Editor</option>
+              <option value="Video Editor">🎬 Video Editor (5 Openings)</option>
+              <option value="AI Video Expert">🤖 AI Video Expert (3 Openings)</option>
+              <option value="Graphic Designer">🎨 Graphic Designer (2 Openings)</option>
+              <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
+              <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
+              <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
               <option value="General Applicant">General Applicant</option>
             </select>
           </div>
@@ -591,8 +773,12 @@
           <div class="form-group mb-3">
             <label class="form-label">Role Applied</label>
             <select id="newCandRole" class="form-control">
-              <option value="SEO Expert">SEO Expert</option>
-              <option value="Video Editor">Video Editor</option>
+              <option value="Video Editor">🎬 Video Editor (5 Openings)</option>
+              <option value="AI Video Expert">🤖 AI Video Expert (3 Openings)</option>
+              <option value="Graphic Designer">🎨 Graphic Designer (2 Openings)</option>
+              <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
+              <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
+              <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
             </select>
           </div>
           <div class="form-group mb-3">
@@ -614,6 +800,148 @@
           </div>
         </form>
       </div>
+    </div>
+  </div>
+
+  <!-- WhatsApp Mobile Screen Simulation Modal -->
+  <div id="waMobileModal" class="modal-backdrop wa-modal-backdrop" style="display: none;">
+    <div class="wa-modal-wrapper">
+      
+      <!-- Top floating close button on desktop -->
+      <button class="wa-modal-close-floating" id="closeWaModalFloatingBtn" title="Close WhatsApp Phone">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Smartphone Hardware Chassis -->
+      <div class="smartphone-chassis">
+        <!-- Phone Outer Bezel -->
+        <div class="phone-outer-frame">
+          
+          <!-- Screen Glass -->
+          <div class="phone-screen">
+            
+            <!-- 1. Phone Top Status Bar -->
+            <div class="phone-status-bar">
+              <span class="status-time" id="waPhoneClock">11:15</span>
+              <div class="dynamic-island-notch">
+                <span class="camera-lens"></span>
+                <span class="speaker-slit"></span>
+              </div>
+              <div class="status-hardware-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+              </div>
+            </div>
+
+            <!-- 2. WhatsApp App Header -->
+            <header class="wa-chat-header">
+              <button class="wa-hdr-icon-btn wa-hdr-back" id="closeWaMobileBtn" title="Back">
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
+              
+              <div class="wa-hdr-profile" id="waHdrProfileArea">
+                <div class="wa-hdr-avatar" id="waPhoneAvatar">
+                  <span id="waPhoneAvatarChar">M</span>
+                  <span class="wa-avatar-online-badge"></span>
+                </div>
+                <div class="wa-hdr-meta">
+                  <div class="wa-hdr-name" id="waPhoneCandName">Candidate Name</div>
+                  <div class="wa-hdr-sub" id="waPhoneCandSub">
+                    <span class="wa-status-text">online</span>
+                    <span class="wa-bullet">•</span>
+                    <span id="waPhoneCandRoleTag" class="wa-role-tag">Role</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wa-hdr-actions">
+                <button class="wa-hdr-icon-btn" id="waHdrCallBtn" title="WhatsApp Voice Call">
+                  <i class="fa-solid fa-phone"></i>
+                </button>
+                <button class="wa-hdr-icon-btn" id="waHdrScheduleBtn" title="Schedule Interview">
+                  <i class="fa-solid fa-calendar-plus"></i>
+                </button>
+                <button class="wa-hdr-icon-btn" id="waHdrMenuBtn" title="More Options">
+                  <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+              </div>
+            </header>
+
+            <!-- 3. Candidate Quick Summary Strip -->
+            <div class="wa-candidate-summary-bar" id="waPhoneSummaryBar">
+              <div class="wa-summary-pill" id="waPillResume">
+                <i class="fa-solid fa-file-pdf"></i> <span id="waPillResumeText">Resume: Pending</span>
+              </div>
+              <div class="wa-summary-pill" id="waPillInterview">
+                <i class="fa-solid fa-calendar-check"></i> <span id="waPillInterviewText">Interview: None</span>
+              </div>
+              <div class="wa-summary-pill wa-pill-phone" id="waPillPhone">
+                <i class="fa-brands fa-whatsapp"></i> <span id="waPillPhoneText">+91 0000000000</span>
+              </div>
+            </div>
+
+            <!-- 4. WhatsApp Chat Canvas (Doodle Pattern Background) -->
+            <div class="wa-chat-canvas" id="waChatCanvas">
+              
+              <!-- Encryption Notice -->
+              <div class="wa-encryption-card">
+                <i class="fa-solid fa-lock"></i>
+                <span>Messages and calls are end-to-end encrypted. No one outside of this chat can read them.</span>
+              </div>
+
+              <!-- Date Separator -->
+              <div class="wa-date-pill">
+                <span>TODAY</span>
+              </div>
+
+              <!-- Message Stream List -->
+              <div class="wa-messages-container" id="waPhoneChatStream">
+                <!-- Messages injected dynamically via JS -->
+              </div>
+
+            </div>
+
+            <!-- 5. Quick One-Tap Reply Action Chips -->
+            <div class="wa-quick-replies-bar">
+              <div class="wa-chips-scroll">
+                <button class="wa-quick-chip" data-template="address">
+                  <i class="fa-solid fa-location-dot"></i> Send Office Location
+                </button>
+                <button class="wa-quick-chip" data-template="resume">
+                  <i class="fa-solid fa-file-arrow-up"></i> Request Resume Link
+                </button>
+                <button class="wa-quick-chip" data-template="confirm">
+                  <i class="fa-solid fa-circle-check"></i> Confirm Interview
+                </button>
+                <button class="wa-quick-chip" data-template="reminder">
+                  <i class="fa-solid fa-bell"></i> 1-Hr Reminder
+                </button>
+              </div>
+            </div>
+
+            <!-- 6. WhatsApp Bottom Message Input Bar -->
+            <footer class="wa-input-bar">
+              <button class="wa-input-btn" id="waEmojiBtn" title="Emoji">
+                <i class="fa-regular fa-face-smile"></i>
+              </button>
+              
+              <div class="wa-input-wrapper">
+                <input type="text" id="waPhoneInput" placeholder="Type a WhatsApp message..." autocomplete="off">
+                <button class="wa-input-btn wa-attach-btn" id="waAttachBtn" title="Attach Document / Quick Info">
+                  <i class="fa-solid fa-paperclip"></i>
+                </button>
+              </div>
+
+              <button class="wa-send-circle-btn" id="waPhoneSendBtn" title="Send WhatsApp Message">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </footer>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 

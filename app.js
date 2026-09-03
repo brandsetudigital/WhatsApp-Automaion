@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const metaDisplayPhoneVal = document.getElementById('metaDisplayPhoneVal');
   const metaAccountNameVal = document.getElementById('metaAccountNameVal');
   const webhookUrlCode = document.getElementById('webhookUrlCode');
+  const whatsappWebQrPanel = document.getElementById('whatsappWebQrPanel');
+  const whatsappWebQr = document.getElementById('whatsappWebQr');
 
   // Set default webhook helper text
   if (webhookUrlCode) {
@@ -77,6 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', () => switchTab(item.dataset.tab));
   });
 
+  // On mobile screens, activate WhatsApp Chats by default
+  if (window.innerWidth <= 900) {
+    switchTab('tab-chats');
+  }
+
   // ==========================================
   // 2. Real-Time Socket Event Listeners & Meta Status
   // ==========================================
@@ -95,6 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateMetaStatusUI(data) {
     const status = data.status || 'disconnected';
     statusBadge.className = `status-badge status-${status}`;
+
+    if (data.provider === 'web') {
+      statusText.textContent = status === 'connected' ? 'WhatsApp Web Connected' : 'WhatsApp Web ' + status;
+      if (metaStatusTitle) metaStatusTitle.textContent = 'WhatsApp Web Browser Session';
+      if (metaStatusDesc) metaStatusDesc.textContent = data.message || 'Use the QR code to link your WhatsApp account.';
+      if (whatsappWebQrPanel) whatsappWebQrPanel.style.display = data.qr ? 'block' : 'none';
+      if (whatsappWebQr && data.qr) whatsappWebQr.src = data.qr;
+      return;
+    }
 
     if (status === 'connected') {
       statusText.textContent = 'Meta API Connected';
@@ -635,6 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
         candidatesList = data.candidates || [];
         updateHiringStatsUI(data.stats || {});
         renderCandidatesTable();
+        renderInboxConversationsList();
       }
     } catch (err) {
       console.error('Error fetching candidates:', err);
@@ -745,7 +762,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return `
         <tr>
           <td>
-            <div class="cand-name">${escapeHtml(c.name || 'Candidate')}</div>
+            <div class="cand-name cand-name-clickable" data-id="${c.id}" title="Click to open WhatsApp Mobile Chat">
+              <i class="fa-brands fa-whatsapp text-success me-1"></i> ${escapeHtml(c.name || 'Candidate')}
+            </div>
             <div class="cand-phone">+${escapeHtml(c.phone)}</div>
           </td>
           <td>
@@ -768,6 +787,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <div class="flex gap-1">
+              <button class="btn-icon-action btn-view-chat open-chat-cand-btn" data-id="${c.id}" title="Open WhatsApp Mobile Chat">
+                <i class="fa-brands fa-whatsapp"></i> Chat ${c.chatHistory && c.chatHistory.length ? `(${c.chatHistory.length})` : ''}
+              </button>
               <button class="btn-icon-action schedule-cand-btn" data-id="${c.id}" title="Schedule Interview">
                 <i class="fa-solid fa-calendar-days"></i> Schedule
               </button>
@@ -781,9 +803,6 @@ document.addEventListener('DOMContentLoaded', () => {
                   <i class="fa-solid fa-clock"></i>
                 </button>
               ` : ''}
-              <a href="https://wa.me/${c.phone}" target="_blank" class="btn-icon-action" title="Chat on WhatsApp">
-                <i class="fa-brands fa-whatsapp text-success"></i>
-              </a>
               <button class="btn-icon-action btn-icon-danger delete-cand-btn" data-id="${c.id}" title="Delete">
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -798,6 +817,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function attachCandidateRowEvents() {
+    // Open WhatsApp Chat on candidate row button or name click
+    document.querySelectorAll('.open-chat-cand-btn, .cand-name-clickable').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = el.dataset.id;
+        openCandidateWhatsAppMobile(id);
+      });
+    });
+
     // Schedule button
     document.querySelectorAll('.schedule-cand-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -807,7 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         scheduleCandidateId.value = cand.id;
         scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
-        scheduleRole.value = (cand.role === 'SEO Expert' || cand.role === 'Video Editor') ? cand.role : 'SEO Expert';
+        scheduleRole.value = cand.role || 'Video Editor';
 
         // Pre-fill tomorrow 11:00 AM if not scheduled
         if (cand.interviewDateTime) {
@@ -1017,7 +1045,904 @@ document.addEventListener('DOMContentLoaded', () => {
       candidatesList = data.candidates;
       updateHiringStatsUI(data.stats || {});
       renderCandidatesTable();
+      renderInboxConversationsList();
+      if (activeMobileCandidateId) {
+        const updated = candidatesList.find(c => c.id === activeMobileCandidateId);
+        if (updated) renderCandidateWhatsAppChat(updated);
+      }
+      if (selectedInboxCandidateId) {
+        const updated = candidatesList.find(c => c.id === selectedInboxCandidateId);
+        if (updated) renderInboxChatStream(updated);
+      }
     }
+  });
+
+  socket.on('hiring-updated', (data) => {
+    if (data && data.candidates) {
+      candidatesList = data.candidates;
+      updateHiringStatsUI(data.stats || {});
+      renderCandidatesTable();
+      renderInboxConversationsList();
+      if (activeMobileCandidateId) {
+        const updated = candidatesList.find(c => c.id === activeMobileCandidateId);
+        if (updated) {
+          renderCandidateWhatsAppChat(updated);
+          if (waChatCanvas) {
+            waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
+          }
+        }
+      }
+      if (selectedInboxCandidateId) {
+        const updated = candidatesList.find(c => c.id === selectedInboxCandidateId);
+        if (updated) {
+          renderInboxChatStream(updated);
+          if (inboxChatCanvas) {
+            inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
+          }
+        }
+      }
+    }
+  });
+
+  // =========================================================================
+  // WhatsApp Mobile Screen Phone Simulator & Chat Viewer
+  // =========================================================================
+  let activeMobileCandidateId = null;
+
+  const waMobileModal = document.getElementById('waMobileModal');
+  const closeWaMobileBtn = document.getElementById('closeWaMobileBtn');
+  const closeWaModalFloatingBtn = document.getElementById('closeWaModalFloatingBtn');
+  const waPhoneChatStream = document.getElementById('waPhoneChatStream');
+  const waChatCanvas = document.getElementById('waChatCanvas');
+  const waPhoneInput = document.getElementById('waPhoneInput');
+  const waPhoneSendBtn = document.getElementById('waPhoneSendBtn');
+  const waPhoneAvatarChar = document.getElementById('waPhoneAvatarChar');
+  const waPhoneCandName = document.getElementById('waPhoneCandName');
+  const waPhoneCandRoleTag = document.getElementById('waPhoneCandRoleTag');
+  const waPillResumeText = document.getElementById('waPillResumeText');
+  const waPillInterviewText = document.getElementById('waPillInterviewText');
+  const waPillPhoneText = document.getElementById('waPillPhoneText');
+  const waPhoneClock = document.getElementById('waPhoneClock');
+  const openMobilePreviewBtn = document.getElementById('openMobilePreviewBtn');
+  const waHdrScheduleBtn = document.getElementById('waHdrScheduleBtn');
+  const waHdrCallBtn = document.getElementById('waHdrCallBtn');
+
+  function updatePhoneClock() {
+    if (waPhoneClock) {
+      const now = new Date();
+      waPhoneClock.textContent = now.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+  }
+  updatePhoneClock();
+  setInterval(updatePhoneClock, 30000);
+
+  function closeWhatsAppMobile() {
+    if (waMobileModal) {
+      waMobileModal.style.display = 'none';
+    }
+    activeMobileCandidateId = null;
+  }
+
+  if (closeWaMobileBtn) closeWaMobileBtn.addEventListener('click', closeWhatsAppMobile);
+  if (closeWaModalFloatingBtn) closeWaModalFloatingBtn.addEventListener('click', closeWhatsAppMobile);
+
+  if (waMobileModal) {
+    waMobileModal.addEventListener('click', (e) => {
+      if (e.target === waMobileModal) {
+        closeWhatsAppMobile();
+      }
+    });
+  }
+
+  // Header quick preview button
+  if (openMobilePreviewBtn) {
+    openMobilePreviewBtn.addEventListener('click', () => {
+      if (!candidatesList || candidatesList.length === 0) {
+        alert('Abhi koi candidate available nahi hai. Pehle ek candidate add karein ya WhatsApp par message receive hone dein.');
+        return;
+      }
+      openCandidateWhatsAppMobile(candidatesList[0].id);
+    });
+  }
+
+  // Header Call button -> open WhatsApp chat link
+  if (waHdrCallBtn) {
+    waHdrCallBtn.addEventListener('click', () => {
+      if (!activeMobileCandidateId) return;
+      const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
+      if (cand && cand.phone) {
+        window.open(`https://wa.me/${cand.phone}`, '_blank');
+      }
+    });
+  }
+
+  // Header Schedule button -> open schedule modal
+  if (waHdrScheduleBtn) {
+    waHdrScheduleBtn.addEventListener('click', () => {
+      if (!activeMobileCandidateId) return;
+      const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
+      if (!cand) return;
+      
+      scheduleCandidateId.value = cand.id;
+      scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
+      scheduleRole.value = cand.role || 'Video Editor';
+
+      if (cand.interviewDateTime) {
+        const d = new Date(cand.interviewDateTime);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        scheduleDateTime.value = d.toISOString().slice(0, 16);
+      } else {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(11, 0, 0, 0);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
+      }
+      scheduleNotes.value = cand.notes || '';
+      scheduleModal.style.display = 'flex';
+    });
+  }
+
+  /**
+   * Format message text with bold, italic, and URLs
+   */
+  function formatWhatsAppText(rawText) {
+    if (!rawText) return '';
+    let text = escapeHtml(rawText);
+
+    // *bold* -> <strong>
+    text = text.replace(/\*([^\*]+)\*/g, '<strong>$1</strong>');
+    // _italic_ -> <em>
+    text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+    // ~strike~ -> <del>
+    text = text.replace(/~([^~]+)~/g, '<del>$1</del>');
+
+    // Auto linkify URLs
+    text = text.replace(/(https?:\/\/[^\s<]+)/gi, (url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#53bdeb; text-decoration:underline;">${url}</a>`;
+    });
+
+    return text;
+  }
+
+  /**
+   * Format message timestamp into "11:03 AM"
+   */
+  function formatTime(isoString) {
+    if (!isoString) return '';
+    try {
+      const d = new Date(isoString);
+      return d.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
+   * Open WhatsApp Mobile Simulator for a specific candidate
+   */
+  function openCandidateWhatsAppMobile(candidateId) {
+    const candidate = candidatesList.find(c => c.id === candidateId);
+    if (!candidate) return;
+
+    activeMobileCandidateId = candidate.id;
+    updatePhoneClock();
+
+    // Populate Header & Info
+    const displayName = candidate.name || 'Candidate';
+    if (waPhoneCandName) waPhoneCandName.textContent = displayName;
+    if (waPhoneAvatarChar) {
+      const firstChar = displayName.trim().charAt(0).toUpperCase() || 'C';
+      waPhoneAvatarChar.textContent = firstChar;
+    }
+    if (waPhoneCandRoleTag) {
+      waPhoneCandRoleTag.textContent = candidate.role || 'Applicant';
+    }
+
+    // Populate Summary Bar
+    if (waPillResumeText) {
+      waPillResumeText.textContent = candidate.resumeReceived ? 'Resume Received' : 'Resume Pending';
+    }
+    if (waPillInterviewText) {
+      if (candidate.interviewDateTime) {
+        try {
+          const d = new Date(candidate.interviewDateTime);
+          waPillInterviewText.textContent = 'Interview: ' + d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        } catch (e) {
+          waPillInterviewText.textContent = 'Interview: Scheduled';
+        }
+      } else {
+        waPillInterviewText.textContent = 'Interview: Not Set';
+      }
+    }
+    if (waPillPhoneText) {
+      waPillPhoneText.textContent = `+${candidate.phone}`;
+    }
+
+    // Render Conversation Bubbles
+    renderCandidateWhatsAppChat(candidate);
+
+    // Show Modal
+    if (waMobileModal) {
+      waMobileModal.style.display = 'flex';
+    }
+
+    // Auto scroll chat to bottom
+    setTimeout(() => {
+      if (waChatCanvas) {
+        waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
+      }
+      if (waPhoneInput) {
+        waPhoneInput.focus();
+      }
+    }, 50);
+  }
+
+  /**
+   * Render candidate conversation bubbles into mobile phone screen
+   */
+  function renderCandidateWhatsAppChat(candidate) {
+    if (!waPhoneChatStream) return;
+
+    const history = candidate.chatHistory || [];
+
+    if (history.length === 0) {
+      waPhoneChatStream.innerHTML = `
+        <div class="wa-msg-row incoming">
+          <div class="wa-bubble incoming">
+            <div class="wa-bubble-sender">${escapeHtml(candidate.name || 'Candidate')}</div>
+            <div class="wa-bubble-text">Hii, I am applying for ${escapeHtml(candidate.role || 'job opening')}.</div>
+            <div class="wa-bubble-meta">
+              <span class="wa-bubble-time">${formatTime(candidate.createdAt || new Date().toISOString())}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    history.forEach((msg) => {
+      const isUser = msg.role === 'user';
+      const rowClass = isUser ? 'incoming' : 'outgoing';
+      const bubbleClass = isUser ? 'incoming' : 'outgoing';
+      const senderLabel = isUser ? escapeHtml(candidate.name || 'Candidate') : 'BrandSetu HR';
+      const timeStr = formatTime(msg.timestamp);
+
+      // Check if message is a document attachment
+      let docCardHtml = '';
+      const text = String(msg.text || '').trim();
+      if (text.includes('[Document received]') || text.toLowerCase().includes('.pdf') || (candidate.resumeUrl && isUser && text.toLowerCase().includes('resume'))) {
+        const docName = candidate.resumeFileName || 'Resume_Document.pdf';
+        const docUrl = candidate.resumeUrl || candidate.portfolio || '#';
+        docCardHtml = `
+          <a href="${docUrl}" target="_blank" class="wa-doc-attachment">
+            <div class="wa-doc-icon"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="wa-doc-info">
+              <div class="wa-doc-title">${escapeHtml(docName)}</div>
+              <div class="wa-doc-sub">PDF Document • Tap to View</div>
+            </div>
+            <div class="wa-doc-download"><i class="fa-solid fa-download"></i></div>
+          </a>
+        `;
+      }
+
+      html += `
+        <div class="wa-msg-row ${rowClass}">
+          <div class="wa-bubble ${bubbleClass}">
+            <div class="wa-bubble-sender">${senderLabel}</div>
+            ${docCardHtml}
+            <div class="wa-bubble-text">${formatWhatsAppText(msg.text)}</div>
+            <div class="wa-bubble-meta">
+              <span class="wa-bubble-time">${timeStr}</span>
+              ${!isUser ? '<span class="wa-double-ticks" title="Delivered & Read">✓✓</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    waPhoneChatStream.innerHTML = html;
+  }
+
+  /**
+   * Send WhatsApp Message from Mobile Phone Simulator
+   */
+  async function sendCandidateWhatsAppMessage() {
+    if (!activeMobileCandidateId) return;
+    const inputVal = (waPhoneInput?.value || '').trim();
+    if (!inputVal) return;
+
+    const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
+    if (!cand) return;
+
+    // Optimistically append outgoing bubble immediately
+    if (!cand.chatHistory) cand.chatHistory = [];
+    const newMsg = {
+      role: 'assistant',
+      text: inputVal,
+      timestamp: new Date().toISOString()
+    };
+    cand.chatHistory.push(newMsg);
+    renderCandidateWhatsAppChat(cand);
+    
+    if (waChatCanvas) {
+      waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
+    }
+
+    if (waPhoneInput) waPhoneInput.value = '';
+
+    // Dispatch API
+    try {
+      const res = await fetch('/api/hiring/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateId: cand.id,
+          message: inputVal
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        alert('Could not send message via WhatsApp: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error sending candidate message:', err);
+    }
+  }
+
+  if (waPhoneSendBtn) {
+    waPhoneSendBtn.addEventListener('click', sendCandidateWhatsAppMessage);
+  }
+
+  if (waPhoneInput) {
+    waPhoneInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendCandidateWhatsAppMessage();
+      }
+    });
+  }
+
+  // Quick Action Chips in Mobile Simulator
+  document.querySelectorAll('.wa-quick-chip').forEach(chip => {
+    chip.addEventListener('click', async () => {
+      if (!activeMobileCandidateId) return;
+      const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
+      if (!cand) return;
+
+      const template = chip.dataset.template;
+      let textToSend = '';
+
+      if (template === 'address') {
+        textToSend = `📍 *BrandSetu Digital Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\nGoogle Maps: https://maps.google.com/?q=Orange+Business+Park+Indore`;
+      } else if (template === 'resume') {
+        textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;
+      } else if (template === 'confirm') {
+        textToSend = `Dear ${cand.name || 'Candidate'}! 🎉 Your in-person interview for the *${cand.role || 'Applied'}* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍`;
+      } else if (template === 'reminder') {
+        if (!confirm('Send 1-Hr Interview Reminder to this candidate?')) return;
+        try {
+          const res = await fetch('/api/hiring/send-reminder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId: cand.id, type: 'interview' })
+          });
+          const d = await res.json();
+          if (d.success) {
+            alert('1-Hr Interview Reminder sent!');
+            loadCandidates();
+          } else {
+            alert('Error: ' + d.error);
+          }
+        } catch (e) {
+          alert('Network error: ' + e.message);
+        }
+        return;
+      }
+
+      if (textToSend && waPhoneInput) {
+        waPhoneInput.value = textToSend;
+        waPhoneInput.focus();
+      }
+    });
+  });
+
+  // =========================================================================
+  // WhatsApp Inbox & Multi-Conversation Live Chats Module
+  // =========================================================================
+  let selectedInboxCandidateId = null;
+  let currentInboxFilter = 'all';
+
+  const navChatCountBadge = document.getElementById('navChatCountBadge');
+  const refreshInboxBtn = document.getElementById('refreshInboxBtn');
+  const inboxPopMobileBtn = document.getElementById('inboxPopMobileBtn');
+  const inboxSearchInput = document.getElementById('inboxSearchInput');
+  const inboxConversationsList = document.getElementById('inboxConversationsList');
+  const inboxEmptyState = document.getElementById('inboxEmptyState');
+  const inboxActiveChat = document.getElementById('inboxActiveChat');
+  const inboxBackToListBtn = document.getElementById('inboxBackToListBtn');
+
+  // Active Chat Header Elements
+  const inboxActiveAvatar = document.getElementById('inboxActiveAvatar');
+  const inboxActiveName = document.getElementById('inboxActiveName');
+  const inboxActiveRoleTag = document.getElementById('inboxActiveRoleTag');
+  const inboxActivePhone = document.getElementById('inboxActivePhone');
+  const inboxInfoResume = document.getElementById('inboxInfoResume');
+  const inboxInfoInterview = document.getElementById('inboxInfoInterview');
+  const inboxInfoStatus = document.getElementById('inboxInfoStatus');
+  const inboxChatCanvas = document.getElementById('inboxChatCanvas');
+  const inboxChatStream = document.getElementById('inboxChatStream');
+  const inboxMessageInput = document.getElementById('inboxMessageInput');
+  const inboxSendBtn = document.getElementById('inboxSendBtn');
+  const inboxScheduleBtn = document.getElementById('inboxScheduleBtn');
+  const inboxOpenMobileBtn = document.getElementById('inboxOpenMobileBtn');
+  const inboxCallBtn = document.getElementById('inboxCallBtn');
+
+  // Filter Pill Elements
+  const inboxFilterAllCount = document.getElementById('inboxFilterAllCount');
+  const inboxFilterMsgCount = document.getElementById('inboxFilterMsgCount');
+  const inboxFilterSchedCount = document.getElementById('inboxFilterSchedCount');
+  const inboxFilterResumeCount = document.getElementById('inboxFilterResumeCount');
+
+  // Filter pill click listeners
+  document.querySelectorAll('.inbox-filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.inbox-filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentInboxFilter = pill.dataset.filter;
+      renderInboxConversationsList();
+    });
+  });
+
+  if (inboxSearchInput) {
+    inboxSearchInput.addEventListener('input', () => {
+      renderInboxConversationsList();
+    });
+  }
+
+  if (refreshInboxBtn) {
+    refreshInboxBtn.addEventListener('click', () => {
+      loadCandidates();
+    });
+  }
+
+  if (inboxBackToListBtn) {
+    inboxBackToListBtn.addEventListener('click', () => {
+      const layout = document.querySelector('.wa-inbox-layout');
+      if (layout) layout.classList.remove('show-chat');
+    });
+  }
+
+  if (inboxPopMobileBtn) {
+    inboxPopMobileBtn.addEventListener('click', () => {
+      const targetId = selectedInboxCandidateId || (candidatesList[0] ? candidatesList[0].id : null);
+      if (targetId) {
+        openCandidateWhatsAppMobile(targetId);
+      } else {
+        alert('Koi candidate ya contact select nahi hai.');
+      }
+    });
+  }
+
+  if (inboxOpenMobileBtn) {
+    inboxOpenMobileBtn.addEventListener('click', () => {
+      if (selectedInboxCandidateId) {
+        openCandidateWhatsAppMobile(selectedInboxCandidateId);
+      }
+    });
+  }
+
+  if (inboxCallBtn) {
+    inboxCallBtn.addEventListener('click', () => {
+      if (!selectedInboxCandidateId) return;
+      const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
+      if (cand && cand.phone) {
+        window.open(`https://wa.me/${cand.phone}`, '_blank');
+      }
+    });
+  }
+
+  if (inboxScheduleBtn) {
+    inboxScheduleBtn.addEventListener('click', () => {
+      if (!selectedInboxCandidateId) return;
+      const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
+      if (!cand) return;
+      
+      scheduleCandidateId.value = cand.id;
+      scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
+      scheduleRole.value = cand.role || 'Video Editor';
+
+      if (cand.interviewDateTime) {
+        const d = new Date(cand.interviewDateTime);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        scheduleDateTime.value = d.toISOString().slice(0, 16);
+      } else {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(11, 0, 0, 0);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
+      }
+      scheduleNotes.value = cand.notes || '';
+      scheduleModal.style.display = 'flex';
+    });
+  }
+
+  /**
+   * Render conversation cards in the left inbox sidebar
+   */
+  function renderInboxConversationsList() {
+    if (!inboxConversationsList) return;
+
+    const total = candidatesList.length;
+    const withMsg = candidatesList.filter(c => c.chatHistory && c.chatHistory.length > 0).length;
+    const scheduled = candidatesList.filter(c => c.status === 'Interview Scheduled').length;
+    const missingResume = candidatesList.filter(c => !c.resumeReceived).length;
+
+    if (inboxFilterAllCount) inboxFilterAllCount.textContent = total;
+    if (inboxFilterMsgCount) inboxFilterMsgCount.textContent = withMsg;
+    if (inboxFilterSchedCount) inboxFilterSchedCount.textContent = scheduled;
+    if (inboxFilterResumeCount) inboxFilterResumeCount.textContent = missingResume;
+    const unreadConversations = candidatesList.filter(c => (Number(c.unreadCount) || 0) > 0).length;
+    if (navChatCountBadge) navChatCountBadge.textContent = unreadConversations;
+
+    const searchTerm = (inboxSearchInput?.value || '').toLowerCase().trim();
+
+    let filtered = candidatesList.filter(c => {
+      // 1. Search Query
+      if (searchTerm) {
+        const nameMatch = (c.name || '').toLowerCase().includes(searchTerm);
+        const phoneMatch = (c.phone || '').includes(searchTerm);
+        const roleMatch = (c.role || '').toLowerCase().includes(searchTerm);
+        const historyMatch = (c.chatHistory || []).some(m => (m.text || '').toLowerCase().includes(searchTerm));
+        if (!nameMatch && !phoneMatch && !roleMatch && !historyMatch) return false;
+      }
+
+      // 2. Filter Pills
+      if (currentInboxFilter === 'with-history') return c.chatHistory && c.chatHistory.length > 0;
+      if (currentInboxFilter === 'interviews') return c.status === 'Interview Scheduled';
+      if (currentInboxFilter === 'pending-resume') return !c.resumeReceived;
+
+      return true;
+    });
+
+    // Sort conversations: Most recent message first, older messages below
+    filtered.sort((a, b) => {
+      const getLatestTime = (cand) => {
+        if (cand.chatHistory && cand.chatHistory.length > 0) {
+          const last = cand.chatHistory[cand.chatHistory.length - 1];
+          if (last.timestamp) return new Date(last.timestamp).getTime();
+        }
+        return new Date(cand.updatedAt || cand.createdAt || 0).getTime();
+      };
+      return getLatestTime(b) - getLatestTime(a);
+    });
+
+    if (filtered.length === 0) {
+      inboxConversationsList.innerHTML = `
+        <div class="inbox-empty-notice">
+          <i class="fa-solid fa-comments fa-2x mb-2 d-block text-dim"></i>
+          Koi chat nahi mili.
+        </div>
+      `;
+      return;
+    }
+
+    inboxConversationsList.innerHTML = filtered.map(c => {
+      const isSelected = c.id === selectedInboxCandidateId;
+      const history = c.chatHistory || [];
+      const lastMsgObj = history.length > 0 ? history[history.length - 1] : null;
+      let lastMsgText = 'No messages yet';
+      let lastMsgTime = '';
+      let isOutgoing = false;
+
+      if (lastMsgObj) {
+        lastMsgText = (lastMsgObj.text || '').replace(/[\r\n]+/g, ' ').substring(0, 45);
+        lastMsgTime = formatTime(lastMsgObj.timestamp);
+        isOutgoing = lastMsgObj.role === 'assistant';
+      } else if (c.createdAt) {
+        lastMsgTime = formatTime(c.createdAt);
+      }
+
+      const initial = (c.name || 'C').trim().charAt(0).toUpperCase() || 'C';
+
+      // Role Pill Class
+      let roleClass = 'badge-role-general';
+      if ((c.role || '').toLowerCase().includes('seo')) roleClass = 'badge-role-seo';
+      else if ((c.role || '').toLowerCase().includes('video')) roleClass = 'badge-role-video';
+
+      return `
+        <div class="wa-chat-item ${isSelected ? 'active' : ''}" data-id="${c.id}">
+          <div class="wa-chat-item-avatar">
+            <span>${escapeHtml(initial)}</span>
+            <span class="wa-online-dot"></span>
+          </div>
+          <div class="wa-chat-item-content">
+            <div class="wa-chat-item-header">
+              <span class="wa-chat-item-name">${escapeHtml(c.name || 'Candidate')}</span>
+              <span class="wa-chat-item-time">${lastMsgTime}</span>
+            </div>
+            <div class="wa-chat-item-lastmsg">
+              ${isOutgoing ? '<span class="text-success"><i class="fa-solid fa-check-double"></i></span> ' : ''}
+              <span>${escapeHtml(lastMsgText)}</span>
+            </div>
+            <div class="wa-chat-item-tags">
+              <span class="badge-role ${roleClass}" style="font-size:0.65rem; padding:1px 5px;">${escapeHtml(c.role || 'General')}</span>
+              ${c.resumeReceived 
+                ? '<span class="badge-status badge-status-received" style="font-size:0.62rem; padding:1px 5px;"><i class="fa-solid fa-file-pdf"></i> Resume</span>' 
+                : '<span class="badge-status badge-status-pending" style="font-size:0.62rem; padding:1px 5px;">No Resume</span>'}
+              ${history.length > 0 ? `<span class="wa-chat-badge-msgcount">${history.length} msgs</span>` : ''}
+              ${(Number(c.unreadCount) || 0) > 0 ? `<span class="wa-chat-badge-unread">${c.unreadCount}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Attach click listeners to each conversation item
+    document.querySelectorAll('.wa-chat-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        selectInboxContact(id);
+      });
+    });
+  }
+
+  /**
+   * Select and load a candidate conversation in the right panel
+   */
+  async function selectInboxContact(candidateId) {
+    selectedInboxCandidateId = candidateId;
+
+    const cand = candidatesList.find(c => c.id === candidateId);
+    if (!cand) return;
+
+    // Opening a conversation marks its incoming messages as read immediately.
+    if ((Number(cand.unreadCount) || 0) > 0) {
+      cand.unreadCount = 0;
+      const activeItem = document.querySelector(`.wa-chat-item[data-id="${candidateId}"]`);
+      if (activeItem) {
+        const badge = activeItem.querySelector('.wa-chat-badge-unread');
+        if (badge) badge.remove();
+      }
+      const unreadConversations = candidatesList.filter(c => (Number(c.unreadCount) || 0) > 0).length;
+      if (navChatCountBadge) navChatCountBadge.textContent = unreadConversations;
+      fetch(`/api/hiring/candidate/${encodeURIComponent(candidateId)}/read`, { method: 'POST' }).catch(() => {});
+    }
+
+    // Highlight left item
+    document.querySelectorAll('.wa-chat-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === candidateId);
+    });
+
+    // Show Chat Panel, Hide Empty State
+    if (inboxEmptyState) inboxEmptyState.style.display = 'none';
+    if (inboxActiveChat) inboxActiveChat.style.display = 'flex';
+
+    // Mobile slide transition
+    const layout = document.querySelector('.wa-inbox-layout');
+    if (layout) layout.classList.add('show-chat');
+
+    // Populate Header Info
+    const initial = (cand.name || 'C').trim().charAt(0).toUpperCase() || 'C';
+    if (inboxActiveAvatar) inboxActiveAvatar.textContent = initial;
+    if (inboxActiveName) inboxActiveName.textContent = cand.name || 'Candidate';
+    if (inboxActivePhone) inboxActivePhone.textContent = `+${cand.phone}`;
+    if (inboxActiveRoleTag) {
+      inboxActiveRoleTag.textContent = cand.role || 'Applicant';
+      inboxActiveRoleTag.className = `badge-role ${
+        (cand.role || '').toLowerCase().includes('seo') ? 'badge-role-seo' :
+        (cand.role || '').toLowerCase().includes('video') ? 'badge-role-video' : 'badge-role-general'
+      }`;
+    }
+
+    // Populate Info Strip
+    if (inboxInfoResume) {
+      inboxInfoResume.innerHTML = cand.resumeReceived 
+        ? `<i class="fa-solid fa-file-circle-check text-success"></i> Resume: Received` 
+        : `<i class="fa-solid fa-file-circle-question text-warning"></i> Resume: Pending`;
+    }
+    if (inboxInfoInterview) {
+      if (cand.interviewDateTime) {
+        try {
+          const d = new Date(cand.interviewDateTime);
+          inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-check text-success"></i> Interview: ${d.toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+        } catch (e) {
+          inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-check"></i> Interview: Scheduled`;
+        }
+      } else {
+        inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-xmark text-muted"></i> Interview: Not Set`;
+      }
+    }
+    if (inboxInfoStatus) {
+      inboxInfoStatus.innerHTML = `<i class="fa-solid fa-tag text-info"></i> Status: ${escapeHtml(cand.status || 'Applied')}`;
+    }
+
+    // Render Chat Messages
+    renderInboxChatStream(cand);
+
+    // Auto focus input
+    setTimeout(() => {
+      if (inboxChatCanvas) inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
+      if (inboxMessageInput) inboxMessageInput.focus();
+    }, 40);
+  }
+
+  /**
+   * Render chat stream for active inbox conversation
+   */
+  function renderInboxChatStream(candidate) {
+    if (!inboxChatStream) return;
+
+    const history = candidate.chatHistory || [];
+
+    if (history.length === 0) {
+      inboxChatStream.innerHTML = `
+        <div class="wa-msg-row incoming">
+          <div class="wa-bubble incoming">
+            <div class="wa-bubble-sender">${escapeHtml(candidate.name || 'Candidate')}</div>
+            <div class="wa-bubble-text">Hii, I am applying for ${escapeHtml(candidate.role || 'job position')}.</div>
+            <div class="wa-bubble-meta">
+              <span class="wa-bubble-time">${formatTime(candidate.createdAt || new Date().toISOString())}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    history.forEach((msg) => {
+      const isUser = msg.role === 'user';
+      const rowClass = isUser ? 'incoming' : 'outgoing';
+      const bubbleClass = isUser ? 'incoming' : 'outgoing';
+      const senderLabel = isUser ? escapeHtml(candidate.name || 'Candidate') : 'BrandSetu HR';
+      const timeStr = formatTime(msg.timestamp);
+
+      // Check for Document / Resume Attachment
+      let docCardHtml = '';
+      const text = String(msg.text || '').trim();
+      if (text.includes('[Document received]') || text.toLowerCase().includes('.pdf') || (candidate.resumeUrl && isUser && text.toLowerCase().includes('resume'))) {
+        const docName = candidate.resumeFileName || 'Resume_Document.pdf';
+        const docUrl = candidate.resumeUrl || candidate.portfolio || '#';
+        docCardHtml = `
+          <a href="${docUrl}" target="_blank" class="wa-doc-attachment">
+            <div class="wa-doc-icon"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="wa-doc-info">
+              <div class="wa-doc-title">${escapeHtml(docName)}</div>
+              <div class="wa-doc-sub">PDF Document • Click to View / Download</div>
+            </div>
+            <div class="wa-doc-download"><i class="fa-solid fa-download"></i></div>
+          </a>
+        `;
+      }
+
+      html += `
+        <div class="wa-msg-row ${rowClass}">
+          <div class="wa-bubble ${bubbleClass}">
+            <div class="wa-bubble-sender">${senderLabel}</div>
+            ${docCardHtml}
+            <div class="wa-bubble-text">${formatWhatsAppText(msg.text)}</div>
+            <div class="wa-bubble-meta">
+              <span class="wa-bubble-time">${timeStr}</span>
+              ${!isUser ? '<span class="wa-double-ticks" title="Delivered & Read">✓✓</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    inboxChatStream.innerHTML = html;
+  }
+
+  /**
+   * Send WhatsApp Message from Inbox Tab
+   */
+  async function sendInboxWhatsAppMessage() {
+    if (!selectedInboxCandidateId) return;
+    const textVal = (inboxMessageInput?.value || '').trim();
+    if (!textVal) return;
+
+    const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
+    if (!cand) return;
+
+    // Optimistically update
+    if (!cand.chatHistory) cand.chatHistory = [];
+    const newMsg = {
+      role: 'assistant',
+      text: textVal,
+      timestamp: new Date().toISOString()
+    };
+    cand.chatHistory.push(newMsg);
+    renderInboxChatStream(cand);
+    renderInboxConversationsList();
+
+    if (inboxChatCanvas) inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
+    if (inboxMessageInput) inboxMessageInput.value = '';
+
+    try {
+      const res = await fetch('/api/hiring/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateId: cand.id,
+          message: textVal
+        })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        alert('Could not send message via WhatsApp: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+    }
+  }
+
+  if (inboxSendBtn) {
+    inboxSendBtn.addEventListener('click', sendInboxWhatsAppMessage);
+  }
+
+  if (inboxMessageInput) {
+    inboxMessageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendInboxWhatsAppMessage();
+      }
+    });
+  }
+
+  // Quick Chips in Inbox Tab
+  document.querySelectorAll('.inbox-quick-chip').forEach(chip => {
+    chip.addEventListener('click', async () => {
+      if (!selectedInboxCandidateId) return;
+      const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
+      if (!cand) return;
+
+      const template = chip.dataset.template;
+      let textToSend = '';
+
+      if (template === 'address') {
+        textToSend = `📍 *BrandSetu Digital Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\nGoogle Maps: https://maps.google.com/?q=Orange+Business+Park+Indore`;
+      } else if (template === 'resume') {
+        textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;
+      } else if (template === 'confirm') {
+        textToSend = `Dear ${cand.name || 'Candidate'}! 🎉 Your in-person interview for the *${cand.role || 'Applied'}* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍`;
+      } else if (template === 'reminder') {
+        if (!confirm('Send 1-Hr Interview Reminder to this candidate?')) return;
+        try {
+          const res = await fetch('/api/hiring/send-reminder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId: cand.id, type: 'interview' })
+          });
+          const d = await res.json();
+          if (d.success) {
+            alert('1-Hr Interview Reminder sent!');
+            loadCandidates();
+          } else {
+            alert('Error: ' + d.error);
+          }
+        } catch (e) {
+          alert('Network error: ' + e.message);
+        }
+        return;
+      }
+
+      if (textToSend && inboxMessageInput) {
+        inboxMessageInput.value = textToSend;
+        inboxMessageInput.focus();
+      }
+    });
   });
 
   // Initial Load Calls
@@ -1025,4 +1950,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAiConfig();
   loadCandidates();
 });
+
 

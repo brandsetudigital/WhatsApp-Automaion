@@ -5,11 +5,17 @@ const hiringController = require('../controllers/hiring.controller');
 // Get all candidates & hiring stats
 router.get('/candidates', hiringController.getCandidates);
 
+// Mark a candidate's incoming WhatsApp messages as read
+router.post('/candidate/:id/read', hiringController.markCandidateMessagesRead);
+
 // Schedule Interview & Send Instant WhatsApp Confirmation
 router.post('/schedule', hiringController.scheduleCandidateInterview);
 
 // Send Manual / Instant Reminder (Missing Resume or Interview)
 router.post('/send-reminder', hiringController.sendCandidateReminder);
+
+// Send Custom WhatsApp Message to Candidate
+router.post('/send-message', hiringController.sendCandidateMessage);
 
 // Create Candidate Manually
 router.post('/candidate', hiringController.createCandidate);

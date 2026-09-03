@@ -17,6 +17,7 @@ const xlsx = require('xlsx');
 
 // Import Custom Services & Modules
 const whatsappCloudService = require('./services/whatsappCloud.service');
+const whatsappWebService = require('./services/whatsappWeb.service');
 const aiService = require('./services/ai.service');
 const hiringService = require('./services/hiring.service');
 const whatsappRoutes = require('./routes/whatsapp.routes');
@@ -73,6 +74,16 @@ const upload = multer({ storage });
 // Initialize Hiring Service with Socket IO
 hiringService.setHiringIo(io);
 
+if ((process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web') {
+  whatsappWebService.on('message', messageData => {
+    processIncomingWhatsAppMessage(messageData).catch(err => {
+      console.error('❌ Error processing WhatsApp Web message:', err.message || err);
+    });
+  });
+  whatsappWebService.on('status', status => io.emit('status-update', status));
+  whatsappWebService.initialize().catch(err => console.error('❌ WhatsApp Web startup failed:', err.message));
+}
+
 // Application State
 let activeCampaign = {
   running: false,
@@ -102,6 +113,7 @@ function saveAutoReplies() {
  */
 async function processIncomingWhatsAppMessage(messageData) {
   const { customerPhone, customerName, messageText, messageId } = messageData;
+  const replyRecipient = messageData.chatId || customerPhone;
 
   console.log(`📩 Webhook message received from +${customerPhone} (${customerName}): "${messageText}"`);
 
@@ -224,7 +236,8 @@ async function processIncomingWhatsAppMessage(messageData) {
       });
 
       try {
-        const sendResult = await whatsappCloudService.sendWhatsAppText(customerPhone, rule.replyText);
+        const isMetaSource = messageData.source === 'meta';
+        const sendResult = await whatsappCloudService.sendWhatsAppText(replyRecipient, rule.replyText, isMetaSource);
         if (candidate) {
           hiringService.appendChatHistory(candidate, 'assistant', rule.replyText);
         }
@@ -290,12 +303,18 @@ async function processIncomingWhatsAppMessage(messageData) {
         ? await aiService.generateHiringAIResponse(candidate, messageText, messageData)
         : await aiService.generateAIResponse(messageText);
 
-      // Send AI response via Meta Cloud API
-      await whatsappCloudService.sendWhatsAppText(customerPhone, aiResponseText);
+      // Send AI response
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, aiResponseText, isMetaSource);
 
       if (candidate) {
         hiringService.appendChatHistory(candidate, 'assistant', aiResponseText);
         hiringService.saveCandidatesAndSyncExcel();
+        io.emit('hiring-updated', {
+          candidates: hiringService.getCandidates(),
+          stats: hiringService.getHiringStats(),
+          candidateId: candidate.id
+        });
       }
 
       console.log(`✅ AI response sent to +${customerPhone}: "${aiResponseText.substring(0, 60)}..."`);
@@ -304,7 +323,7 @@ async function processIncomingWhatsAppMessage(messageData) {
         text: `🤖 AI Assistant replied to +${customerPhone}: "${aiResponseText.substring(0, 60)}..."`
       });
     } catch (aiErr) {
-      console.error('❌ Error processing AI response for +${customerPhone}:', aiErr.message);
+      console.error(`❌ Error processing AI response for +${customerPhone}:`, aiErr.message);
       io.emit('log', {
         type: 'error',
         text: `❌ AI Chatbot error for +${customerPhone}: ${aiErr.message}`
@@ -323,6 +342,15 @@ app.use('/api/hiring', hiringRoutes);
 // Socket.io Realtime Events
 io.on('connection', async (socket) => {
   try {
+    if ((process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web') {
+      socket.emit('status-update', whatsappWebService.getStatus());
+      socket.emit('campaign-progress', activeCampaign);
+      socket.emit('hiring:update', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats()
+      });
+      return;
+    }
     const health = await whatsappCloudService.checkMetaHealth();
     socket.emit('status-update', {
       provider: 'meta',

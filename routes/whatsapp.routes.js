@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const whatsappController = require('../controllers/whatsapp.controller');
+const whatsappWebService = require('../services/whatsappWeb.service');
 
 // Meta Webhook Verification (GET
 router.get('/webhook', (req, res) => {
@@ -18,6 +19,10 @@ router.post('/webhook', (req, res) => {
 // Meta WhatsApp Cloud API Connection Status Health Check (GET)
 router.get('/status', (req, res) => {
   whatsappController.getWhatsAppStatus(req, res);
+});
+
+router.get('/web/qr', (req, res) => {
+  res.json({ success: true, ...whatsappWebService.getStatus() });
 });
 
 module.exports = router;

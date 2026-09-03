@@ -2,6 +2,11 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const FormData = require('form-data');
+const whatsappWebService = require('./whatsappWeb.service');
+
+function isWebProvider() {
+  return (process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web';
+}
 
 const GRAPH_API_VERSION = 'v20.0';
 
@@ -38,7 +43,8 @@ function getHeaders() {
 /**
  * Send text message via Meta WhatsApp Cloud API
  */
-async function sendWhatsAppText(to, message) {
+async function sendWhatsAppText(to, message, forceMeta = false) {
+  if (!forceMeta && isWebProvider()) return whatsappWebService.sendWhatsAppText(to, message);
   const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
 
