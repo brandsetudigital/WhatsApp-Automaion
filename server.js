@@ -74,7 +74,7 @@ const upload = multer({ storage });
 // Initialize Hiring Service with Socket IO
 hiringService.setHiringIo(io);
 
-if ((process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web') {
+if ((process.env.WHATSAPP_PROVIDER || 'web').toLowerCase() === 'web') {
   whatsappWebService.on('message', messageData => {
     processIncomingWhatsAppMessage(messageData).catch(err => {
       console.error('❌ Error processing WhatsApp Web message:', err.message || err);

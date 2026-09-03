@@ -94,7 +94,7 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
  */
 async function getWhatsAppStatus(req, res) {
   try {
-    if ((process.env.WHATSAPP_PROVIDER || 'meta').toLowerCase() === 'web') {
+    if ((process.env.WHATSAPP_PROVIDER || 'web').toLowerCase() === 'web') {
       return res.json({ success: true, ...whatsappWebService.getStatus() });
     }
     const health = await whatsappCloudService.checkMetaHealth();

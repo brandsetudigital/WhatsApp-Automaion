@@ -1,5 +1,115 @@
 [
   {
+    "id": "cand_1788435212110_4z3u1",
+    "phone": "38899686625461",
+    "whatsappChatId": "38899686625461@lid",
+    "name": "Nancy Ajmera",
+    "role": "General Applicant",
+    "city": "Indore",
+    "experience": "",
+    "portfolio": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-03T11:33:32.109Z",
+    "updatedAt": "2026-09-03T11:33:33.764Z",
+    "lastMessage": "Hello! Can I get more info on this?",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "",
+        "timestamp": "2026-09-03T11:33:32.110Z"
+      },
+      {
+        "role": "user",
+        "text": "",
+        "timestamp": "2026-09-03T11:33:32.192Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:33:32.784Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:33:32.854Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-03T11:33:33.764Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Nancy! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:33:34.176Z"
+      }
+    ],
+    "unreadCount": 3
+  },
+  {
+    "id": "cand_1788435010658_taur6",
+    "phone": "28721134207059",
+    "whatsappChatId": "28721134207059@lid",
+    "name": "Candidate",
+    "role": "General Applicant",
+    "city": "Indore",
+    "experience": "",
+    "portfolio": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-03T11:30:10.647Z",
+    "updatedAt": "2026-09-03T11:30:16.481Z",
+    "lastMessage": "Hello! Can I get more info on this?",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "",
+        "timestamp": "2026-09-03T11:30:10.660Z"
+      },
+      {
+        "role": "user",
+        "text": "",
+        "timestamp": "2026-09-03T11:30:11.053Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:30:11.746Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:30:11.822Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-03T11:30:16.482Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-03T11:30:16.830Z"
+      }
+    ],
+    "unreadCount": 3
+  },
+  {
     "id": "cand_1788432113455_taw4v",
     "phone": "172146936524879",
     "whatsappChatId": "172146936524879@lid",
@@ -423,19 +533,9 @@
     "interviewReminderSent": true,
     "interviewReminderSentAt": "2026-09-03T10:41:55.248Z",
     "createdAt": "2026-09-03T08:59:53.960Z",
-    "updatedAt": "2026-09-03T10:57:42.261Z",
-    "lastMessage": "Yes a rha hun",
+    "updatedAt": "2026-09-03T11:40:12.717Z",
+    "lastMessage": "Hiiii",
     "chatHistory": [
-      {
-        "role": "assistant",
-        "text": "Namaste Arjun! 🌟 We have paid internship",
-        "timestamp": "2026-09-03T10:04:35.266Z"
-      },
-      {
-        "role": "user",
-        "text": "Ok",
-        "timestamp": "2026-09-03T10:04:40.795Z"
-      },
       {
         "role": "assistant",
         "text": "Great! 🚀 Which role are you interested in applying",
@@ -525,9 +625,19 @@
         "role": "assistant",
         "text": "Hello Arjun! 😊\nYour interview is already confirmed for *Thu, 3 Sept, 05:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
         "timestamp": "2026-09-03T10:51:49.210Z"
+      },
+      {
+        "role": "user",
+        "text": "Hiiii",
+        "timestamp": "2026-09-03T11:40:12.722Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nYour interview is already confirmed for *Thu, 3 Sept, 05:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
+        "timestamp": "2026-09-03T11:40:13.707Z"
       }
     ],
-    "unreadCount": 0
+    "unreadCount": 1
   },
   {
     "id": "cand_1788424547715_naphc",
