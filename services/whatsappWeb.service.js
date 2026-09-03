@@ -2,23 +2,47 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const QRCode = require('qrcode');
 const EventEmitter = require('events');
 const path = require('path');
+const fs = require('fs');
+
+function getChromeExecutablePath() {
+  if (process.env.PUPPETEER_EXECUTABLE_PATH && fs.existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
+    return process.env.PUPPETEER_EXECUTABLE_PATH;
+  }
+  const possiblePaths = [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+    '/snap/bin/chromium',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return undefined;
+}
 
 class WhatsAppWebService extends EventEmitter {
   constructor() {
     super();
     this.qrDataUrl = null;
     this.status = 'disconnected';
+    const execPath = getChromeExecutablePath();
     this.client = new Client({
       authStrategy: new LocalAuth({ dataPath: path.join(__dirname, '..', '.wwebjs_auth') }),
       puppeteer: {
         headless: true,
+        ...(execPath ? { executablePath: execPath } : {}),
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
           '--disable-accelerated-2d-canvas',
           '--no-first-run',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--single-process',
+          '--no-zygote'
         ]
       }
     });
