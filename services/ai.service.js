@@ -96,9 +96,9 @@ function detectLanguage(text) {
  */
 async function callGeminiApi(promptText, apiKey, options = {}) {
   const candidateModels = [
+    'gemini-3.5-flash',
     'gemini-3.6-flash',
-    'gemini-3.7-flash',
-    'gemini-3.5-flash'
+    'gemini-3.7-flash'
   ];
 
   for (const model of candidateModels) {
@@ -155,12 +155,12 @@ function extractJsonFromString(str) {
   return null;
 }
 
-function parseInterviewScheduleLocal(userMessage) {
+function parseInterviewScheduleLocal(userMessage, candidate = null) {
   if (!userMessage) return null;
   const rawText = String(userMessage).trim();
   const text = rawText.toLowerCase();
 
-  // 1. Filter out non-scheduling queries (salary, experience, portfolio, general questions)
+  // 1. Filter out pure non-scheduling queries (salary, experience, role selection, general questions)
   if (text.includes('timing') || text.includes('salary') || text.includes('address') || text.includes('kaha') || text.includes('where') || text.includes('package') || text.includes('tool') || text.includes('skill') || text.includes('exp') || text.includes('year') || text.includes('portfolio') || text.includes('resume')) {
     // Only proceed if explicit scheduling verb is present
     if (!text.includes('aa sakta') && !text.includes('aa jaunga') && !text.includes('aunga') && !text.includes('aungi') && !text.includes('reschedule') && !text.includes('visit kar')) {
@@ -168,31 +168,35 @@ function parseInterviewScheduleLocal(userMessage) {
     }
   }
 
-  // 2. Detect Negation (e.g. "kal nahi aa sakta", "cannot come tomorrow", "sry i not coming", "cancel")
-  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|nahi\s*ho\s*payega)/i;
+  // 2. Detect Negation (e.g. "kal nahi aa sakta", "cannot come tomorrow", "not possible", "nahi ho payega", "not available")
+  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi|busy\s*hu|kisi\s*aur\s*din)/i;
   const hasNegation = negationPattern.test(text);
 
   // 3. Determine working text: if there's negation with reschedule clause
   let schedulingText = text;
   if (hasNegation) {
-    const rescheduleMatch = text.match(/(?:reschedule|shift|instead|naya\s*time|dusre\s*din|phir|ab)\s*(?:my\s*interview|to|for|ko)?\s*(.*)/i);
+    const rescheduleMatch = text.match(/(?:reschedule|shift|instead|naya\s*time|dusre\s*din|phir|ab|parso|monday|tuesday|wednesday|thursday|friday|saturday)\s*(?:my\s*interview|to|for|ko)?\s*(.*)/i);
     if (rescheduleMatch && rescheduleMatch[1] && rescheduleMatch[1].trim().length > 2) {
-      schedulingText = rescheduleMatch[1].trim();
+      schedulingText = rescheduleMatch[0].trim();
     } else {
       const alternativeMatch = text.match(/(?:aaj|today|tomorrow|kal|monday|tuesday|wednesday|thursday|friday|saturday)\s*(?:ko)?\s*\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)?/i);
       if (alternativeMatch && !negationPattern.test(alternativeMatch[0])) {
         schedulingText = alternativeMatch[0];
       } else {
-        return null;
+        return null; // Candidate said NO / Not available without alternative date
       }
     }
   }
 
-  // 4. Must have day indicator OR explicit time keyword (am/pm/baje)
+  // 4. Check for Affirmative Confirmation (e.g. "ha", "haan", "yes", "ok", "done", "aa sakta hu", "theek hai", "sure")
+  const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
+  const isAffirmative = affirmativePattern.test(text);
+
+  // 5. Must have day indicator OR explicit time keyword OR affirmative response when interview slot is pending
   const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
   const hasExplicitTimeModifier = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(schedulingText);
 
-  if (!hasDayIndicator && !hasExplicitTimeModifier) {
+  if (!hasDayIndicator && !hasExplicitTimeModifier && !isAffirmative) {
     return null;
   }
 
@@ -201,12 +205,15 @@ function parseInterviewScheduleLocal(userMessage) {
   const istNow = new Date(now.getTime() + istOffsetMs);
 
   let targetDate = new Date(istNow);
-  let dayOffset = 0;
+  let dayOffset = 1; // Default to tomorrow for affirmative responses
 
   if (schedulingText.includes('day after tomorrow') || schedulingText.includes('parso') || schedulingText.includes('parson')) {
     dayOffset = 2;
-  } else if (schedulingText.includes('tomorrow') || schedulingText.includes('kal')) {
+  } else if (schedulingText.includes('tomorrow') || schedulingText.includes('kal') || isAffirmative) {
     dayOffset = 1;
+    // If tomorrow is Sunday, roll over to Monday
+    const tomorrowDay = (istNow.getUTCDay() + 1) % 7;
+    if (tomorrowDay === 0) dayOffset = 2;
   } else if (schedulingText.includes('today') || schedulingText.includes('aaj')) {
     dayOffset = 0;
   } else {
@@ -224,6 +231,7 @@ function parseInterviewScheduleLocal(userMessage) {
 
   targetDate.setUTCDate(targetDate.getUTCDate() + dayOffset);
 
+  // Default hour: 11:00 AM (between 10 AM - 12 PM morning slot)
   let hour = 11;
   let minute = 0;
 
@@ -261,9 +269,12 @@ function parseInterviewScheduleLocal(userMessage) {
 
   const isoStr = `${yyyy}-${mm}-${dd}T${hh}:${min}:00+05:30`;
 
+  const isOnlineMode = /(?:online|google\s*meet|meet|zoom|virtual|video\s*call|bahar|out\s*of\s*indore|not\s*in\s*indore)/i.test(text) || (candidate && candidate.interviewMode === 'online');
+
   return {
     isScheduling: true,
     proposedDateTimeIso: isoStr,
+    interviewMode: isOnlineMode ? 'online' : 'in_person',
     readableFormattedTime: `${dd}/${mm}/${yyyy} at ${hour > 12 ? hour - 12 : hour}:${min} ${hour >= 12 ? 'PM' : 'AM'}`
   };
 }
@@ -272,18 +283,18 @@ function parseInterviewScheduleLocal(userMessage) {
  * Detect Interview Date/Time from candidate message (Hybrid: Fast Local + Gemini)
  */
 async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
-  const localParsed = parseInterviewScheduleLocal(userMessage);
+  const localParsed = parseInterviewScheduleLocal(userMessage, candidate);
   if (localParsed && localParsed.isScheduling) {
     return localParsed;
   }
 
-  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|nahi\s*ho\s*payega)/i;
-  if (negationPattern.test(userMessage)) {
-    return null;
+  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi)/i;
+  if (negationPattern.test(userMessage) && !/(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}\s*(?:baje|am|pm)\b)/i.test(userMessage)) {
+    return null; // Pure negation without alternative
   }
 
-  // Fast pre-filter: Skip LLM call if message has no scheduling/time keywords
-  const scheduleKeywords = /(?:kal|tomorrow|today|aaj|parso|baje|am|pm|interview|schedule|reschedule|monday|tuesday|wednesday|thursday|friday|saturday|sunday|aunga|aungi|aa\s*raha|\b(?:1[0-2]|[1-9])\s*(?:baje|am|pm|o'?clock)?\b)/i;
+  // Fast pre-filter: Skip LLM call if message has no scheduling/time/affirmative keywords
+  const scheduleKeywords = /(?:kal|tomorrow|today|aaj|parso|baje|am|pm|interview|schedule|reschedule|monday|tuesday|wednesday|thursday|friday|saturday|sunday|aunga|aungi|aa\s*raha|haan|yes|yep|sure|done|online|google\s*meet|\b(?:1[0-2]|[1-9])\s*(?:baje|am|pm|o'?clock)?\b)/i;
   if (!scheduleKeywords.test(userMessage)) {
     return null;
   }
@@ -384,7 +395,28 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 2. RESUME / PORTFOLIO SUBMISSION DETECTED (Right now in message)
+  // 2. OUT OF INDORE / ONLINE GOOGLE MEET INTERVIEW CHECK
+  const outOfIndorePattern = /(?:indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|bahar\s*hu|bahar\s*rehta|bhopal|delhi|ujjain|dewas|gwaliar|gwalior|jabalpur|raipur|jaipur|pune|mumbai|other\s*city|dusre\s*shehar|online\s*interview|google\s*meet|virtual\s*interview|video\s*call\s*interview|online\s*meet|online\s*kar\s*lo|online\s*ho\s*skta|online\s*ho\s*sakta|online\s*de\s*sakta|online\s*le\s*lo)/i;
+  if (outOfIndorePattern.test(text)) {
+    candidate.interviewMode = 'online';
+    if (isHinglish) {
+      return `${greetingHi}\n\nKoi baat nahi! Agar aap filhal Indore se bahar hain, toh hum aapka *Online Google Meet Interview* conduct kar sakte hain. 💻✨\n\n👉 Kripya batayein aap kis din aur time par online interview ke liye available hain? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅\n\n📌 *(Interview shuru hone se 15 minute pehle aapko WhatsApp par Google Meet joining link mil jayegi).* 👍`;
+    } else {
+      return `${greetingEn}\n\nNo problem at all! If you are currently outside Indore, we can conduct your interview online via *Google Meet*. 💻✨\n\n👉 Please share your preferred Date and Time when you are available for the online interview (Monday to Saturday, 10:00 AM – 6:00 PM). 📅\n\n📌 *(You will receive the Google Meet joining link on WhatsApp 15 minutes prior to the interview).* 👍`;
+    }
+  }
+
+  // 3. NEGATION / CANNOT COME TOMORROW / RESCHEDULE REQUEST
+  const unablePhrases = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi|busy\s*hu|busy|kisi\s*aur\s*din|nahi|nhi)/i;
+  if (unablePhrases.test(text) && !text.includes('ha') && !text.includes('yes')) {
+    if (isHinglish) {
+      return `${greetingHi}\n\nKoi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅`;
+    } else {
+      return `${greetingEn}\n\nNo problem at all! Please share your preferred Date and Time (Monday to Saturday, between 10:00 AM and 6:00 PM) when you would be available to visit for your in-person interview. 📅`;
+    }
+  }
+
+  // 3. RESUME / PORTFOLIO SUBMISSION DETECTED (Right now in message)
   const isDirectResumeInMessage = (
     text.endsWith('.pdf') ||
     text.endsWith('.docx') ||
@@ -407,19 +439,19 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (isDirectResumeInMessage) {
     if (!candidate.interviewDateTime) {
       if (isHinglish) {
-        return `${greetingHi}\n\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\nAap in-person practical interview ke liye hamare Indore office (103 Orange Business Park, Bhawarkua) kis din aur time visit karna chahenge? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅`;
+        return `${greetingHi}\n\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person practical interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
       } else {
-        return `${greetingEn}\n\nThank you for sharing your resume/portfolio! 📄✨\n\nWhen would you like to visit our Indore office (103 Orange Business Park, Bhawarkua) for an in-person interview? Please share your preferred date and time (Monday to Saturday, 10:00 AM – 6:00 PM). 📅`;
+        return `${greetingEn}\n\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
       }
     }
   }
 
-  // 3. CANDIDATE RESUME IS ALREADY ON FILE (Ask for interview date/time directly)
+  // 4. CANDIDATE RESUME IS ALREADY ON FILE (Propose tomorrow morning 10 AM - 12 PM slot)
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
     if (isHinglish) {
-      return `${greetingHi}\n\nAapka resume hamare paas already saved hai! 📄✨\n\nAap in-person interview ke liye hamare Indore office (Bhawarkua) kis din aur time visit kar sakte hain? (Monday to Saturday, 10:00 AM – 6:00 PM) 📅`;
+      return `${greetingHi}\n\nAapka resume hamare paas already saved hai! 📄✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna time batayein). 👍`;
     } else {
-      return `${greetingEn}\n\nYour resume is already received and saved on file! 📄✨\n\nWhen would you like to visit our Indore office for your in-person interview? Please share your preferred date and time (Monday to Saturday, 10:00 AM – 6:00 PM). 📅`;
+      return `${greetingEn}\n\nYour resume is already received and saved on file! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
     }
   }
 
@@ -506,14 +538,7 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  const unablePhrases = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|cancel|reschedule|postpone)/i;
-  if (unablePhrases.test(text)) {
-    if (isHinglish) {
-      return `${greetingHi}\n\nKoi baat nahi! Aap kis naye din ya time par hamare Indore office visit karna chahenge? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅\n\nKripya apna preferred date aur time batayein, hum aapka interview reschedule kar denge. 👍`;
-    } else {
-      return `${greetingEn}\n\nNo problem at all! When would you like to reschedule your in-person interview? (Monday to Saturday, between 10:00 AM and 6:00 PM) 📅\n\nPlease share your preferred date and time, and we will update your schedule. 👍`;
-    }
-  }
+
 
   // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET ──
   if (!candidate.role || candidate.role === 'General Applicant') {
@@ -569,12 +594,12 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // ── STEP 4: RESUME / PORTFOLIO RECEIVED, ASK FOR INTERVIEW DATE & TIME ──
+  // ── STEP 4: RESUME / PORTFOLIO RECEIVED, PROPOSE TOMORROW MORNING 10 AM - 12 PM SLOT ──
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
     if (isHinglish) {
-      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\nAap *in-person practical interview* ke liye hamare Indore office kab visit karna chahenge?\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore\n⏰ *Interview Slots:* Monday to Saturday (10:00 AM se 6:00 PM ke beech)\n\nKripya apna preferred *Date aur Time* batayein (e.g. *Kal 2 baje* ya *Monday 11 AM*). 📅`;
+      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
     } else {
-      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\nWhen would you like to visit our Indore office for an in-person practical interview?\n📍 *Office:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore\n⏰ *Timings:* Monday to Saturday (10:00 AM – 6:00 PM)\n\nPlease share your preferred *Day and Time* (e.g. *Tomorrow 2 PM* or *Monday 11 AM*). 📅`;
+      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
     }
   }
 
@@ -667,8 +692,9 @@ Acknowledge the chosen role and ask:
 👉 STEP 3 (If role & experience are known, but Resume / Portfolio is pending):
 Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link based on the job requirements.
 
-👉 STEP 4 (If Resume / Portfolio has been received):
-Thank them and invite them for an in-person practical interview at our Indore office (103 Orange Business Park, Bhawarkua, Mon-Sat 10 AM - 6 PM). Ask which day and time works best for them.
+👉 STEP 4 (If Resume / Portfolio has been received, but interview not scheduled yet):
+1. Propose tomorrow morning slot: Ask "Kya aap kal morning me 10:00 AM se 12:00 PM ke beech hamare Indore office (103 Orange Business Park, Bhawarkua) interview ke liye aa sakte hain?"
+2. If candidate says NO / Cannot come / Not available / Busy: Reply politely: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
 
 RULES:
 - If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.

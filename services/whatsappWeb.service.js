@@ -8,6 +8,27 @@ function getChromeExecutablePath() {
   if (process.env.PUPPETEER_EXECUTABLE_PATH && fs.existsSync(process.env.PUPPETEER_EXECUTABLE_PATH)) {
     return process.env.PUPPETEER_EXECUTABLE_PATH;
   }
+  const localCache = path.join(__dirname, '..', '.cache', 'puppeteer');
+  if (fs.existsSync(localCache)) {
+    try {
+      const searchChrome = (dir) => {
+        const entries = fs.readdirSync(dir);
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry);
+          const stat = fs.statSync(fullPath);
+          if (stat.isDirectory()) {
+            const res = searchChrome(fullPath);
+            if (res) return res;
+          } else if (entry === 'chrome' || entry === 'chrome.exe' || entry === 'chromium') {
+            return fullPath;
+          }
+        }
+        return null;
+      };
+      const cachedBinary = searchChrome(localCache);
+      if (cachedBinary) return cachedBinary;
+    } catch (e) {}
+  }
   const possiblePaths = [
     '/usr/bin/google-chrome-stable',
     '/usr/bin/google-chrome',

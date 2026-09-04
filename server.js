@@ -181,14 +181,18 @@ async function processIncomingWhatsAppMessage(messageData) {
     try {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
       if (scheduleIntent && scheduleIntent.isScheduling && scheduleIntent.proposedDateTimeIso) {
-        console.log(`📅 Automatic Interview Schedule detected for ${candidate.name} (+${candidate.phone}): ${scheduleIntent.proposedDateTimeIso}`);
+        const isOnline = scheduleIntent.interviewMode === 'online' || candidate.interviewMode === 'online';
+        if (isOnline) candidate.interviewMode = 'online';
+
+        console.log(`📅 Automatic Interview Schedule detected for ${candidate.name} (+${candidate.phone}): ${scheduleIntent.proposedDateTimeIso} (Mode: ${isOnline ? 'Online Google Meet' : 'In-Person'})`);
         
         await hiringService.scheduleInterview(
           candidate.id,
           scheduleIntent.proposedDateTimeIso,
           candidate.role,
-          `Auto-scheduled via WhatsApp AI: "${messageText}"`,
-          true // Sends official English confirmation message
+          `Auto-scheduled via WhatsApp AI: "${messageText}" (${isOnline ? 'Online Google Meet' : 'In-Person'})`,
+          true,
+          isOnline ? 'online' : 'in_person'
         );
         interviewScheduledNow = true;
         return; // Confirmation already sent by scheduleInterview!

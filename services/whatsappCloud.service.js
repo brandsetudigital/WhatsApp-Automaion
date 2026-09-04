@@ -41,12 +41,33 @@ function getHeaders() {
 }
 
 /**
+ * Send request to Meta Graph API with comprehensive error handling
+ */
+async function postMetaGraph(url, payload) {
+  try {
+    const response = await axios.post(url, payload, { headers: getHeaders() });
+    return response.data;
+  } catch (err) {
+    const metaError = err.response?.data?.error;
+    if (metaError) {
+      const errMsg = `Meta WhatsApp API error (${err.response.status}): ${metaError.message || JSON.stringify(metaError)} (Code: ${metaError.code || 'N/A'})`;
+      console.error(`❌ ${errMsg}`);
+      throw new Error(errMsg);
+    }
+    throw err;
+  }
+}
+
+/**
  * Send text message via Meta WhatsApp Cloud API
  */
 async function sendWhatsAppText(to, message, forceMeta = false) {
   if (!forceMeta && isWebProvider()) return whatsappWebService.sendWhatsAppText(to, message);
-  const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
+  if (recipient.length > 13) {
+    throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
+  }
+  const url = getMessagesUrl();
 
   const payload = {
     messaging_product: 'whatsapp',
@@ -59,16 +80,18 @@ async function sendWhatsAppText(to, message, forceMeta = false) {
     }
   };
 
-  const response = await axios.post(url, payload, { headers: getHeaders() });
-  return response.data;
+  return postMetaGraph(url, payload);
 }
 
 /**
  * Send template message via Meta WhatsApp Cloud API
  */
 async function sendWhatsAppTemplate(to, templateName, languageCode = 'en_US', components = []) {
-  const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
+  if (recipient.length > 13) {
+    throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
+  }
+  const url = getMessagesUrl();
 
   const payload = {
     messaging_product: 'whatsapp',
@@ -84,8 +107,7 @@ async function sendWhatsAppTemplate(to, templateName, languageCode = 'en_US', co
     }
   };
 
-  const response = await axios.post(url, payload, { headers: getHeaders() });
-  return response.data;
+  return postMetaGraph(url, payload);
 }
 
 /**
@@ -122,8 +144,11 @@ async function uploadMediaToWhatsApp(filePath, mimeType) {
  * Send Image message via Meta WhatsApp Cloud API
  */
 async function sendWhatsAppImage(to, mediaIdOrUrl, caption = '') {
-  const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
+  if (recipient.length > 13) {
+    throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
+  }
+  const url = getMessagesUrl();
 
   const imageObj = {};
   if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
@@ -143,16 +168,18 @@ async function sendWhatsAppImage(to, mediaIdOrUrl, caption = '') {
     image: imageObj
   };
 
-  const response = await axios.post(url, payload, { headers: getHeaders() });
-  return response.data;
+  return postMetaGraph(url, payload);
 }
 
 /**
  * Send Document message via Meta WhatsApp Cloud API
  */
 async function sendWhatsAppDocument(to, mediaIdOrUrl, filename = 'document.pdf', caption = '') {
-  const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
+  if (recipient.length > 13) {
+    throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
+  }
+  const url = getMessagesUrl();
 
   const docObj = { filename };
   if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
@@ -172,16 +199,18 @@ async function sendWhatsAppDocument(to, mediaIdOrUrl, filename = 'document.pdf',
     document: docObj
   };
 
-  const response = await axios.post(url, payload, { headers: getHeaders() });
-  return response.data;
+  return postMetaGraph(url, payload);
 }
 
 /**
  * Send Video message via Meta WhatsApp Cloud API
  */
 async function sendWhatsAppVideo(to, mediaIdOrUrl, caption = '') {
-  const url = getMessagesUrl();
   const recipient = formatPhoneNumber(to);
+  if (recipient.length > 13) {
+    throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
+  }
+  const url = getMessagesUrl();
 
   const videoObj = {};
   if (mediaIdOrUrl.startsWith('http://') || mediaIdOrUrl.startsWith('https://')) {
@@ -201,8 +230,7 @@ async function sendWhatsAppVideo(to, mediaIdOrUrl, caption = '') {
     video: videoObj
   };
 
-  const response = await axios.post(url, payload, { headers: getHeaders() });
-  return response.data;
+  return postMetaGraph(url, payload);
 }
 
 /**
