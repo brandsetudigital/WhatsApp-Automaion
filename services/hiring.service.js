@@ -227,7 +227,15 @@ function trackCandidateFromMessage(messageData) {
   const lower = text.toLowerCase().trim();
   const msgType = messageData.messageType;
 
-  let candidate = candidates.find(c => c.whatsappChatId === messageData.chatId || c.phone === phone);
+  let candidate = candidates.find(c => {
+    if (messageData.chatId && c.whatsappChatId && c.whatsappChatId === messageData.chatId) {
+      return true;
+    }
+    if (c.phone && cleanPhone(c.phone) === phone) {
+      return true;
+    }
+    return false;
+  });
   const nowIso = new Date().toISOString();
 
   // Extract drive / portfolio / doc link if present
