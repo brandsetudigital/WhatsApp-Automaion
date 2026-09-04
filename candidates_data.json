@@ -1,5 +1,527 @@
 [
   {
+    "id": "cand_1787215346351_vyz8q",
+    "phone": "918357977322",
+    "name": "Arjun Meena",
+    "role": "AI Video Expert",
+    "city": "Indore",
+    "experience": "Fresher (Paid Internship)",
+    "portfolio": "",
+    "resumeReceived": true,
+    "resumeFileName": "image_1788512940051.jpg",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-09-07T05:30:00.000Z",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Monday morning 11\" (In-Person)",
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-04T08:56:44.391Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-08-20T08:42:26.350Z",
+    "updatedAt": "2026-09-04T09:09:01.260Z",
+    "lastMessage": "[Image received]",
+    "chatHistory": [
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-04T08:42:54.815Z"
+      },
+      {
+        "role": "user",
+        "text": "*Graphic Designer*",
+        "timestamp": "2026-09-04T08:43:13.458Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nGreat! You have selected *Graphic Designer*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼",
+        "timestamp": "2026-09-04T08:43:15.172Z"
+      },
+      {
+        "role": "user",
+        "text": "*Fresher (Paid Internship)*",
+        "timestamp": "2026-09-04T08:43:29.487Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\n💰 *Internship & Compensation Details:*\nWe offer Paid Internships (3-6 Months) as well as Full-Time roles. Deserving candidates receive a performance-based stipend/salary, Certificate of Completion, industry mentorship, and full-time placement opportunities. 🤝\n\nFinal compensation is negotiable and decided based on your practical skills and in-person interview.\n\n👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM* for your interview?",
+        "timestamp": "2026-09-04T08:43:31.150Z"
+      },
+      {
+        "role": "user",
+        "text": "yes kal  mooring 10 30 bje ata  hun",
+        "timestamp": "2026-09-04T08:44:12.575Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🎉\n\nYour interview for the *Graphic Designer* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Sat, 5 Sept, 2026, 10:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T08:44:13.481Z"
+      },
+      {
+        "role": "user",
+        "text": "ok thik h",
+        "timestamp": "2026-09-04T08:44:53.440Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🔄\n\nYour interview for the *Graphic Designer* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* Sat, 5 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T08:44:54.327Z"
+      },
+      {
+        "role": "user",
+        "text": "Kal nhi a skta hun hun me not possible",
+        "timestamp": "2026-09-04T08:51:57.306Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Namaste Arjun! 🙏\n\nKoi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅",
+        "timestamp": "2026-09-04T08:51:59.299Z"
+      },
+      {
+        "role": "user",
+        "text": "Monday morning 11",
+        "timestamp": "2026-09-04T08:52:23.712Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🔄\n\nYour interview for the *Graphic Designer* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* Mon, 7 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T08:52:24.622Z"
+      },
+      {
+        "role": "user",
+        "text": "Manual Entry: Role AI Video Expert, Portfolio: N/A",
+        "timestamp": "2026-09-04T08:56:13.955Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📍 *BrandSetu Digital Office Address:*103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014Google Maps: https://maps.google.com/?q=Orange+Business+Park+Indore",
+        "timestamp": "2026-09-04T08:56:28.071Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun Meena! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *AI Video Expert* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-04T08:56:45.165Z"
+      },
+      {
+        "role": "user",
+        "text": "Ok",
+        "timestamp": "2026-09-04T09:08:42.987Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nAwesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥",
+        "timestamp": "2026-09-04T09:08:44.856Z"
+      },
+      {
+        "role": "user",
+        "text": "[Image received]",
+        "timestamp": "2026-09-04T09:09:01.260Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\nYour interview is confirmed for *Mon, 7 Sept, 11:00 am* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
+        "timestamp": "2026-09-04T09:09:05.316Z"
+      }
+    ],
+    "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1788512941318_image_1788512940051.jpg",
+    "resumeUrl": "/uploads/resumes/918357977322_1788512941318_image_1788512940051.jpg",
+    "unreadCount": 2,
+    "interviewMode": "in_person"
+  },
+  {
+    "id": "cand_1788512332550_bm5ms",
+    "phone": "917693884339",
+    "whatsappChatId": null,
+    "name": "Shyama's house of snacks",
+    "role": "Digital Marketing Manager",
+    "city": "Indore",
+    "experience": "Fresher (Paid Internship)",
+    "portfolio": "",
+    "resumeReceived": true,
+    "resumeFileName": "image_1788512430755.jpg",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-09-05T05:30:00.000Z",
+    "notes": "Auto-scheduled via WhatsApp AI: \"ok sir\" (In-Person)",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-04T08:58:52.546Z",
+    "updatedAt": "2026-09-04T09:07:13.029Z",
+    "lastMessage": "ok sir",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hi!",
+        "timestamp": "2026-09-04T08:58:52.550Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-04T08:58:54.490Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm a fresher and looking for an internship in digital marketing",
+        "timestamp": "2026-09-04T08:59:44.974Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\n\n💰 *Internship & Compensation Details:*\nWe offer Paid Internships (3-6 Months) as well as Full-Time roles. Deserving candidates receive a performance-based stipend/salary, Certificate of Completion, industry mentorship, and full-time placement opportunities. 🤝\n\nFinal compensation is negotiable and decided based on your practical skills and in-person interview.\n\nPlease share your updated Resume or Portfolio link so we can schedule your interview. 📄",
+        "timestamp": "2026-09-04T08:59:46.827Z"
+      },
+      {
+        "role": "user",
+        "text": "Ok",
+        "timestamp": "2026-09-04T09:00:15.831Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\nExcellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼",
+        "timestamp": "2026-09-04T09:00:17.577Z"
+      },
+      {
+        "role": "user",
+        "text": "[Image received]",
+        "timestamp": "2026-09-04T09:00:31.961Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-04T09:00:36.440Z"
+      },
+      {
+        "role": "user",
+        "text": "Can you please share me the JD",
+        "timestamp": "2026-09-04T09:01:13.170Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-04T09:01:14.890Z"
+      },
+      {
+        "role": "user",
+        "text": "No I'm not available",
+        "timestamp": "2026-09-04T09:02:21.675Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Shyama's! 😊\n\nNo problem at all! Please share your preferred Date and Time (Monday to Saturday, between 10:00 AM and 6:00 PM) when you would be available to visit for your in-person interview. 📅",
+        "timestamp": "2026-09-04T09:02:23.370Z"
+      },
+      {
+        "role": "user",
+        "text": "I will be available on Sunday",
+        "timestamp": "2026-09-04T09:03:20.136Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Shyama's house of snacks! 🎉\n\nYour interview for the *Digital Marketing Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Sun, 6 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T09:03:21.176Z"
+      },
+      {
+        "role": "user",
+        "text": "ok sir",
+        "timestamp": "2026-09-04T09:03:38.179Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Shyama's house of snacks! 🔄\n\nYour interview for the *Digital Marketing Manager* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* Sat, 5 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T09:03:39.248Z"
+      }
+    ],
+    "unreadCount": 0,
+    "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\917693884339_1788512431984_image_1788512430755.jpg",
+    "resumeUrl": "/uploads/resumes/917693884339_1788512431984_image_1788512430755.jpg",
+    "interviewMode": "in_person"
+  },
+  {
+    "id": "cand_1788512608826_c2yfk",
+    "phone": "919669765911",
+    "whatsappChatId": null,
+    "name": "BrandSetuDigital",
+    "role": "General Applicant",
+    "city": "Indore",
+    "experience": "",
+    "portfolio": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-04T09:03:28.825Z",
+    "updatedAt": "2026-09-04T09:03:28.825Z",
+    "lastMessage": "Thank you for contacting BrandSetu Digital! \nPlease let us know how we can help you.",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Thank you for contacting BrandSetu Digital! \nPlease let us know how we can help you.",
+        "timestamp": "2026-09-04T09:03:28.826Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello BrandSetuDigital! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-04T09:03:30.365Z"
+      }
+    ],
+    "unreadCount": 1
+  },
+  {
+    "id": "cand_1787223675887_2tjr5",
+    "phone": "917470584339",
+    "name": "Mohit 🎬",
+    "role": "Video Editor",
+    "city": "Indore",
+    "experience": "",
+    "portfolio": "",
+    "resumeReceived": true,
+    "resumeFileName": "[Document received]",
+    "status": "Resume Received",
+    "interviewDateTime": null,
+    "notes": "Auto-scheduled via WhatsApp AI: \"Tomorrow morning 12 pm\"",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-08-20T11:06:04.867Z",
+    "createdAt": "2026-08-20T11:01:15.887Z",
+    "updatedAt": "2026-09-04T08:57:08.627Z",
+    "lastMessage": "Hi!",
+    "chatHistory": [
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 😊\n\nThank you for sharing your resume/portfolio! 📄✨\n\nWhen would you be available to visit our Indore office (Bhawarkua) for an in-person interview? Please share your preferred date and time (Mon-Sat, between 10:00 AM and 6:00 PM). 📅",
+        "timestamp": "2026-08-20T11:02:43.382Z"
+      },
+      {
+        "role": "user",
+        "text": "Tomorrow morning 12 pm",
+        "timestamp": "2026-08-20T11:03:01.988Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Mohit 🎬! 🎉\n\nYour interview for the *Video Editor* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Fri, 21 Aug, 2026, 12:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-08-20T11:03:03.009Z"
+      },
+      {
+        "role": "user",
+        "text": "Thank you",
+        "timestamp": "2026-08-20T11:03:09.588Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 😊 Great! Your interview is confirmed for *Fri, 21 Aug, 12:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
+        "timestamp": "2026-08-20T11:03:13.145Z"
+      },
+      {
+        "role": "user",
+        "text": "Ok",
+        "timestamp": "2026-08-20T11:03:23.114Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 😊 Great! Your interview is confirmed for *Fri, 21 Aug, 12:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
+        "timestamp": "2026-08-20T11:03:25.333Z"
+      },
+      {
+        "role": "user",
+        "text": "Video editor kon kon tool Ane chaiye",
+        "timestamp": "2026-08-20T11:03:39.702Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 😊\n\n🎬 *Video Editor Role & Tools:*\n- Key Tools: Adobe Premiere Pro, After Effects, Photoshop (or DaVinci Resolve)\n- Scope: Viral Reels editing, YouTube content, Commercial client ads, sound design & motion graphics.\n\nPlease share your Portfolio or Google Drive link of past work! 🎥",
+        "timestamp": "2026-08-20T11:03:43.148Z"
+      },
+      {
+        "role": "user",
+        "text": "Salary kya rhegi",
+        "timestamp": "2026-08-20T11:03:58.077Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Namaste Mohit ji! 🙏\n\n💰 *Salary Details:*\nHamare yahan salary fixed nahi hai. Salary puri tarah negotiable hai aur aapke *skills, practical test, experience aur in-person interview performance* ke basis par decide hoti hai. 🤝\n\nAapka interview already scheduled hai for: *Fri, 21 Aug, 12:00 pm*.",
+        "timestamp": "2026-08-20T11:04:01.591Z"
+      },
+      {
+        "role": "user",
+        "text": "Thik hai",
+        "timestamp": "2026-08-20T11:04:21.683Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Namaste Mohit ji! 🙏\nBrandSetu Digital me aapka swagat hai!\n\nHum hiring kar rahe hain for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Kripya apna *Name*, *Role* (SEO Expert ya Video Editor) aur *Resume / Portfolio link* yahan share karein. 📄✨",
+        "timestamp": "2026-08-20T11:04:25.234Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit 🎬! 🔔 *Interview Reminder*\n\nThis is a quick reminder that your interview for the *Video Editor* position is scheduled today at *12:00 pm* at the BrandSetu Digital office.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\nPlease arrive on time. For location assistance, call/WhatsApp: +91 9329232025. 👍\n\nSee you soon!\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-08-20T11:06:04.075Z"
+      },
+      {
+        "role": "user",
+        "text": "hioi",
+        "timestamp": "2026-09-04T08:40:02.805Z"
+      },
+      {
+        "role": "assistant",
+        "text": "\". The reminder was sent.\n    *   He",
+        "timestamp": "2026-09-04T08:40:24.382Z"
+      },
+      {
+        "role": "user",
+        "text": "hii",
+        "timestamp": "2026-09-04T08:40:30.087Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 👋 \n\nKa",
+        "timestamp": "2026-09-04T08:40:43.712Z"
+      },
+      {
+        "role": "user",
+        "text": "Hi!",
+        "timestamp": "2026-09-04T08:57:08.628Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mohit! 😊\nGreat! You have selected *Video Editor*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼",
+        "timestamp": "2026-09-04T08:57:10.637Z"
+      }
+    ],
+    "unreadCount": 3
+  },
+  {
+    "id": "cand_1788512223471_xgeuf",
+    "phone": "917828966773",
+    "whatsappChatId": null,
+    "name": "manshi",
+    "role": "Digital Marketing Manager",
+    "city": "Indore",
+    "experience": "",
+    "portfolio": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-04T08:57:03.470Z",
+    "updatedAt": "2026-09-04T08:58:19.377Z",
+    "lastMessage": "Manual Entry: Role Digital Marketing Manager, Portfolio: N/A",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Manual Entry: Role Digital Marketing Manager, Portfolio: N/A",
+        "timestamp": "2026-09-04T08:57:03.471Z"
+      },
+      {
+        "role": "assistant",
+        "text": "hii",
+        "timestamp": "2026-09-04T08:57:12.545Z"
+      },
+      {
+        "role": "assistant",
+        "text": "hello",
+        "timestamp": "2026-09-04T08:58:19.377Z"
+      }
+    ],
+    "unreadCount": 0
+  },
+  {
+    "id": "cand_1788511510376_gwvgl",
+    "phone": "917869724727",
+    "whatsappChatId": null,
+    "name": "Aabid",
+    "role": "AI Video Expert",
+    "city": "Indore",
+    "experience": "Experienced (Full-Time)",
+    "portfolio": "",
+    "resumeReceived": true,
+    "resumeFileName": "AABID_UID.pdf",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-09-04T08:30:00.000Z",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Today 2 PM\" (In-Person)",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-04T08:45:10.376Z",
+    "updatedAt": "2026-09-04T08:53:09.196Z",
+    "lastMessage": "Today 2 PM",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hi",
+        "timestamp": "2026-09-04T08:45:10.380Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Aabid! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
+        "timestamp": "2026-09-04T08:45:12.109Z"
+      },
+      {
+        "role": "user",
+        "text": "Ai video expert",
+        "timestamp": "2026-09-04T08:45:25.231Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Aabid! 😊\nGreat! You have selected *AI Video Expert*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼",
+        "timestamp": "2026-09-04T08:45:27.285Z"
+      },
+      {
+        "role": "user",
+        "text": "Full time",
+        "timestamp": "2026-09-04T08:45:42.219Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Aabid! 😊\nAwesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥",
+        "timestamp": "2026-09-04T08:45:43.837Z"
+      },
+      {
+        "role": "user",
+        "text": "AABID UID.pdf",
+        "timestamp": "2026-09-04T08:46:11.472Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Aabid! 😊\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-04T08:46:15.527Z"
+      },
+      {
+        "role": "user",
+        "text": "No",
+        "timestamp": "2026-09-04T08:46:23.667Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Aabid! 😊\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-04T08:46:25.328Z"
+      },
+      {
+        "role": "user",
+        "text": "Today 2 PM",
+        "timestamp": "2026-09-04T08:46:44.030Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Aabid! 🎉\n\nYour interview for the *AI Video Expert* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Fri, 4 Sept, 2026, 02:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-04T08:46:44.888Z"
+      }
+    ],
+    "unreadCount": 0,
+    "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\917869724727_1788511571495_AABID_UID.pdf",
+    "resumeUrl": "/uploads/resumes/917869724727_1788511571495_AABID_UID.pdf",
+    "interviewMode": "in_person"
+  },
+  {
     "id": "cand_1788435212110_4z3u1",
     "phone": "38899686625461",
     "whatsappChatId": "38899686625461@lid",
@@ -375,125 +897,6 @@
     "unreadCount": 0
   },
   {
-    "id": "cand_1787223675887_2tjr5",
-    "phone": "917470584339",
-    "name": "Mohit 🎬",
-    "role": "Video Editor",
-    "city": "Indore",
-    "experience": "",
-    "portfolio": "",
-    "resumeReceived": true,
-    "resumeFileName": "[Document received]",
-    "status": "Interview Scheduled",
-    "interviewDateTime": "2026-08-21T06:30:00.000Z",
-    "notes": "Auto-scheduled via WhatsApp AI: \"Tomorrow morning 12 pm\"",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
-    "interviewReminderSent": true,
-    "interviewReminderSentAt": "2026-08-20T11:06:04.867Z",
-    "createdAt": "2026-08-20T11:01:15.887Z",
-    "updatedAt": "2026-09-03T07:44:52.895Z",
-    "lastMessage": "Thik hai",
-    "chatHistory": [
-      {
-        "role": "user",
-        "text": "Hii",
-        "timestamp": "2026-08-20T11:01:15.887Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊\nWelcome to BrandSetu Digital!\n\nWe are actively hiring for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Please share your *Name*, *Role you are applying for*, and your *Resume / Portfolio link* to proceed! 📄💼",
-        "timestamp": "2026-08-20T11:01:27.992Z"
-      },
-      {
-        "role": "user",
-        "text": "Video editor",
-        "timestamp": "2026-08-20T11:01:43.570Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊\n\nThank you for your interest in the *Video Editor* position at BrandSetu Digital! 😊\n\nPlease share your updated *Resume (PDF)* or Video Portfolio/Drive link here so we can proceed with scheduling your in-person interview. 📄✨",
-        "timestamp": "2026-08-20T11:01:47.393Z"
-      },
-      {
-        "role": "user",
-        "text": "[Document received]",
-        "timestamp": "2026-08-20T11:02:39.382Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊\n\nThank you for sharing your resume/portfolio! 📄✨\n\nWhen would you be available to visit our Indore office (Bhawarkua) for an in-person interview? Please share your preferred date and time (Mon-Sat, between 10:00 AM and 6:00 PM). 📅",
-        "timestamp": "2026-08-20T11:02:43.382Z"
-      },
-      {
-        "role": "user",
-        "text": "Tomorrow morning 12 pm",
-        "timestamp": "2026-08-20T11:03:01.988Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Dear Mohit 🎬! 🎉\n\nYour interview for the *Video Editor* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Fri, 21 Aug, 2026, 12:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
-        "timestamp": "2026-08-20T11:03:03.009Z"
-      },
-      {
-        "role": "user",
-        "text": "Thank you",
-        "timestamp": "2026-08-20T11:03:09.588Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊 Great! Your interview is confirmed for *Fri, 21 Aug, 12:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
-        "timestamp": "2026-08-20T11:03:13.145Z"
-      },
-      {
-        "role": "user",
-        "text": "Ok",
-        "timestamp": "2026-08-20T11:03:23.114Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊 Great! Your interview is confirmed for *Fri, 21 Aug, 12:00 pm* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍",
-        "timestamp": "2026-08-20T11:03:25.333Z"
-      },
-      {
-        "role": "user",
-        "text": "Video editor kon kon tool Ane chaiye",
-        "timestamp": "2026-08-20T11:03:39.702Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit! 😊\n\n🎬 *Video Editor Role & Tools:*\n- Key Tools: Adobe Premiere Pro, After Effects, Photoshop (or DaVinci Resolve)\n- Scope: Viral Reels editing, YouTube content, Commercial client ads, sound design & motion graphics.\n\nPlease share your Portfolio or Google Drive link of past work! 🎥",
-        "timestamp": "2026-08-20T11:03:43.148Z"
-      },
-      {
-        "role": "user",
-        "text": "Salary kya rhegi",
-        "timestamp": "2026-08-20T11:03:58.077Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Namaste Mohit ji! 🙏\n\n💰 *Salary Details:*\nHamare yahan salary fixed nahi hai. Salary puri tarah negotiable hai aur aapke *skills, practical test, experience aur in-person interview performance* ke basis par decide hoti hai. 🤝\n\nAapka interview already scheduled hai for: *Fri, 21 Aug, 12:00 pm*.",
-        "timestamp": "2026-08-20T11:04:01.591Z"
-      },
-      {
-        "role": "user",
-        "text": "Thik hai",
-        "timestamp": "2026-08-20T11:04:21.683Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Namaste Mohit ji! 🙏\nBrandSetu Digital me aapka swagat hai!\n\nHum hiring kar rahe hain for:\n1️⃣ *SEO Expert*\n2️⃣ *Video Editor*\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua, Indore (In-Office Full Time)\n\n👉 Kripya apna *Name*, *Role* (SEO Expert ya Video Editor) aur *Resume / Portfolio link* yahan share karein. 📄✨",
-        "timestamp": "2026-08-20T11:04:25.234Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Mohit 🎬! 🔔 *Interview Reminder*\n\nThis is a quick reminder that your interview for the *Video Editor* position is scheduled today at *12:00 pm* at the BrandSetu Digital office.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\nPlease arrive on time. For location assistance, call/WhatsApp: +91 9329232025. 👍\n\nSee you soon!\n- HR Team, BrandSetu Digital",
-        "timestamp": "2026-08-20T11:06:04.075Z"
-      }
-    ],
-    "unreadCount": 0
-  },
-  {
     "id": "cand_1787221184847_ysrup",
     "phone": "917879010084",
     "name": "manisha",
@@ -530,132 +933,6 @@
         "timestamp": "2026-09-03T08:15:10.071Z"
       }
     ],
-    "unreadCount": 0
-  },
-  {
-    "id": "cand_1787215346351_vyz8q",
-    "phone": "918357977322",
-    "name": "Arjun Meena",
-    "role": "Video Editor",
-    "city": "Indore",
-    "experience": "",
-    "portfolio": "",
-    "resumeReceived": true,
-    "resumeFileName": "Arjun_Meena_CRM_Executive_Resume.pdf",
-    "status": "Interview Scheduled",
-    "interviewDateTime": "2026-08-21T07:30:00.000Z",
-    "notes": "Auto-scheduled via WhatsApp AI: \"Arjun_Meena Backen Resume (1).pdf\"",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
-    "interviewReminderSent": false,
-    "interviewReminderSentAt": null,
-    "createdAt": "2026-08-20T08:42:26.350Z",
-    "updatedAt": "2026-09-03T08:07:34.902Z",
-    "lastMessage": "Apply",
-    "chatHistory": [
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:44:58.448Z"
-      },
-      {
-        "role": "user",
-        "text": "manisha meena.pdf",
-        "timestamp": "2026-08-21T11:45:17.771Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:45:19.211Z"
-      },
-      {
-        "role": "user",
-        "text": "Arjun_Meena Backen Resume (1).pdf",
-        "timestamp": "2026-08-21T11:45:46.245Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Dear Arjun Meena! 🔄\n\nYour interview for the *Video Editor* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* Fri, 21 Aug, 2026, 01:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital",
-        "timestamp": "2026-08-21T11:45:47.267Z"
-      },
-      {
-        "role": "user",
-        "text": "manisha meena.pdf",
-        "timestamp": "2026-08-21T11:46:05.513Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:46:07.497Z"
-      },
-      {
-        "role": "user",
-        "text": "Arjun Meena.pdf",
-        "timestamp": "2026-08-21T11:46:29.985Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:46:31.270Z"
-      },
-      {
-        "role": "user",
-        "text": "Arjun_Meena_CRM_Executive_Resume.pdf",
-        "timestamp": "2026-08-21T11:46:45.404Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:46:47.057Z"
-      },
-      {
-        "role": "user",
-        "text": "Hii",
-        "timestamp": "2026-08-21T11:49:09.600Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:49:11.031Z"
-      },
-      {
-        "role": "user",
-        "text": "Apply",
-        "timestamp": "2026-08-21T11:49:25.528Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun! 😊\nPlease share your updated *Resume (PDF)* or *Portfolio link* to proceed with your interview schedule! 📄💼",
-        "timestamp": "2026-08-21T11:49:27.015Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun Meena! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼",
-        "timestamp": "2026-09-03T07:59:04.647Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Dear Arjun Meena! 🎉 Your in-person interview for the *Video Editor* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍",
-        "timestamp": "2026-09-03T08:02:06.739Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun Meena! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼",
-        "timestamp": "2026-09-03T08:02:08.588Z"
-      },
-      {
-        "role": "assistant",
-        "text": "Hello Arjun Meena! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼",
-        "timestamp": "2026-09-03T08:07:19.122Z"
-      },
-      {
-        "role": "assistant",
-        "text": "📍 *BrandSetu Digital Office Address:*103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014Google Maps: https://maps.google.com/?q=Orange+Business+Park+Indore",
-        "timestamp": "2026-09-03T08:07:34.902Z"
-      }
-    ],
-    "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1787312805432_Arjun_Meena_CRM_Executive_Resume.pdf",
-    "resumeUrl": "/uploads/resumes/918357977322_1787312805432_Arjun_Meena_CRM_Executive_Resume.pdf",
     "unreadCount": 0
   }
 ]

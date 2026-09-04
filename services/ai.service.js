@@ -192,6 +192,14 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
   const isAffirmative = affirmativePattern.test(text);
 
+  // Pure acknowledgement check (e.g. "ok", "ok sir", "thik h", "thanks", "thank you", "done", "sure")
+  const isPureAcknowledgement = /^(?:ok|okay|ok\s*sir|thik|theek|thik\s*h|thik\s*hai|theek\s*hai|done|sure|thanks|thank\s*you|shukriya|alright|ji|ha|haan|yes|confirm)(?:[\s,!.]*)$/i.test(text);
+
+  // If candidate ALREADY has an interview scheduled and simply says "ok" / "thank you", do NOT reschedule!
+  if (candidate && candidate.interviewDateTime && isPureAcknowledgement) {
+    return null;
+  }
+
   // 5. Must have day indicator OR explicit time keyword OR affirmative response when interview slot is pending
   const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
   const hasExplicitTimeModifier = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(schedulingText);
@@ -288,6 +296,11 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
     return localParsed;
   }
 
+  const isPureAck = /^(?:ok|okay|ok\s*sir|thik|theek|thik\s*h|thik\s*hai|theek\s*hai|done|sure|thanks|thank\s*you|shukriya|alright|ji|ha|haan|yes|confirm)(?:[\s,!.]*)$/i.test(String(userMessage).trim().toLowerCase());
+  if (candidate && candidate.interviewDateTime && isPureAck) {
+    return null;
+  }
+
   const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi)/i;
   if (negationPattern.test(userMessage) && !/(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}\s*(?:baje|am|pm)\b)/i.test(userMessage)) {
     return null; // Pure negation without alternative
@@ -340,6 +353,91 @@ Return JSON strictly:
     console.error('Error parsing interview schedule with Gemini:', err.message);
   }
   return null;
+}
+
+/**
+ * Get tailored, role-specific Job Description (JD) for Fresher vs Experienced
+ */
+function getDetailedJobDescription(role, experience, lang) {
+  const isHinglish = (lang === 'hinglish' || lang === 'hindi');
+  const isFresher = String(experience || '').toLowerCase().includes('fresher') || String(experience || '').toLowerCase().includes('intern');
+
+  if (role === 'Digital Marketing Manager') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Digital Marketing Intern (Paid Internship):*\n• Scope: Meta Ads (FB/Insta) & Google Ads campaign setup me assist karna, creative ad copy research, daily lead flow monitor karna aur performance analytics sikhna.\n• Duration & Mode: 3-6 Months Paid Internship (In-Office, Indore).\n• Benefits: Handsome stipend, certificate of completion, live ad budgets handling & pre-placement / full-time job offer.`
+        : `📋 *Job Description (JD) — Digital Marketing Manager (Full-Time):*\n• Scope: Scaling high-budget Meta & Google Paid Ads, lead generation funnels, conversion rate optimization (CRO), ROAS maximization, A/B creative testing & client ROI strategy.\n• Mode: Full-Time In-Office (Indore).\n• Benefits: Competitive salary + performance incentives & campaign leadership.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Digital Marketing:*\n• Paid Internship: Meta & Google Ads setup, ad copywriting, audience targeting & daily lead generation assistance.\n• Full-Time: High-budget ad scaling, ROAS optimization, funnel strategy & client ROI management.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — Digital Marketing:*\n• Paid Internship: Assisting in Meta/Google Ad campaigns, audience targeting, copywriting & analytics.\n• Full-Time: Managing high-budget ad funnels, maximizing ROAS, CRO & client performance strategy.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  if (role === 'Video Editor') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Video Editing Intern (Paid Internship):*\n• Scope: Instagram viral reels, shorts, dynamic cuts, animated typography subtitles, sound effects (SFX) aur creative motion graphics create karna.\n• Tools: Adobe Premiere Pro, After Effects, CapCut Pro.\n• Benefits: Handsome stipend, certificate & expert mentorship.`
+        : `📋 *Job Description (JD) — Video Editor (Full-Time):*\n• Scope: End-to-end commercial video production, brand ad campaigns, YouTube long-form, multi-cam editing, advanced color grading & sound design.\n• Tools: Adobe Premiere Pro, After Effects, DaVinci Resolve.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Video Editor:*\n• Scope: Viral Instagram reels, commercial ads, YouTube long-form, dynamic cuts, SFX & motion graphics.\n• Tools: Premiere Pro, After Effects, DaVinci Resolve.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — Video Editor:*\n• Scope: High-retention Instagram reels, commercial video ads, YouTube content, sound design & motion graphics.\n• Tools: Adobe Premiere Pro, After Effects, DaVinci Resolve.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  if (role === 'AI Video Expert') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — AI Video Intern (Paid Internship):*\n• Scope: AI prompt engineering, AI character animations, text-to-video generation, lip-sync & voice cloning ads create karna.\n• Tools: Midjourney, Runway (Gen-2/Gen-3), Kling AI, Luma Dream Machine, ElevenLabs.\n• Benefits: Paid stipend, AI workflows training & live client projects.`
+        : `📋 *Job Description (JD) — AI Video Expert (Full-Time):*\n• Scope: Production-grade AI commercial generation, character consistency across scenes, realistic VFX & automated AI video workflows.\n• Tools: Runway Gen-3, Kling, Midjourney, Luma, HeyGen, Topaz AI, Premiere Pro.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — AI Video Expert:*\n• Scope: AI prompt engineering, hyper-realistic video generation, avatar animations & AI video ads.\n• Tools: Midjourney, Runway, Kling AI, Luma, ElevenLabs.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — AI Video Expert:* \n• Scope: AI video generation, prompt engineering pipelines, character animation & AI commercial production.\n• Tools: Runway, Kling AI, Midjourney, Luma, HeyGen.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  if (role === 'Graphic Designer') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Graphic Design Intern (Paid Internship):*\n• Scope: Social media post designs, promotional banners, YouTube thumbnails, typography layout & story creatives design karna.\n• Tools: Adobe Photoshop, Illustrator, Figma, Canva Pro.\n• Benefits: Paid stipend, portfolio building & full-time placement.`
+        : `📋 *Job Description (JD) — Graphic Designer (Full-Time):*\n• Scope: Complete brand identity design, high-converting Meta/Google ad creatives, packaging design, pitch decks & creative direction.\n• Tools: Adobe Photoshop, Illustrator, Figma, InDesign.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Graphic Designer:*\n• Scope: Social media creatives, high-converting ad banners, brand identity & thumbnail design.\n• Tools: Photoshop, Illustrator, Figma.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — Graphic Designer:*\n• Scope: Brand identity, social media creatives, high-converting ad banners & visual storytelling.\n• Tools: Adobe Photoshop, Illustrator, Figma.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  if (role === 'SEO & AEO Expert') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — SEO & AEO Intern (Paid Internship):*\n• Scope: Keyword research, on-page SEO optimization, meta tags, content structure, blog publishing & AI Search (AEO/ChatGPT) ranking basics.\n• Tools: Google Search Console, Google Analytics, WordPress, SEMrush/Ahrefs basics.\n• Benefits: Paid stipend, live client ranking experience & certification.`
+        : `📋 *Job Description (JD) — SEO & AEO Expert (Full-Time):*\n• Scope: Comprehensive Technical SEO audits, Page 1 Google ranking strategies, Answer Engine Optimization (AEO for ChatGPT/Perplexity/Gemini), high-authority backlink building & organic lead generation.\n• Tools: Ahrefs, SEMrush, Screaming Frog, GSC, GA4, WordPress.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — SEO & AEO Expert:*\n• Scope: Google Page 1 ranking strategies, On-Page/Off-Page/Technical SEO, AI Search (AEO) visibility & backlink building.\n• Tools: Ahrefs, SEMrush, Google Search Console, Screaming Frog.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — SEO & AEO Expert:*\n• Scope: Technical SEO audits, Page 1 search rankings, Answer Engine Optimization (AEO) & lead acquisition.\n• Tools: Ahrefs, SEMrush, Screaming Frog, GSC, GA4.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  if (role === 'Social Media Manager') {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Social Media Intern (Paid Internship):*\n• Scope: Content calendar planning, viral reels trend research, engaging captions, hashtag research & audience engagement/community handling.\n• Benefits: Paid stipend, real brand growth experience & certification.`
+        : `📋 *Job Description (JD) — Social Media Manager (Full-Time):*\n• Scope: End-to-end social media growth strategy for client brands, viral content scripting, influencer collaborations, lead funnels & monthly ROI reporting.`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Social Media Manager:*\n• Scope: Managing client Instagram/LinkedIn profiles, viral reels planning, caption copywriting & organic audience growth.\n• Mode: Onsite / In-Office (Indore).`
+        : `📋 *Job Description (JD) — Social Media Manager:*\n• Scope: Managing brand social presence, viral reels strategy, copywriting & audience community growth.\n• Mode: Onsite / In-Office (Indore).`;
+    }
+  }
+
+  // General 6-Roles Overview
+  return isHinglish
+    ? `📋 *Brand Setu Digital — Hiring Overview (6 Openings):*\n1️⃣ 🎬 Video Editor: Viral Reels, Commercial Ads & Motion Graphics\n2️⃣ 🤖 AI Video Expert: AI Prompts, Character Animation & AI Commercials\n3️⃣ 🎨 Graphic Designer: Social Creatives, Ad Banners & Brand Identity\n4️⃣ 🔎 SEO & AEO Expert: Google Page 1 Ranking & AI Search Visibility\n5️⃣ 📱 Social Media Manager: Profile Growth, Content Calendar & Viral Strategy\n6️⃣ 📢 Digital Marketing Manager: Meta & Google Paid Ads (High ROAS)\n\n• Modes Available: Paid Internship (3-6 Months) & Full-Time Careers (In-Office, Indore).`
+    : `📋 *Brand Setu Digital — Hiring Overview (6 Openings):*\n1️⃣ 🎬 Video Editor: Viral Reels, Video Ads & Motion Graphics\n2️⃣ 🤖 AI Video Expert: AI Prompts, Character Animation & AI Commercials\n3️⃣ 🎨 Graphic Designer: Social Creatives, Ad Banners & Brand Identity\n4️⃣ 🔎 SEO & AEO Expert: Google Search & AI Search Visibility (AEO)\n5️⃣ 📱 Social Media Manager: Brand Growth, Content Planning & Trends\n6️⃣ 📢 Digital Marketing Manager: Meta & Google Paid Ad Campaigns\n\n• Available Options: Paid Internship (3-6 Months) & Full-Time Roles (In-Office, Indore).`;
 }
 
 /**
@@ -440,6 +538,17 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
       return `${greetingHi}\n\n🏢 Yeh Onsite *In-Office* role hai hamare Indore office (103 Orange Business Park, Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna Resume share karein. 👍`;
     } else {
       return `${greetingEn}\n\n🏢 This is an Onsite *In-Office* position at our Indore office (103 Orange Business Park, Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available for an in-office role in Indore, please share your resume or portfolio to proceed. 👍`;
+    }
+  }
+
+  // 7. FAQ: JOB DESCRIPTION (JD) / WORK RESPONSIBILITIES
+  const jdKeywords = /(?:\bjd\b|job\s*description|description|responsibilit|kaam\s*kya|work\s*detail|role\s*detail|profile\s*detail)/i;
+  if (jdKeywords.test(text)) {
+    const jdText = getDetailedJobDescription(candidate.role, candidate.experience, lang);
+    if (isHinglish) {
+      return `${greetingHi}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna time batayein). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄` : `👉 Aap inme se kis position ke liye apply karna chahte hain?`))}`;
+    } else {
+      return `${greetingEn}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Your interview is already confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Please share your updated Resume or Portfolio link so we can schedule your interview. 📄` : `👉 Which position would you like to apply for?`))}`;
     }
   }
 
@@ -598,6 +707,7 @@ Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Go
 2. If candidate says NO / Cannot come / Not available / Busy: Reply politely: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
 
 RULES:
+- If candidate asks about Job Description (JD) / Work / Responsibilities: Politely explain that complete details regarding the Job Description, key responsibilities, client projects, and work scope will be explained in detail during the in-person interview at our Indore office.
 - If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.
 - If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
 - If candidate writes in Hindi/Hinglish, reply in natural Hinglish. If in English, reply in crisp English.
