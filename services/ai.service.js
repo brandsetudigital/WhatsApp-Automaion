@@ -100,9 +100,10 @@ function detectLanguage(text) {
 async function callGeminiApi(promptText, apiKey, options = {}) {
   const candidateModels = [
     'gemini-3.6-flash',
-    'gemini-3.1-pro-preview',
+    'gemini-3.5-flash',
+    'gemini-3.7-flash',
     'gemini-2.5-flash',
-    'gemini-1.5-flash'
+    'gemini-3.1-pro-preview'
   ];
 
   for (const model of candidateModels) {
@@ -211,12 +212,12 @@ function isGreetingMessage(rawText) {
 }
 
 /**
- * Detect questions about documents/portfolio to bring
+ * Detect questions about documents/portfolio to bring (handles phonetic typos like dacument, docoment, lane h)
  */
 function isDocumentQuery(rawText) {
   if (!rawText) return false;
   const text = String(rawText).toLowerCase().trim();
-  return /(?:document|documents|kya\s*lana|kya\s*lekar|resume\s*lana|hard\s*copy|print\s*out|printout|kya\s*chahiye\s*sath|sath\s*me\s*kya)/i.test(text);
+  return /(?:d[aoe]c[uo]ment|doc\b|paper\b|kya\s*(?:kya\s*)?la(?:na|ne|kar|ke)|kya\s*(?:le\s*)?jana|kya\s*lekar|resume\s*la(?:na|ne)|hard\s*copy|print\s*out|printout|kya\s*chahiye|sath\s*me\s*kya|saath\s*me\s*kya|sath\s*kya|kya\s*leke)/i.test(text);
 }
 
 function parseInterviewScheduleLocal(userMessage, candidate = null) {
@@ -665,6 +666,16 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
       return `${greetingHi}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna time batayein). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄` : `👉 Aap inme se kis position ke liye apply karna chahte hain?`))}`;
     } else {
       return `${greetingEn}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Your interview is already confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Please share your updated Resume or Portfolio link so we can schedule your interview. 📄` : `👉 Which position would you like to apply for?`))}`;
+    }
+  }
+
+  // 8. FAQ: DOCUMENTS REQUIRED (General)
+  if (isDocumentQuery(text)) {
+    const roleDoc = candidate.role && candidate.role !== 'General Applicant' ? `${candidate.role} work samples/portfolio` : 'work samples/portfolio';
+    if (isHinglish) {
+      return `${greetingHi}\n\n📌 *Documents Required:*\nInterview ke liye aapko apna updated *Resume (Hard Copy / PDF)* aur ${roleDoc} saath lekar aana hoga. 👍\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢` : `👉 Kripya batayein aap kis position ke liye apply karna chahte hain?`)}`;
+    } else {
+      return `${greetingEn}\n\n📌 *Documents Required:*\nPlease bring your updated *Resume (Hard Copy/PDF)* and ${roleDoc} with you for the interview. 👍\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM*? 🏢` : `👉 Which position would you like to apply for?`)}`;
     }
   }
 

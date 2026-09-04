@@ -31,6 +31,7 @@ async function testConversationFixes() {
     { message: 'Hiiii', expectedReschedule: false },
     { message: 'Location share kre office ki', expectedReschedule: false },
     { message: 'kya documents lane hain?', expectedReschedule: false },
+    { message: 'dacument lane h', expectedReschedule: false },
     { message: 'Today 5:30 baje mera interview reschedule kar do', expectedReschedule: true }
   ];
 
