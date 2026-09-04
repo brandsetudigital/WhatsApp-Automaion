@@ -67,6 +67,14 @@ async function sendWhatsAppText(to, message, forceMeta = false) {
   if (recipient.length > 13) {
     throw new Error(`Invalid phone number for Meta Cloud API: "+${recipient}" (looks like a WhatsApp Web LID: @lid, which Meta Cloud API cannot route to)`);
   }
+
+  // Self-recipient protection: Meta API returns 400 if sending to own sender number
+  const ownBusinessNumbers = ['919329232025', '9329232025', '919244856276', '9244856276'];
+  if (ownBusinessNumbers.includes(recipient)) {
+    console.log(`ℹ️ Skipping WhatsApp message to business's own sender phone number (+${recipient})`);
+    return { success: true, skipped: true, recipient };
+  }
+
   const url = getMessagesUrl();
 
   const payload = {
