@@ -340,6 +340,9 @@ function trackCandidateFromMessage(messageData) {
 
   const initialName = extractedName || validProfileName || 'Candidate';
 
+  // Detect language of the incoming message
+  const msgLang = detectCandidateLang(text);
+
   if (!candidate) {
     if (!text && !hasValidDocumentUpload) return null;
     candidate = {
@@ -349,6 +352,7 @@ function trackCandidateFromMessage(messageData) {
       name: initialName,
       role: detectedRole || 'General Applicant',
       city: 'Indore',
+      lang: msgLang,
       experience: detectedExperience || '',
       portfolio: extractedLink,
       resumeReceived: hasResumeSignal,
@@ -367,12 +371,13 @@ function trackCandidateFromMessage(messageData) {
     };
     appendChatHistory(candidate, 'user', text);
     candidates.unshift(candidate);
-    console.log(`📋 New Candidate Registered: ${candidate.name} (+${candidate.phone}) for ${candidate.role}`);
+    console.log(`📋 New Candidate Registered: ${candidate.name} (+${candidate.phone}) for ${candidate.role} [Lang: ${candidate.lang}]`);
   } else {
     // Update existing candidate
     if (messageData.chatId) candidate.whatsappChatId = messageData.chatId;
     candidate.updatedAt = nowIso;
     candidate.lastMessage = text;
+    if (text) candidate.lang = msgLang;
     appendChatHistory(candidate, 'user', text);
 
     if (extractedName) {
@@ -444,6 +449,27 @@ function markCandidateMessagesRead(candidateId) {
   return candidate;
 }
 
+function detectCandidateLang(text) {
+  if (!text) return 'hinglish';
+  if (/[\u0900-\u097F]/.test(text)) return 'hindi';
+  const clean = text.toLowerCase().trim();
+  const strongHinglishWords = [
+    'kese', 'kaise', 'kaha', 'kahan', 'batao', 'bataye', 'batayein', 'hoga',
+    'krte', 'karte', 'karna', 'chahiye', 'mera', 'meri', 'mere', 'aapse',
+    'krna', 'bhi', 'kuchh', 'achha', 'accha', 'kitna', 'kitni', 'milega',
+    'milegi', 'lagega', 'aa sakta hu', 'aa skta hu', 'dopahar', 'baje',
+    'kya', 'hai', 'h', 'hum', 'aap', 'ji', 'theek', 'thik', 'bhejo', 'bheja',
+    'aana', 'jana', 'kab', 'kis', 'parso', 'kal', 'nhi', 'nahi', 'mujhe',
+    'bhai', 'sir', 'haan', 'sahi', 'dekh', 'raha', 'rahi', 'karein', 'karo'
+  ];
+  const words = clean.split(/[\s,?.!]+/);
+  const countHinglish = words.filter(w => strongHinglishWords.includes(w)).length;
+  if (countHinglish >= 1) {
+    return 'hinglish';
+  }
+  return 'english';
+}
+
 /**
  * Schedule Interview Date/Time for a candidate
  */
@@ -471,8 +497,9 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
   saveCandidatesAndSyncExcel();
 
   const isOnline = candidate.interviewMode === 'online';
+  const isEnglish = (candidate.lang === 'english');
 
-  // Send Instant Confirmation Message to candidate (in professional English / Hinglish note)
+  // Send Instant Confirmation Message to candidate (in strictly matched English or Hinglish)
   if (sendInstantConfirmation) {
     try {
       const formattedTime = interviewDate.toLocaleString('en-IN', {
@@ -487,20 +514,33 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       });
 
       let confirmMsg = '';
-      if (isOnline) {
-        confirmMsg = isRescheduled
-          ? `Dear ${candidate.name}! 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-          : `Dear ${candidate.name}! 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+      if (isEnglish) {
+        if (isOnline) {
+          confirmMsg = isRescheduled
+            ? `Dear ${candidate.name}! 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `Dear ${candidate.name}! 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+        } else {
+          confirmMsg = isRescheduled
+            ? `Dear ${candidate.name}! 🔄\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
+            : `Dear ${candidate.name}! 🎉\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
+        }
       } else {
-        confirmMsg = isRescheduled
-          ? `Dear ${candidate.name}! 🔄\n\nYour interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
-          : `Dear ${candidate.name}! 🎉\n\nYour interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
+        // Hinglish
+        if (isOnline) {
+          confirmMsg = isRescheduled
+            ? `Dear ${candidate.name}! 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `Dear ${candidate.name}! 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+        } else {
+          confirmMsg = isRescheduled
+            ? `Dear ${candidate.name}! 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview *reschedule* ho gaya hai.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
+            : `Dear ${candidate.name}! 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview schedule ho gaya hai.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital`;
+        }
       }
 
       const candidateRecipient = candidate.whatsappChatId || candidate.phone;
       await whatsappCloudService.sendWhatsAppText(candidateRecipient, confirmMsg);
       appendChatHistory(candidate, 'assistant', confirmMsg);
-      console.log(`✅ Interview Confirmation sent to candidate ${candidate.name} (+${candidate.phone}) for ${formattedTime} (Mode: ${candidate.interviewMode})`);
+      console.log(`✅ Interview Confirmation sent to candidate ${candidate.name} (+${candidate.phone}) for ${formattedTime} (Mode: ${candidate.interviewMode}, Lang: ${candidate.lang || 'hinglish'})`);
       
       // Also Notify HR Phone(s)
       const hrPhones = (process.env.HR_PHONE_NUMBER || process.env.HR_PHONE_NUMBERS || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
@@ -532,13 +572,16 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
 }
 
 /**
- * Send Missing Resume Reminder Manually or via Scheduler (English)
+ * Send Missing Resume Reminder Manually or via Scheduler (Language matched)
  */
 async function sendResumeReminder(candidateId) {
   const candidate = candidates.find(c => c.id === candidateId || c.phone === cleanPhone(candidateId));
   if (!candidate) throw new Error('Candidate not found');
 
-  const reminderText = `Hello ${candidate.name || 'Candidate'}! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *${candidate.role || 'Job'}* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+  const isEnglish = (candidate.lang === 'english');
+  const reminderText = isEnglish
+    ? `Hello ${candidate.name || 'Candidate'}! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *${candidate.role || 'Job'}* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)`
+    : `Namaste ${candidate.name || 'Candidate'}! 👋\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapke interest ke liye dhanyawad. Humein abhi tak aapka updated *Resume / Portfolio* receive nahi hua hai. 📄\n\n👉 Kripya apna Resume (PDF) ya Portfolio link yahan share karein taaki hum aapka interview schedule kar sakein. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)`;
 
   const candidateRecipient = candidate.whatsappChatId || candidate.phone;
 
@@ -574,7 +617,7 @@ async function sendResumeReminder(candidateId) {
 }
 
 /**
- * Send Interview 1-Hour Reminder to Candidate AND HR
+ * Send Interview 1-Hour Reminder to Candidate AND HR (Language matched)
  */
 async function sendInterview1HrReminder(candidate) {
   // Mark reminder as attempted/sent immediately to prevent repeated cron loops on error
@@ -584,6 +627,7 @@ async function sendInterview1HrReminder(candidate) {
 
   try {
     const isOnline = candidate.interviewMode === 'online';
+    const isEnglish = (candidate.lang === 'english');
     const interviewDate = new Date(candidate.interviewDateTime);
     const formattedTime = interviewDate.toLocaleString('en-IN', {
       timeZone: 'Asia/Kolkata',
@@ -595,16 +639,23 @@ async function sendInterview1HrReminder(candidate) {
       hour12: true
     });
 
-    // 1. Send Reminder to Candidate
-    const candidateReminderMsg = isOnline
-      ? `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye *Online Google Meet Interview* scheduled hai at *${formattedTime}*. 💻\n\n📌 *Joining Link:* Interview shuru hone se 15 minute pehle aapko isi WhatsApp chat par Google Meet link mil jayegi.\n\n👉 Kya aap interview ke liye available hain? Kripya confirm karein. 👍\n\n📞 Help: +91 9329232025\n- HR Team, Brand Setu Digital`
-      : `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye interview scheduled hai at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Kya aap interview ke liye office aa rahe hain? Kripya confirm karein. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital`;
+    // 1. Send Reminder to Candidate (Strictly matched English / Hinglish)
+    let candidateReminderMsg = '';
+    if (isEnglish) {
+      candidateReminderMsg = isOnline
+        ? `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nYour *Online Google Meet Interview* for *${candidate.role}* at *Brand Setu Digital* is scheduled today at *${formattedTime}*. 💻\n\n📌 *Joining Link:* You will receive the Google Meet link here on WhatsApp 15 minutes before the interview starts.\n\n👉 Are you ready and available for the interview? Please confirm. 👍\n\n📞 Help: +91 9329232025\n- HR Team, Brand Setu Digital`
+        : `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nYour in-person interview for *${candidate.role}* at *Brand Setu Digital* is scheduled today at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital`;
+    } else {
+      candidateReminderMsg = isOnline
+        ? `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye *Online Google Meet Interview* scheduled hai at *${formattedTime}*. 💻\n\n📌 *Joining Link:* Interview shuru hone se 15 minute pehle aapko isi WhatsApp chat par Google Meet link mil jayegi.\n\n👉 Kya aap interview ke liye ready aur available hain? Kripya confirm karein. 👍\n\n📞 Help: +91 9329232025\n- HR Team, Brand Setu Digital`
+        : `Hello ${candidate.name}! 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye interview scheduled hai at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Kya aap interview ke liye office aa rahe hain? Kripya confirm karein. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital`;
+    }
 
     const candidateRecipient = candidate.whatsappChatId || candidate.phone;
     try {
       await whatsappCloudService.sendWhatsAppText(candidateRecipient, candidateReminderMsg);
       appendChatHistory(candidate, 'assistant', candidateReminderMsg);
-      console.log(`🔔 1-Hour Interview Reminder sent to candidate ${candidate.name} (+${candidate.phone})`);
+      console.log(`🔔 1-Hour Interview Reminder sent to candidate ${candidate.name} (+${candidate.phone}) (Lang: ${candidate.lang || 'hinglish'})`);
     } catch (candErr) {
       console.error(`Error sending 1-hr reminder to candidate (+${candidate.phone}):`, candErr.message);
     }

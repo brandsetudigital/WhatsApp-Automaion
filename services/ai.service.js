@@ -69,17 +69,20 @@ function updateAiConfig(updateData) {
  * Detect Language (Default to English unless Devanagari Hindi or explicit Hinglish phrases used)
  */
 function detectLanguage(text) {
+  if (!text) return 'hinglish';
   if (/[\u0900-\u097F]/.test(text)) {
     return 'hindi';
   }
-  const clean = (text || '').toLowerCase().trim();
+  const clean = text.toLowerCase().trim();
   const strongHinglishWords = [
     'kese', 'kaise', 'kaha', 'kahan', 'batao', 'bataye', 'batayein', 'hoga',
     'krte', 'karte', 'karna', 'chahiye', 'mera', 'meri', 'mere', 'aapse',
     'krna', 'bhi', 'kuchh', 'achha', 'accha', 'kitna', 'kitni', 'milega',
     'milegi', 'lagega', 'aa sakta hu', 'aa skta hu', 'dopahar', 'baje',
     'kya', 'hai', 'h', 'hum', 'aap', 'ji', 'theek', 'thik', 'bhejo', 'bheja',
-    'aana', 'jana', 'kab', 'kis', 'parso', 'kal', 'nhi', 'nahi', 'mujhe'
+    'aana', 'jana', 'kab', 'kis', 'parso', 'kal', 'nhi', 'nahi', 'mujhe',
+    'bhai', 'sir', 'haan', 'sahi', 'dekh', 'raha', 'rahi', 'karein', 'karo',
+    'aunga', 'aungi', 'aaunga', 'aaungi', 'krunga', 'karunga', 'denge', 'bhej'
   ];
   const words = clean.split(/[\s,?.!]+/);
   const countHinglish = words.filter(w => strongHinglishWords.includes(w)).length;
@@ -192,10 +195,12 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
   const isAffirmative = affirmativePattern.test(text);
 
-  // Pure acknowledgement check (e.g. "ok", "ok sir", "thik h", "thanks", "thank you", "done", "sure")
-  const isPureAcknowledgement = /^(?:ok|okay|ok\s*sir|thik|theek|thik\s*h|thik\s*hai|theek\s*hai|done|sure|thanks|thank\s*you|shukriya|alright|ji|ha|haan|yes|confirm)(?:[\s,!.]*)$/i.test(text);
+  // Robust check for pure acknowledgement (e.g. "ok", "ok sir", "ok done", "ok sir done", "thik hai", "done", "thank you", "thanks sir")
+  const cleanTokens = text.replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+  const ackKeywords = ['ok', 'okay', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks', 'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haan', 'confirm', 'got', 'it'];
+  const isPureAcknowledgement = cleanTokens.length > 0 && cleanTokens.every(t => ackKeywords.includes(t));
 
-  // If candidate ALREADY has an interview scheduled and simply says "ok" / "thank you", do NOT reschedule!
+  // If candidate ALREADY has an interview scheduled and simply sends an acknowledgement, do NOT reschedule!
   if (candidate && candidate.interviewDateTime && isPureAcknowledgement) {
     return null;
   }
@@ -296,7 +301,9 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
     return localParsed;
   }
 
-  const isPureAck = /^(?:ok|okay|ok\s*sir|thik|theek|thik\s*h|thik\s*hai|theek\s*hai|done|sure|thanks|thank\s*you|shukriya|alright|ji|ha|haan|yes|confirm)(?:[\s,!.]*)$/i.test(String(userMessage).trim().toLowerCase());
+  const cleanAckTokens = String(userMessage || '').toLowerCase().replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
+  const ackKeywords = ['ok', 'okay', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks', 'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haan', 'confirm', 'got', 'it'];
+  const isPureAck = cleanAckTokens.length > 0 && cleanAckTokens.every(t => ackKeywords.includes(t));
   if (candidate && candidate.interviewDateTime && isPureAck) {
     return null;
   }
@@ -613,12 +620,12 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     const isOnline = candidate.interviewMode === 'online';
     if (isHinglish) {
       return isOnline
-        ? `${greetingHi}\nAapka Online Google Meet interview already confirmed hai for *${interviewFormatted}*. Interview start hone se *15 minute pehle* aapko isi chat par Google Meet link share kar di jayegi! 💻✨`
-        : `${greetingHi}\nAapka interview already confirmed hai for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Hum aapse milne ke liye eager hain! 😊📍`;
+        ? `Thank you ${firstName ? firstName + '! ' : ''}👍 Aapka Online Google Meet interview confirmed hai for *${interviewFormatted}*. Interview start hone se *15 minute pehle* aapko isi chat par Google Meet link share kar di jayegi! All the best! 💻✨`
+        : `Thank you ${firstName ? firstName + '! ' : ''}👍 Aapka in-person interview confirmed hai for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
     } else {
       return isOnline
-        ? `${greetingEn}\nYour Online Google Meet interview is confirmed for *${interviewFormatted}*. You will receive the joining link on WhatsApp 15 minutes prior to the interview! 💻✨`
-        : `${greetingEn}\nYour interview is confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. We look forward to meeting you! 😊📍`;
+        ? `Thank you ${firstName ? firstName + '! ' : ''}👍 Your Online Google Meet interview is confirmed for *${interviewFormatted}*. You will receive the joining link on WhatsApp 15 minutes prior to the interview. All the best! 💻✨`
+        : `Thank you ${firstName ? firstName + '! ' : ''}👍 Your interview is confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
     }
   }
 }
@@ -688,11 +695,23 @@ ${historyLines ? historyLines : '(Start of chat)'}
 LATEST CANDIDATE MESSAGE:
 "${userMessage}"
 
+STRICT LANGUAGE DIRECTIVE (MANDATORY):
+Candidate's Detected Language: ${lang.toUpperCase()}
+- If candidate wrote in ENGLISH: You MUST reply 100% in fluent, professional ENGLISH. Do NOT include ANY Hindi or Hinglish words (never use words like "aapka", "shukriya", "kripya", "namaste", "bataiye", etc.).
+- If candidate wrote in HINDI / HINGLISH: You MUST reply in natural, polite HINGLISH.
+
 STRICT STEP-BY-STEP RECRUITMENT FUNNEL INSTRUCTIONS:
-Follow these 4 sequential qualification steps strictly:
+Follow these 5 sequential qualification steps strictly:
 
 👉 STEP 1 (If candidate has NOT chosen a role yet):
-Greet candidate by name and present the 6 active openings (1. Video Editor, 2. AI Video Expert, 3. Graphic Designer, 4. SEO & AEO Expert, 5. Social Media Manager, 6. Digital Marketing Manager). Ask which position (1 to 6) they want to apply for.
+Greet candidate by name and present the 6 active openings:
+1. Video Editor
+2. AI Video Expert
+3. Graphic Designer
+4. SEO & AEO Expert
+5. Social Media Manager
+6. Digital Marketing Manager
+Ask which position (1 to 6) they want to apply for.
 
 👉 STEP 2 (If role is chosen, but Experience / Fresher status is not known yet):
 Acknowledge the chosen role and ask:
@@ -703,14 +722,21 @@ Acknowledge the chosen role and ask:
 Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link based on the job requirements.
 
 👉 STEP 4 (If Resume / Portfolio has been received, but interview not scheduled yet):
-1. Propose tomorrow morning slot: Ask "Kya aap kal morning me 10:00 AM se 12:00 PM ke beech hamare Indore office (103 Orange Business Park, Bhawarkua) interview ke liye aa sakte hain?"
-2. If candidate says NO / Cannot come / Not available / Busy: Reply politely: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
+1. Propose tomorrow morning slot:
+   - English: "Are you available to visit our Indore office (103 Orange Business Park, Bhawarkua) for an in-person interview tomorrow morning between 10:00 AM and 12:00 PM?"
+   - Hinglish: "Kya aap kal morning me 10:00 AM se 12:00 PM ke beech hamare Indore office (103 Orange Business Park, Bhawarkua) interview ke liye aa sakte hain?"
+2. If candidate says NO / Cannot come / Busy:
+   - English: "No problem! Please share your preferred Date and Time (Monday to Saturday, 10:00 AM to 6:00 PM) when you can visit for the interview."
+   - Hinglish: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
+
+👉 STEP 5 (If interview is ALREADY scheduled and confirmed):
+If candidate says "ok", "thank you", "thik h", "done", "yes", or sends an acknowledgement:
+Reply with a warm Thank You & Best of Luck message confirming their already scheduled interview date & time and office location (103 Orange Business Park, Bhawarkua, Indore). Do NOT propose another slot and do NOT reschedule!
 
 RULES:
-- If candidate asks about Job Description (JD) / Work / Responsibilities: Politely explain that complete details regarding the Job Description, key responsibilities, client projects, and work scope will be explained in detail during the in-person interview at our Indore office.
+- If candidate asks about Job Description (JD) / Work / Responsibilities: Share the clear, concise job description for their specific applied role (tailored for Fresher Internship or Experienced Full-Time).
 - If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.
 - If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
-- If candidate writes in Hindi/Hinglish, reply in natural Hinglish. If in English, reply in crisp English.
 - OUTPUT ONLY the direct WhatsApp reply. No thinking, no extra notes.
 
 Direct WhatsApp Message:
