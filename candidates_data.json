@@ -17,7 +17,7 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-08-20T08:42:26.350Z",
-    "updatedAt": "2026-09-04T09:09:01.260Z",
+    "updatedAt": "2026-09-04T10:26:24.189Z",
     "lastMessage": "[Image received]",
     "chatHistory": [
       {
@@ -123,7 +123,7 @@
     ],
     "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1788512941318_image_1788512940051.jpg",
     "resumeUrl": "/uploads/resumes/918357977322_1788512941318_image_1788512940051.jpg",
-    "unreadCount": 2,
+    "unreadCount": 0,
     "interviewMode": "in_person"
   },
   {

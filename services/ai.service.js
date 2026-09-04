@@ -99,9 +99,10 @@ function detectLanguage(text) {
  */
 async function callGeminiApi(promptText, apiKey, options = {}) {
   const candidateModels = [
-    'gemini-1.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-pro'
+    'gemini-3.6-flash',
+    'gemini-3.1-pro-preview',
+    'gemini-2.5-flash',
+    'gemini-1.5-flash'
   ];
 
   for (const model of candidateModels) {
@@ -158,10 +159,88 @@ function extractJsonFromString(str) {
   return null;
 }
 
+/**
+ * Detect if incoming candidate message is a simple acknowledgment / closing / trivial reply
+ */
+function isAcknowledgementMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean) return false;
+
+  const directPhrases = [
+    'ok', 'okay', 'thik h', 'thik hai', 'theek hai', 'theek h', 'haa thik h', 'ha thik h',
+    'haa theek h', 'ha theek h', 'haa theek hai', 'ha theek hai', 'haa thik', 'ha thik',
+    'haa', 'ha', 'haan', 'yes', 'yep', 'yeah', 'done', 'ji', 'ji sir', 'sir', 'sure',
+    'alright', 'all right', 'thanks', 'thank you', 'shukriya', 'got it', 'confirm',
+    'hmm', 'hm', 'hmmm', 'hmmmm', 'acha', 'accha', 'achha', 'acha ji', 'accha ji',
+    'sahi h', 'sahi hai', 'k', 'kk', 'okk', 'okey', 'okay sir', 'ok sir', 'done sir',
+    'yes sir', 'ha sir', 'haa sir', 'haan sir', 'thik hai sir', 'thik h sir', 'thik h ji',
+    'bilkul', 'bilkul sir', 'see you', 'bye', 'good', 'nice', 'great', 'perfect', 'hm ji'
+  ];
+
+  if (directPhrases.includes(clean)) return true;
+
+  const tokens = clean.split(' ').filter(Boolean);
+  const ackVocab = new Set([
+    'ok', 'okay', 'okk', 'okey', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks',
+    'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haa', 'haan',
+    'confirm', 'got', 'it', 'hm', 'hmm', 'hmmm', 'hmmmm', 'acha', 'accha', 'achha',
+    'sahi', 'bye', 'good', 'nice', 'great', 'k', 'kk', 'bilkul', 'perfect', 'see'
+  ]);
+
+  return tokens.length > 0 && tokens.every(t => ackVocab.has(t));
+}
+
+/**
+ * Detect candidate arrival or on-the-way status
+ */
+function isArrivalStatusMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:aa\s*raha|a\s*rha|aa\s*rahi|a\s*rhi|aa\s*rahe|a\s*rhe|pahuch|on\s*the\s*way|coming|i\s*am\s*coming|reception|office\s*ke\s*bahar|office\s*me\s*hu|gate\s*par|pahunch)/i.test(text);
+}
+
+/**
+ * Detect short greeting
+ */
+function isGreetingMessage(rawText) {
+  if (!rawText) return false;
+  const clean = String(rawText).toLowerCase().replace(/[^a-z\s]/g, '').trim();
+  return /^(?:hi|hii|hiii|hiiii|hello|helo|hey|heyy|namaste|namaskar|good\s*morning|good\s*afternoon|good\s*evening)$/i.test(clean);
+}
+
+/**
+ * Detect questions about documents/portfolio to bring
+ */
+function isDocumentQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:document|documents|kya\s*lana|kya\s*lekar|resume\s*lana|hard\s*copy|print\s*out|printout|kya\s*chahiye\s*sath|sath\s*me\s*kya)/i.test(text);
+}
+
 function parseInterviewScheduleLocal(userMessage, candidate = null) {
   if (!userMessage) return null;
   const rawText = String(userMessage).trim();
   const text = rawText.toLowerCase();
+
+  // 0. If candidate ALREADY has an interview scheduled:
+  if (candidate && candidate.interviewDateTime) {
+    // Pure acknowledgments, arrival updates, greetings, doc questions must NEVER reschedule
+    if (isAcknowledgementMessage(text) || isArrivalStatusMessage(text) || isGreetingMessage(text) || isDocumentQuery(text)) {
+      return null;
+    }
+
+    // Must have explicit reschedule keyword OR explicit new day/time to allow rescheduling
+    const hasExplicitReschedule = /(?:reschedule|shift|instead|change\s*time|dusre\s*din|dusra\s*time|time\s*badal)/i.test(text);
+    const hasExplicitDay = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(text);
+    const hasExplicitTime = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(text);
+
+    // If there is no explicit day/time and no explicit reschedule keyword, DO NOT reschedule
+    if (!hasExplicitReschedule && !(hasExplicitDay && hasExplicitTime)) {
+      return null;
+    }
+  }
 
   // 1. Filter out pure non-scheduling queries (salary, experience, role selection, general questions)
   if (text.includes('timing') || text.includes('salary') || text.includes('address') || text.includes('kaha') || text.includes('where') || text.includes('package') || text.includes('tool') || text.includes('skill') || text.includes('exp') || text.includes('year') || text.includes('portfolio') || text.includes('resume')) {
@@ -191,19 +270,9 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     }
   }
 
-  // 4. Check for Affirmative Confirmation (e.g. "ha", "haan", "yes", "ok", "done", "aa sakta hu", "theek hai", "sure")
+  // 4. Check for Affirmative Confirmation (Only when interview slot is pending/not scheduled yet)
   const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
-  const isAffirmative = affirmativePattern.test(text);
-
-  // Robust check for pure acknowledgement (e.g. "ok", "ok sir", "ok done", "ok sir done", "thik hai", "done", "thank you", "thanks sir")
-  const cleanTokens = text.replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
-  const ackKeywords = ['ok', 'okay', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks', 'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haan', 'confirm', 'got', 'it'];
-  const isPureAcknowledgement = cleanTokens.length > 0 && cleanTokens.every(t => ackKeywords.includes(t));
-
-  // If candidate ALREADY has an interview scheduled and simply sends an acknowledgement, do NOT reschedule!
-  if (candidate && candidate.interviewDateTime && isPureAcknowledgement) {
-    return null;
-  }
+  const isAffirmative = (!candidate || !candidate.interviewDateTime) && affirmativePattern.test(text);
 
   // 5. Must have day indicator OR explicit time keyword OR affirmative response when interview slot is pending
   const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
@@ -301,11 +370,10 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
     return localParsed;
   }
 
-  const cleanAckTokens = String(userMessage || '').toLowerCase().replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(Boolean);
-  const ackKeywords = ['ok', 'okay', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks', 'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haan', 'confirm', 'got', 'it'];
-  const isPureAck = cleanAckTokens.length > 0 && cleanAckTokens.every(t => ackKeywords.includes(t));
-  if (candidate && candidate.interviewDateTime && isPureAck) {
-    return null;
+  if (candidate && candidate.interviewDateTime) {
+    if (isAcknowledgementMessage(userMessage) || isArrivalStatusMessage(userMessage) || isGreetingMessage(userMessage) || isDocumentQuery(userMessage)) {
+      return null;
+    }
   }
 
   const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi)/i;
@@ -333,12 +401,14 @@ Current Date & Time: ${nowIso}
 
 Context:
 Candidate message: "${userMessage}"
+Candidate already has scheduled interview: ${candidate && candidate.interviewDateTime ? candidate.interviewDateTime : 'No'}
 
 Instructions:
 1. Determine if candidate is proposing/confirming a specific date, day, or time when they CAN come for an in-person interview (e.g., "Tomorrow at 2 PM", "Monday 11 AM", "Kal 3 baje aa jaunga", "Today at 4 PM", "Reschedule to today 5 PM").
-2. If candidate says they CANNOT come without proposing a new time, set isScheduling to false!
-3. If YES, compute the target date-time in ISO-8601 string format with "+05:30" offset (e.g. "2026-08-21T14:00:00+05:30"). Office hours: 10:00 AM to 06:00 PM.
-4. If NO, set isScheduling to false.
+2. If candidate says simple acknowledgment ("ok", "thik h", "done", "yes", "sure", "thanks", "hmm", "haa thik h") and already has an interview scheduled, set isScheduling to false!
+3. If candidate says they CANNOT come without proposing a new time, set isScheduling to false!
+4. If candidate is explicitly scheduling or rescheduling to a specific time, compute the target date-time in ISO-8601 string format with "+05:30" offset (e.g. "2026-08-21T14:00:00+05:30"). Office hours: 10:00 AM to 06:00 PM.
+5. If NO, set isScheduling to false.
 
 Return JSON strictly:
 {
@@ -482,6 +552,45 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // ── SPECIAL HANDLING WHEN INTERVIEW IS ALREADY CONFIRMED ──
+  if (candidate.interviewDateTime) {
+    // 1. Simple Acknowledgment / Closing ("thik h", "ok", "haa thik h", "hmm", "done", "thanks", "sure", etc.)
+    if (isAcknowledgementMessage(text)) {
+      if (isHinglish) {
+        return `Bahut badiya! Interview me milte hain. 👍 All the best! 😊`;
+      } else {
+        return `Great! Looking forward to meeting you at the interview. 👍 All the best! 😊`;
+      }
+    }
+
+    // 2. Candidate Arrival / On the way ("aa raha hu", "gate par hu", "reception", "on the way")
+    if (isArrivalStatusMessage(text)) {
+      if (isHinglish) {
+        return `Bahut badiya! 🏢 Hamara office 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital) par hai. Office pahunch kar reception par contact karein. 👍`;
+      } else {
+        return `Great! 🏢 Our office is at 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital). Please check in at the reception upon arrival. 👍`;
+      }
+    }
+
+    // 3. Greeting when interview is already confirmed ("hii", "hello")
+    if (isGreetingMessage(text)) {
+      if (isHinglish) {
+        return `${greetingHi}\nKaise hain aap? Interview ke regarding koi question ya help chahiye to batayein! 👍`;
+      } else {
+        return `${greetingEn}\nHow can I help you regarding your scheduled interview? 👍`;
+      }
+    }
+
+    // 4. Documents to bring question
+    if (isDocumentQuery(text)) {
+      if (isHinglish) {
+        return `📌 Kripya apna updated *Resume (Hard Copy / PDF)* aur design/work samples saath lekar aayein. 👍`;
+      } else {
+        return `📌 Please bring your updated *Resume (Hard Copy/PDF)* and work samples/portfolio with you. 👍`;
+      }
+    }
+  }
+
   // 1. OTHER ROLE CHECK (Roles not in current 6 active openings e.g. Website Developer, Telecaller, Accountant, etc.)
   const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|telecaller|caller|calling|sales|bpo|receptionist|accountant|data\s*entry)/i;
   const isExcludedRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media') && !text.includes('digital marketing');
@@ -615,17 +724,17 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // ── STEP 5: INTERVIEW ALREADY CONFIRMED ──
+  // ── STEP 5: INTERVIEW ALREADY CONFIRMED (Default fallback) ──
   if (candidate.interviewDateTime) {
     const isOnline = candidate.interviewMode === 'online';
     if (isHinglish) {
       return isOnline
-        ? `Thank you ${firstName ? firstName + '! ' : ''}👍 Aapka Online Google Meet interview confirmed hai for *${interviewFormatted}*. Interview start hone se *15 minute pehle* aapko isi chat par Google Meet link share kar di jayegi! All the best! 💻✨`
-        : `Thank you ${firstName ? firstName + '! ' : ''}👍 Aapka in-person interview confirmed hai for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
+        ? `Aapka Online Google Meet interview *${interviewFormatted}* ke liye confirmed hai. Interview start hone se *15 minute pehle* link share kar di jayegi. All the best! 💻✨`
+        : `Aapka in-person interview *${interviewFormatted}* ke liye confirmed hai at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
     } else {
       return isOnline
-        ? `Thank you ${firstName ? firstName + '! ' : ''}👍 Your Online Google Meet interview is confirmed for *${interviewFormatted}*. You will receive the joining link on WhatsApp 15 minutes prior to the interview. All the best! 💻✨`
-        : `Thank you ${firstName ? firstName + '! ' : ''}👍 Your interview is confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
+        ? `Your Online Google Meet interview is confirmed for *${interviewFormatted}*. You will receive the joining link 15 minutes prior. All the best! 💻✨`
+        : `Your in-person interview is confirmed for *${interviewFormatted}* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍`;
     }
   }
 }
@@ -635,6 +744,9 @@ function cleanAiResponseText(rawText) {
   let text = rawText.trim();
   text = text.replace(/^```(?:markdown|json|text)?\s*/i, '').replace(/```\s*$/i, '').trim();
   text = text.replace(/^(?:Direct\s*WhatsApp\s*Message|HR\s*Assistant\s*Reply|Reply):\s*/i, '').trim();
+  if (text.includes('STRICT LANGUAGE DIRECTIVE') || text.includes('STRICT STEP-BY-STEP') || text.includes('COMPANY INFORMATION') || text.includes('CANDIDATE PROFILE')) {
+    return '';
+  }
   return text.trim();
 }
 
@@ -730,8 +842,14 @@ Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Go
    - Hinglish: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
 
 👉 STEP 5 (If interview is ALREADY scheduled and confirmed):
-If candidate says "ok", "thank you", "thik h", "done", "yes", or sends an acknowledgement:
-Reply with a warm Thank You & Best of Luck message confirming their already scheduled interview date & time and office location (103 Orange Business Park, Bhawarkua, Indore). Do NOT propose another slot and do NOT reschedule!
+- If candidate sends simple acknowledgment ("ok", "thik h", "haa thik h", "hmm", "done", "yes", "sure", "thanks", "acha"):
+  Reply with a SHORT, friendly closing acknowledgment (e.g. English: "Great! See you at the interview. 👍 All the best! 😊" | Hinglish: "Bahut badiya! Interview me milte hain. 👍 All the best! 😊").
+  DO NOT repeat the entire interview confirmation paragraph or address/time, and DO NOT reschedule!
+- If candidate says they are coming / on the way ("aa raha hu", "gate par hu", "reception"):
+  Welcome them warmly and tell them to check in at the reception (103 Orange Business Park, Bhawarkua).
+- If candidate asks a specific question (documents to bring, directions, salary, JD):
+  Answer ONLY that specific question concisely.
+- NEVER reschedule unless the candidate explicitly gives a new specific time/day to reschedule.
 
 RULES:
 - If candidate asks about Job Description (JD) / Work / Responsibilities: Share the clear, concise job description for their specific applied role (tailored for Fresher Internship or Experienced Full-Time).
@@ -745,7 +863,7 @@ Direct WhatsApp Message:
   // 1. Call Gemini AI with active modern models
   if (rawKey && rawKey.trim() !== '') {
     try {
-      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 350 });
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 450 });
       if (result && result.text) {
         const cleanedText = cleanAiResponseText(result.text);
         if (cleanedText.length > 5) {
