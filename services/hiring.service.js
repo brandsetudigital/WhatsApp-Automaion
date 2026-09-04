@@ -313,6 +313,17 @@ function trackCandidateFromMessage(messageData) {
     }
   }
 
+  // Check if this is a fresh application intent (e.g. candidate clicks Instagram Ad, types "apply", "new apply", "restart", "start", or sends ad greeting)
+  const isFreshApplyIntent = (
+    lower === 'apply' ||
+    lower === 'new apply' ||
+    lower === 'restart' ||
+    lower.startsWith('apply for') ||
+    lower.includes('can i get more info') ||
+    lower.includes('looking for job') ||
+    lower.includes('hiring ke liye')
+  );
+
   // Fallback to WhatsApp profile name if valid
   const rawCustomerName = (messageData.customerName || '').trim();
   const validProfileName = (rawCustomerName && rawCustomerName.toLowerCase() !== 'customer' && rawCustomerName.toLowerCase() !== 'user')
@@ -330,7 +341,7 @@ function trackCandidateFromMessage(messageData) {
       name: initialName,
       role: detectedRole || 'General Applicant',
       city: 'Indore',
-      experience: '',
+      experience: detectedExperience || '',
       portfolio: extractedLink,
       resumeReceived: hasResumeSignal,
       resumeFileName: msgType === 'document' ? (messageData.messageText || 'Resume Document') : (hasResumeSignal ? 'Portfolio Link' : ''),
@@ -362,11 +373,26 @@ function trackCandidateFromMessage(messageData) {
       candidate.name = validProfileName;
     }
 
-    if (detectedRole && (candidate.role === 'General Applicant' || !candidate.role)) {
+    // If candidate sends a fresh apply intent, reset stale interview/role state for the new flow
+    if (isFreshApplyIntent) {
+      console.log(`🔄 Candidate ${candidate.name} (+${candidate.phone}) restarted application flow`);
+      candidate.role = detectedRole || 'General Applicant';
+      candidate.experience = '';
+      candidate.interviewDateTime = null;
+      candidate.status = candidate.resumeReceived ? 'Resume Received' : 'Applied';
+    } else if (detectedRole) {
       candidate.role = detectedRole;
     }
 
-    if (detectedExperience && (!candidate.experience || candidate.experience === '')) {
+    // If candidate had an old interview in the past, clear the expired interview date
+    if (candidate.interviewDateTime && new Date(candidate.interviewDateTime).getTime() < (Date.now() - 24 * 3600 * 1000)) {
+      candidate.interviewDateTime = null;
+      if (candidate.status === 'Interview Scheduled') {
+        candidate.status = candidate.resumeReceived ? 'Resume Received' : 'Applied';
+      }
+    }
+
+    if (detectedExperience) {
       candidate.experience = detectedExperience;
     }
 
