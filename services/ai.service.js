@@ -810,12 +810,12 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // ── STEP 4: RESUME / PORTFOLIO RECEIVED, PROPOSE TOMORROW MORNING 10 AM - 12 PM SLOT ──
+  // ── STEP 4: RESUME / PORTFOLIO RECEIVED (Immediate acknowledgment, HR review) ──
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
     if (isHinglish) {
-      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, shukriya! 📄✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨\n\nHamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍`;
     } else {
-      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
+      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍`;
     }
   }
 
@@ -933,13 +933,13 @@ Acknowledge the chosen role and ask:
 👉 STEP 3 (If role & experience are known, but Resume / Portfolio is pending):
 Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link based on the job requirements.
 
-👉 STEP 4 (If Resume / Portfolio has been received, but interview not scheduled yet):
-1. Propose tomorrow morning slot:
-   - English: "Are you available to visit our Indore office (103 Orange Business Park, Bhawarkua) for an in-person interview tomorrow morning between 10:00 AM and 12:00 PM?"
-   - Hinglish: "Kya aap kal morning me 10:00 AM se 12:00 PM ke beech hamare Indore office (103 Orange Business Park, Bhawarkua) interview ke liye aa sakte hain?"
-2. If candidate says NO / Cannot come / Busy:
-   - English: "No problem! Please share your preferred Date and Time (Monday to Saturday, 10:00 AM to 6:00 PM) when you can visit for the interview."
-   - Hinglish: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
+👉 STEP 4 (If Resume / Portfolio has just been received, but not reviewed yet):
+- Acknowledge receipt warmly and inform that HR is reviewing:
+  - English: "Thank you for sharing your resume/portfolio! 📄✨ Our HR team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍"
+  - Hinglish: "Aapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨ Hamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍"
+- If candidate says NO / Cannot come / Busy for interview:
+  - English: "No problem! Please share your preferred Date and Time (Monday to Saturday, 10:00 AM to 6:00 PM) when you can visit for the interview."
+  - Hinglish: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
 
 👉 STEP 5 (If interview is ALREADY scheduled and confirmed):
 - If candidate sends simple acknowledgment ("ok", "thik h", "haa thik h", "hmm", "done", "yes", "sure", "thanks", "acha"):

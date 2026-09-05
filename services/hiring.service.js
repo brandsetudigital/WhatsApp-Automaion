@@ -433,6 +433,8 @@ function trackCandidateFromMessage(messageData) {
 
     if (hasResumeSignal && !candidate.resumeReceived) {
       candidate.resumeReceived = true;
+      candidate.resumeReceivedAt = nowIso;
+      candidate.interviewSlotProposed = false;
       candidate.resumeFileName = msgType === 'document' ? (messageData.messageText || 'Resume Document') : 'Portfolio Link';
       if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
         candidate.status = 'Resume Received';
@@ -708,14 +710,54 @@ async function sendInterview1HrReminder(candidate) {
 }
 
 /**
+ * Send In-Person Interview Slot Proposal (10-15 mins after resume review)
+ */
+async function sendInterviewSlotProposal(candidate) {
+  if (!candidate || candidate.interviewDateTime || candidate.status === 'Not Interested' || candidate.interviewSlotProposed) {
+    return;
+  }
+
+  candidate.interviewSlotProposed = true;
+  candidate.interviewSlotProposedAt = new Date().toISOString();
+  saveCandidatesAndSyncExcel();
+
+  const isEnglish = (candidate.lang === 'english');
+  const candName = getCandidateDisplayName(candidate);
+  const greeting = candName && candName !== 'Candidate' ? `Hello ${candName}! 😊` : 'Hello! 😊';
+
+  const proposalMsg = isEnglish
+    ? `${greeting}\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`
+    : `${greeting}\n\nAapki profile aur portfolio HR team dwara shortlist kar li gayi hai. 👏✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+
+  const recipient = candidate.whatsappChatId || candidate.phone;
+  try {
+    await whatsappCloudService.sendWhatsAppText(recipient, proposalMsg);
+    appendChatHistory(candidate, 'assistant', proposalMsg);
+    saveCandidatesAndSyncExcel();
+
+    console.log(`📅 10-15 Min Delayed Interview Slot Proposal dispatched to candidate ${candidate.name} (+${candidate.phone})`);
+    if (ioInstance) {
+      ioInstance.emit('log', {
+        type: 'info',
+        text: `📅 Interview Slot Proposal sent to ${candidate.name} (+${candidate.phone}) (after 10-15 min resume review)`
+      });
+    }
+  } catch (err) {
+    console.error(`Error sending interview slot proposal to +${candidate.phone}:`, err.message);
+  }
+}
+
+/**
  * Background Automation Cron / Interval
  * Checks every 60 seconds:
  * 1. Missing Resume Reminders (4 hours after apply)
  * 2. 1-Hour Interview Reminders (Between 45 to 65 mins before interview)
+ * 3. Delayed Interview Slot Proposal (10 to 15 mins after Resume Received)
  */
 function runHiringAutomationCheck() {
   const now = new Date().getTime();
   const FOUR_HOURS_MS = 4 * 60 * 60 * 1000; // 4 Hours
+  const TEN_MINS_MS = 10 * 60 * 1000; // 10 Minutes
 
   candidates.forEach(candidate => {
     // 1. Missing Resume Reminder (After 4 Hours if not received)
@@ -741,6 +783,20 @@ function runHiringAutomationCheck() {
         console.log(`🔔 Triggering 1-hour interview reminder for ${candidate.name} (+${candidate.phone}) in ${diffMinutes}m`);
         sendInterview1HrReminder(candidate).catch(err => {
           // Logged inside sendInterview1HrReminder
+        });
+      }
+    }
+
+    // 3. Delayed Interview Slot Proposal (10-15 mins after Resume Received)
+    if (candidate.resumeReceived && !candidate.interviewSlotProposed && !candidate.interviewDateTime && candidate.status !== 'Not Interested') {
+      const resumeTime = candidate.resumeReceivedAt ? new Date(candidate.resumeReceivedAt).getTime() : (candidate.createdAt ? new Date(candidate.createdAt).getTime() : now);
+      const elapsedMs = now - resumeTime;
+
+      // Send proposal after 10-15 minutes (>= 10 mins)
+      if (elapsedMs >= TEN_MINS_MS) {
+        console.log(`⏱️ Triggering 10-15 minute delayed interview proposal for ${candidate.name} (+${candidate.phone})`);
+        sendInterviewSlotProposal(candidate).catch(err => {
+          console.error('Error in sendInterviewSlotProposal:', err.message);
         });
       }
     }
