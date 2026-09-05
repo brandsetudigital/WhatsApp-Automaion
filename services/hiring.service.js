@@ -32,7 +32,7 @@ function loadCandidates() {
 
         candidates.forEach(candidate => {
           if (candidate.unreadCount === undefined) {
-            candidate.unreadCount = (candidate.chatHistory || []).some(message => message.role === 'user') ? 1 : 0;
+            candidate.unreadCount = 0;
           }
         });
       }
@@ -204,16 +204,34 @@ function appendChatHistory(candidate, role, text) {
 }
 
 /**
+ * Sanitize candidate name by stripping emojis, symbols, and non-name strings
+ */
+function cleanCandidateName(rawName) {
+  if (!rawName) return 'Candidate';
+  let cleaned = String(rawName).replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, '');
+  cleaned = cleaned.replace(/[^a-zA-Z\s\u0900-\u097F]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (!cleaned || cleaned.length < 2) return 'Candidate';
+
+  const blacklisted = [
+    'candidate', 'customer', 'user', 'allhumdullillha', 'alhamdulillah', 'allah',
+    'sunshine', 'admin', 'brandsetu', 'brandsetudigital', 'snacks', 'house of snacks',
+    'status', 'broadcast', 'unknown', 'null', 'undefined'
+  ];
+
+  if (blacklisted.some(b => cleaned.toLowerCase().includes(b))) {
+    return 'Candidate';
+  }
+
+  return cleaned.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+/**
  * Helper to get clean candidate first or display name
  */
 function getCandidateDisplayName(candidate) {
   if (!candidate) return 'Candidate';
-  let name = (candidate.name || '').trim();
-  if (!name || name.toLowerCase() === 'customer' || name.toLowerCase() === 'candidate') {
-    return 'Candidate';
-  }
-  // Return first name or full name cleanly
-  return name;
+  return cleanCandidateName(candidate.name);
 }
 
 /**
@@ -338,7 +356,7 @@ function trackCandidateFromMessage(messageData) {
     ? rawCustomerName
     : null;
 
-  const initialName = extractedName || validProfileName || 'Candidate';
+  const initialName = cleanCandidateName(extractedName || validProfileName);
 
   // Detect language of the incoming message
   const msgLang = detectCandidateLang(text);
@@ -381,9 +399,9 @@ function trackCandidateFromMessage(messageData) {
     appendChatHistory(candidate, 'user', text);
 
     if (extractedName) {
-      candidate.name = extractedName;
+      candidate.name = cleanCandidateName(extractedName);
     } else if (validProfileName && (candidate.name === 'Candidate' || candidate.name === 'Customer' || !candidate.name)) {
-      candidate.name = validProfileName;
+      candidate.name = cleanCandidateName(validProfileName);
     }
 
     // If candidate sends a fresh apply intent, reset stale interview/role state for the new flow

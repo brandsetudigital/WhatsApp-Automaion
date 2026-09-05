@@ -175,6 +175,65 @@ async function processIncomingWhatsAppMessage(messageData) {
     console.error('Error tracking candidate from message:', candErr);
   }
 
+  // 1.5 Check if Candidate said "Not Interested / Cancel / Drop"
+  if (candidate && aiService.isNotInterestedMessage(messageText)) {
+    console.log(`🛑 Candidate ${candidate.name} (+${candidate.phone}) marked NOT INTERESTED`);
+    candidate.status = 'Not Interested';
+    candidate.interviewDateTime = null; // Clear any scheduled interview
+    candidate.resumeReminderSent = true; // Block future resume reminders
+    candidate.interviewReminderSent = true; // Block future interview reminders
+    candidate.updatedAt = new Date().toISOString();
+
+    const isEnglish = (candidate.lang === 'english');
+    const closingMsg = isEnglish
+      ? `Thank you for letting us know! We have updated your status and will not disturb you further. We wish you all the best for your future endeavors! ✨`
+      : `Humein batane ke liye dhanyawad! Humne aapka status update kar diya hai. Aapke future ke liye best wishes! ✨`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, closingMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', closingMsg);
+    } catch (sendErr) {
+      console.error('Error sending not-interested closing message:', sendErr.message);
+    }
+
+    hiringService.saveCandidatesAndSyncExcel();
+    io.emit('hiring-updated', {
+      candidates: hiringService.getCandidates(),
+      stats: hiringService.getHiringStats(),
+      candidateId: candidate.id
+    });
+    return; // Stop immediately!
+  }
+
+  // 1.6 If Candidate is ALREADY Not Interested and sends casual text, ignore
+  if (candidate && candidate.status === 'Not Interested') {
+    const isReapply = /(?:apply|restart|start|job|hiring|reopen)/i.test(messageText);
+    if (!isReapply) {
+      console.log(`ℹ️ Ignored casual message from Not Interested candidate: +${customerPhone}`);
+      return;
+    }
+  }
+
+  // 1.7 If candidate already has an interview scheduled and sends simple acknowledgment ("ok", "thik h", "ok sir")
+  if (candidate && candidate.interviewDateTime && aiService.isAcknowledgementMessage(messageText)) {
+    console.log(`👍 Candidate ${candidate.name} (+${candidate.phone}) sent acknowledgment for scheduled interview`);
+    const isEnglish = (candidate.lang === 'english');
+    const ackMsg = isEnglish
+      ? `Great! Looking forward to seeing you at the interview. 👍 All the best! 😊`
+      : `Bahut badiya! Interview me milte hain. 👍 All the best! 😊`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, ackMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', ackMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+    } catch (e) {
+      console.error('Error sending ack reply:', e.message);
+    }
+    return; // Don't reschedule or send repetitive messages!
+  }
+
   // 2. Check for Automatic Interview Scheduling Intent if candidate is active
   let interviewScheduledNow = false;
   if (candidate && messageText && messageText.length > 2) {

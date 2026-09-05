@@ -113,7 +113,7 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
         contents: [{ parts: [{ text: promptText }] }],
         generationConfig: {
           temperature: options.temperature ?? 0.65,
-          maxOutputTokens: options.maxTokens ?? 400
+          maxOutputTokens: options.maxTokens ?? 800
         }
       };
 
@@ -194,6 +194,79 @@ function isAcknowledgementMessage(rawText) {
 }
 
 /**
+ * Detect if incoming candidate message expresses lack of interest, cancellation, or rejection
+ */
+function isNotInterestedMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean) return false;
+
+  const notInterestedPhrases = [
+    'not interested',
+    'not intrested',
+    'not interest',
+    'not intrest',
+    'not intersted',
+    'nhi chahiye',
+    'nahi chahiye',
+    'nhi chaiye',
+    'nahi chaiye',
+    'job nahi chahiye',
+    'job nhi chahiye',
+    'job nahi krna',
+    'job nhi krna',
+    'no need',
+    'dont need',
+    'don t need',
+    'no thanks',
+    'no thank you',
+    'not looking for job',
+    'not looking',
+    'already placed',
+    'placed',
+    'got another job',
+    'got a job',
+    'kahi aur lag gayi',
+    'kahi aur ho gaya',
+    'dusri jagah ho gaya',
+    'dusri company me ho gaya',
+    'drop',
+    'cancel my interview',
+    'cancel interview',
+    'interview cancel',
+    'cancel it',
+    'nahi aana',
+    'nhi aana',
+    'nahi aaunga',
+    'nhi aaunga',
+    'nahi aaungi',
+    'nhi aaungi',
+    'stop',
+    'unsubscribe',
+    'don t message',
+    'dont message',
+    'mat karo message',
+    'mat bhejo',
+    'mat karo'
+  ];
+
+  for (const phrase of notInterestedPhrases) {
+    if (clean === phrase || clean.startsWith(phrase + ' ') || clean.endsWith(' ' + phrase) || clean.includes(' ' + phrase + ' ')) {
+      return true;
+    }
+    if (clean === phrase) return true;
+  }
+
+  // Regex check for tight matches
+  if (/\b(?:not\s*inter[a-z]*|nhi\s*chahi[a-z]*|nahi\s*chahi[a-z]*|no\s*need|already\s*placed|kahi\s*aur\s*lag\s*gayi|cancel\s*interview|interview\s*cancel|nahi\s*aana|nhi\s*aana)\b/i.test(text)) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Detect candidate arrival or on-the-way status
  */
 function isArrivalStatusMessage(rawText) {
@@ -219,6 +292,8 @@ function isDocumentQuery(rawText) {
   const text = String(rawText).toLowerCase().trim();
   return /(?:d[aoe]c[uo]ment|doc\b|paper\b|kya\s*(?:kya\s*)?la(?:na|ne|kar|ke)|kya\s*(?:le\s*)?jana|kya\s*lekar|resume\s*la(?:na|ne)|hard\s*copy|print\s*out|printout|kya\s*chahiye|sath\s*me\s*kya|saath\s*me\s*kya|sath\s*kya|kya\s*leke)/i.test(text);
 }
+
+
 
 function parseInterviewScheduleLocal(userMessage, candidate = null) {
   if (!userMessage) return null;
@@ -535,6 +610,15 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
 
   const isHinglish = (lang === 'hinglish' || lang === 'hindi');
 
+  // ── 0. NOT INTERESTED / CANCEL / DROP HANDLING ──
+  if (isNotInterestedMessage(text) || candidate.status === 'Not Interested') {
+    if (isHinglish) {
+      return `Humein batane ke liye dhanyawad! Humne aapka status update kar diya hai. Aapke future ke liye best wishes! ✨`;
+    } else {
+      return `Thank you for letting us know! We have updated your status and will not disturb you further. We wish you all the best for your future endeavors! ✨`;
+    }
+  }
+
   let interviewFormatted = '';
   if (candidate.interviewDateTime) {
     try {
@@ -775,8 +859,11 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
 
   // Candidate Name
   let candName = (candidate.name || '').trim();
-  if (!candName || candName.toLowerCase() === 'candidate' || candName.toLowerCase() === 'customer') {
-    candName = (messageData.customerName && messageData.customerName !== 'Customer') ? messageData.customerName : 'Candidate';
+  candName = candName.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, '');
+  candName = candName.replace(/[^a-zA-Z\s\u0900-\u097F]/g, ' ').replace(/\s+/g, ' ').trim();
+  
+  if (!candName || candName.length < 2 || ['candidate', 'customer', 'user', 'allhumdullillha', 'alhamdulillah', 'allah', 'sunshine', 'admin', 'brandsetu', 'snacks'].some(b => candName.toLowerCase().includes(b))) {
+    candName = 'Candidate';
   }
 
   const candidateSummary = {
@@ -818,9 +905,11 @@ ${historyLines ? historyLines : '(Start of chat)'}
 LATEST CANDIDATE MESSAGE:
 "${userMessage}"
 
-STRICT LANGUAGE DIRECTIVE (MANDATORY):
-Candidate's Detected Language: ${lang.toUpperCase()}
-- If candidate wrote in ENGLISH: You MUST reply 100% in fluent, professional ENGLISH. Do NOT include ANY Hindi or Hinglish words (never use words like "aapka", "shukriya", "kripya", "namaste", "bataiye", etc.).
+STRICT NAME & LANGUAGE DIRECTIVE (MANDATORY):
+- If Candidate Name is "Candidate" or unknown: Greet simply as "Hello! 😊" (English) or "Namaste! 🙏" (Hinglish). NEVER write "Hello Candidate!" or include emojis/phrases in the person's name!
+- If Candidate Name is a real valid name (e.g. "Arjun"): Greet as "Hello Arjun! 😊" or "Namaste Arjun! 🙏".
+- Candidate's Detected Language: ${lang.toUpperCase()}
+- If candidate wrote in ENGLISH: You MUST reply 100% in fluent, professional ENGLISH. Do NOT include ANY Hindi or Hinglish words.
 - If candidate wrote in HINDI / HINGLISH: You MUST reply in natural, polite HINGLISH.
 
 STRICT STEP-BY-STEP RECRUITMENT FUNNEL INSTRUCTIONS:
@@ -862,7 +951,7 @@ Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Go
   Answer ONLY that specific question concisely.
 - NEVER reschedule unless the candidate explicitly gives a new specific time/day to reschedule.
 
-RULES:
+- If candidate says "Not interested", "nhi chahiye", "no need", "not looking", "drop", "cancel", "nahi aana": Politely thank them and close the conversation with best wishes. DO NOT offer an interview or provide office address!
 - If candidate asks about Job Description (JD) / Work / Responsibilities: Share the clear, concise job description for their specific applied role (tailored for Fresher Internship or Experienced Full-Time).
 - If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.
 - If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
@@ -874,7 +963,7 @@ Direct WhatsApp Message:
   // 1. Call Gemini AI with active modern models
   if (rawKey && rawKey.trim() !== '') {
     try {
-      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 450 });
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 800 });
       if (result && result.text) {
         const cleanedText = cleanAiResponseText(result.text);
         if (cleanedText.length > 5) {
@@ -949,5 +1038,7 @@ module.exports = {
   generateAIResponse,
   parseInterviewScheduleWithGemini,
   parseInterviewScheduleLocal,
+  isNotInterestedMessage,
+  isAcknowledgementMessage,
   detectLanguage
 };

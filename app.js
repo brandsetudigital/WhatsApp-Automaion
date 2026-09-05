@@ -1673,16 +1673,17 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="wa-chat-item-time">${lastMsgTime}</span>
             </div>
             <div class="wa-chat-item-lastmsg">
-              ${isOutgoing ? '<span class="text-success"><i class="fa-solid fa-check-double"></i></span> ' : ''}
-              <span>${escapeHtml(lastMsgText)}</span>
+              <div class="wa-chat-lastmsg-text">
+                ${isOutgoing ? '<span class="text-success"><i class="fa-solid fa-check-double"></i></span> ' : ''}
+                <span>${escapeHtml(lastMsgText)}</span>
+              </div>
+              ${(Number(c.unreadCount) || 0) > 0 ? `<span class="wa-chat-badge-unread">${c.unreadCount}</span>` : ''}
             </div>
             <div class="wa-chat-item-tags">
               <span class="badge-role ${roleClass}" style="font-size:0.65rem; padding:1px 5px;">${escapeHtml(c.role || 'General')}</span>
               ${c.resumeReceived 
                 ? '<span class="badge-status badge-status-received" style="font-size:0.62rem; padding:1px 5px;"><i class="fa-solid fa-file-pdf"></i> Resume</span>' 
                 : '<span class="badge-status badge-status-pending" style="font-size:0.62rem; padding:1px 5px;">No Resume</span>'}
-              ${history.length > 0 ? `<span class="wa-chat-badge-msgcount">${history.length} msgs</span>` : ''}
-              ${(Number(c.unreadCount) || 0) > 0 ? `<span class="wa-chat-badge-unread">${c.unreadCount}</span>` : ''}
             </div>
           </div>
         </div>

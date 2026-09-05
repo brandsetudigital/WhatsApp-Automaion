@@ -245,11 +245,11 @@
     "portfolio": "",
     "resumeReceived": false,
     "resumeFileName": "",
-    "status": "Applied",
+    "status": "Resume Pending",
     "interviewDateTime": null,
     "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-05T09:25:30.846Z",
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-09-04T09:03:28.825Z",
@@ -265,9 +265,14 @@
         "role": "assistant",
         "text": "Hello BrandSetuDigital! 😊\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝",
         "timestamp": "2026-09-04T09:03:30.365Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Namaste BrandSetuDigital! 👋\n\nBrandSetu Digital me *General Applicant* position ke liye aapke interest ke liye dhanyawad. Humein abhi tak aapka updated *Resume / Portfolio* receive nahi hua hai. 📄\n\n👉 Kripya apna Resume (PDF) ya Portfolio link yahan share karein taaki hum aapka interview schedule kar sakein. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-05T09:25:31.985Z"
       }
     ],
-    "unreadCount": 1
+    "unreadCount": 0
   },
   {
     "id": "cand_1787223675887_2tjr5",
@@ -391,7 +396,7 @@
         "timestamp": "2026-09-04T08:57:10.637Z"
       }
     ],
-    "unreadCount": 3
+    "unreadCount": 0
   },
   {
     "id": "cand_1788512223471_xgeuf",
@@ -404,11 +409,11 @@
     "portfolio": "",
     "resumeReceived": false,
     "resumeFileName": "",
-    "status": "Applied",
+    "status": "Resume Pending",
     "interviewDateTime": null,
     "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-05T09:25:30.871Z",
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-09-04T08:57:03.470Z",
@@ -429,6 +434,11 @@
         "role": "assistant",
         "text": "hello",
         "timestamp": "2026-09-04T08:58:19.377Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Namaste manshi! 👋\n\nBrandSetu Digital me *Digital Marketing Manager* position ke liye aapke interest ke liye dhanyawad. Humein abhi tak aapka updated *Resume / Portfolio* receive nahi hua hai. 📄\n\n👉 Kripya apna Resume (PDF) ya Portfolio link yahan share karein taaki hum aapka interview schedule kar sakein. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-05T09:25:32.301Z"
       }
     ],
     "unreadCount": 0
