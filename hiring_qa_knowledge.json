@@ -1,0 +1,117 @@
+{
+  "company": {
+    "name": "Brand Setu Digital",
+    "industry": "Digital Marketing, AI Media, Creative & Performance Agency",
+    "location": "103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore, Madhya Pradesh 452014",
+    "contact": "+91 9329232025",
+    "workMode": "100% Onsite In-Office (Indore)",
+    "officeHours": "Monday to Saturday, 10:00 AM – 7:00 PM (Sunday Off)",
+    "interviewHours": "Monday to Saturday, 10:00 AM – 6:00 PM"
+  },
+  "roles": [
+    {
+      "id": 1,
+      "title": "Video Editor",
+      "tools": ["Adobe Premiere Pro", "After Effects", "DaVinci Resolve", "CapCut Pro"],
+      "scope": "High-retention Reels, YouTube long-form videos, dynamic cuts, SFX, subtitle animations.",
+      "portfolioRequired": "Google Drive link of past video edits + PDF Resume"
+    },
+    {
+      "id": 2,
+      "title": "AI Video Expert",
+      "tools": ["Midjourney", "Runway Gen-2/Gen-3", "Kling AI", "Luma Dream Machine", "Pika", "HeyGen", "ElevenLabs"],
+      "scope": "AI video generation, prompt engineering, AI avatar creation, realistic animations for ads.",
+      "portfolioRequired": "Google Drive link of AI generated videos + PDF Resume"
+    },
+    {
+      "id": 3,
+      "title": "Graphic Designer",
+      "tools": ["Adobe Photoshop", "Illustrator", "Figma", "Canva Pro"],
+      "scope": "Social media creatives, ad banners, typography, branding, thumbnail designs.",
+      "portfolioRequired": "Behance / Google Drive / Figma link + PDF Resume"
+    },
+    {
+      "id": 4,
+      "title": "SEO & AEO Expert",
+      "tools": ["Ahrefs", "SEMrush", "Google Search Console", "Screaming Frog", "WordPress SEO"],
+      "scope": "On-Page, Off-Page, Technical SEO, AI Search Optimization (AEO for ChatGPT/Perplexity/Gemini), Page 1 rankings.",
+      "portfolioRequired": "Live case studies / ranking proofs + PDF Resume"
+    },
+    {
+      "id": 5,
+      "title": "Social Media Manager",
+      "tools": ["Meta Business Suite", "Canva", "Notion", "Analytics"],
+      "scope": "Organic profile growth, viral reels strategy, content calendar planning, caption writing.",
+      "portfolioRequired": "Past managed profiles & growth case studies + PDF Resume"
+    },
+    {
+      "id": 6,
+      "title": "Digital Marketing Manager",
+      "tools": ["Meta Ads Manager", "Google Ads", "GA4", "Funnel Analytics"],
+      "scope": "High-ROI Paid Ads on Meta and Google, lead gen, media planning, funnel optimization.",
+      "portfolioRequired": "Ad campaign case studies / ROAS track record + PDF Resume"
+    }
+  ],
+  "frequentlyAskedQuestions": [
+    {
+      "topic": "Salary & Stipend",
+      "triggers": ["salary", "package", "stipend", "kitna milega", "ctc", "per month", "pay"],
+      "hinglish": "💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur In-Person Practical Interview* ke basis par decide hoti hai aur interview ke dauraan finalize kar di jayegi. 🤝\n\nKripya apna updated *Resume (PDF)* aur portfolio link share karein taaki hum aapka interview schedule kar sakein. 📄",
+      "english": "💰 *Salary / Compensation Details:*\nSalary and stipend are decided based on your *Experience, Skills, and In-Person Practical Interview performance*, and will be discussed and finalized during the interview. 🤝\n\nPlease share your updated *Resume (PDF)* or portfolio link so we can proceed with scheduling your interview. 📄"
+    },
+    {
+      "topic": "Work From Home (WFH) / Remote",
+      "triggers": ["wfh", "work from home", "remote", "ghar se", "online job", "part time"],
+      "hinglish": "🏢 Yeh position strictly **Onsite In-Office** role hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office me full-time kaam karne ke liye comfortable hain, toh kripya apna **Resume (PDF)** yahan share karein. 👍",
+      "english": "🏢 This is strictly an **Onsite In-Office** position at our Indore office (*103 Orange Business Park, Bhawarkua*). We currently do not offer remote or work-from-home options.\n\nIf you are available to work from our Indore office, please share your updated **Resume (PDF)** to proceed. 👍"
+    },
+    {
+      "topic": "Office Location & Address",
+      "triggers": ["location", "address", "kahan", "kaha", "where", "office address", "bhawarkua"],
+      "hinglish": "📍 *Office Address:*\n**Brand Setu Digital**\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact Helpline:* +91 9329232025",
+      "english": "📍 *Office Location:*\n**Brand Setu Digital**\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact Helpline:* +91 9329232025"
+    },
+    {
+      "topic": "Office & Interview Timings",
+      "triggers": ["timings", "timing", "kab aana hai", "interview time", "hours", "sunday open"],
+      "hinglish": "⏰ *Timings Info:*\n- **Office Working Hours:** Monday to Saturday | 10:00 AM – 7:00 PM (Sunday Off)\n- **Interview Slots:** Monday to Saturday | 10:00 AM – 6:00 PM\n\nAap inme se kisi bhi din 10:00 AM se 6:00 PM ke beech apna interview schedule kar sakte hain. 👍",
+      "english": "⏰ *Timings Info:*\n- **Office Hours:** Monday to Saturday | 10:00 AM – 7:00 PM (Sunday Off)\n- **Interview Hours:** Monday to Saturday | 10:00 AM – 6:00 PM\n\nYou can schedule your interview between 10:00 AM and 6:00 PM on any working day (Mon–Sat). 👍"
+    },
+    {
+      "topic": "Freshers & Paid Internship",
+      "triggers": ["fresher", "freshers", "internship", "paid internship", "certificate", "training"],
+      "hinglish": "🎓 *Fresher & Internship Details:*\nHaan, Freshers bilkul apply kar sakte hain! Hum Freshers ke liye **Paid Internship (3 to 6 Months)** provide karte hain jisme:\n- Handsome Monthly Stipend 💵\n- Live Client Projects & Mentorship 🚀\n- Certificate of Completion 📜\n- Full-Time Job Offer (PPO) based on performance ✨\n\nKripya apna updated **Resume (PDF)** aur work samples share karein!",
+      "english": "🎓 *Fresher & Internship Details:*\nYes, Freshers are welcome to apply! We offer **Paid Internships (3 to 6 Months)** that include:\n- Monthly Stipend 💵\n- Real-world Client Projects & Mentorship 🚀\n- Certificate of Completion 📜\n- Pre-Placement Full-Time Job Offer (PPO) ✨\n\nPlease share your updated **Resume (PDF)** and work samples to get started!"
+    },
+    {
+      "topic": "Resume Format Requirement",
+      "triggers": ["photo", "image", "screenshot", "format", "word", "doc"],
+      "hinglish": "📌 *Resume & Portfolio Notice:*\n1. Resume kripya **PDF format (.pdf)** me hi share karein (Photos / camera screenshots accept nahi hote). 📄\n2. Portfolio / work samples ke liye aap apna **Google Drive, Behance, ya Figma link** yahan share karein. 👍",
+      "english": "📌 *Resume & Portfolio Notice:*\n1. Resumes must be shared in **PDF format (.pdf)** only (Photos or screenshots are not accepted). 📄\n2. For portfolio / work samples, please share your **Google Drive, Behance, or Figma link**. 👍"
+    },
+    {
+      "topic": "Interview Process & Selection",
+      "triggers": ["selection process", "interview me kya hoga", "test", "rounds", "hiring process"],
+      "hinglish": "📋 *Selection Process:*\n1️⃣ Resume & Portfolio Review on WhatsApp.\n2️⃣ In-person visit at Indore Office (103 Orange Business Park).\n3️⃣ Practical Skill Assessment (Live editing/designing/strategy task).\n4️⃣ Final HR & Management round ➔ Offer Letter & Joining! 🚀",
+      "english": "📋 *Selection Process:*\n1️⃣ Resume & Portfolio Review on WhatsApp.\n2️⃣ In-person visit at our Indore Office (103 Orange Business Park).\n3️⃣ Practical Assessment (Live skill task on editing/design/strategy).\n4️⃣ Final HR Discussion ➔ Offer Letter & Onboarding! 🚀"
+    },
+    {
+      "topic": "Documents Required for Interview",
+      "triggers": ["documents", "kya lana hai", "what to bring", "docs", "papers"],
+      "hinglish": "📌 *Documents Required for Interview:*\n1. Updated **Resume** (Hard copy / PDF) 📄\n2. Past **Portfolio / Work Samples** (Accessible on phone/drive/laptop) 💼\n3. Government ID Proof (Aadhar Card) 🆔",
+      "english": "📌 *Documents Required for Interview:*\n1. Updated **Resume** (Hard copy / PDF) 📄\n2. Past **Portfolio / Work Samples** (Accessible via drive/phone/laptop) 💼\n3. Government ID Proof (Aadhar Card) 🆔"
+    },
+    {
+      "topic": "Outside Indore / Online Interview",
+      "triggers": ["outside indore", "bhopal", "ujjain", "delhi", "online interview", "google meet"],
+      "hinglish": "💻 *Online Interview Option:*\nAgar aap abhi Indore se bahar hain, toh hum aapka **Online Google Meet Interview** conduct kar sakte hain.\n👉 Kripya batayein aap kis din aur time par online interview ke liye available hain? (Mon–Sat, 10:00 AM – 6:00 PM) 📅\n*(Note: Joining ke baad job strictly Indore office onsite rahegi).* 👍",
+      "english": "💻 *Online Interview Option:*\nIf you are currently outside Indore, we can conduct your initial round online via **Google Meet**.\n👉 Please share your preferred Date and Time (Mon–Sat, 10:00 AM – 6:00 PM) for the online interview. 📅\n*(Note: Upon selection, this role is strictly In-Office at our Indore location).* 👍"
+    },
+    {
+      "topic": "Rescheduling Interview",
+      "triggers": ["reschedule", "kal nahi", "busy hu", "later", "parso", "time change"],
+      "hinglish": "🔄 *Reschedule Confirmation:*\nKoi baat nahi! Aap apni suvidha ke anusaar Monday se Saturday (10:00 AM se 6:00 PM ke beech) koi bhi suitable Date aur Time bata dijiye, hum aapka slot update kar denge. 👍",
+      "english": "🔄 *Reschedule Confirmation:*\nNo problem at all! Please let us know your preferred Date and Time (Monday to Saturday, 10:00 AM – 6:00 PM) and we will update your interview schedule accordingly. 👍"
+    }
+  ]
+}

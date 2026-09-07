@@ -143,33 +143,63 @@ async function processIncomingWhatsAppMessage(messageData) {
   try {
     candidate = hiringService.trackCandidateFromMessage(messageData);
 
-    // If candidate sent a media file (PDF resume, document, image)
+    // If candidate sent a media file (PDF resume vs Image/other media)
     if (candidate && messageData.mediaId) {
-      const resumesDir = path.join(__dirname, 'uploads', 'resumes');
-      const safeName = (messageData.mediaFilename || `resume_${Date.now()}.pdf`).replace(/[^a-zA-Z0-9._-]/g, '_');
-      const uniqueFileName = `${candidate.phone}_${Date.now()}_${safeName}`;
-      const destPath = path.join(resumesDir, uniqueFileName);
+      const isPdf = (messageData.messageType === 'document' && (
+        (messageData.mimeType && messageData.mimeType.toLowerCase().includes('pdf')) ||
+        (messageData.mediaFilename && messageData.mediaFilename.toLowerCase().endsWith('.pdf'))
+      ));
 
-      candidate.resumeReceived = true;
-      candidate.resumeFileName = safeName;
-      candidate.resumePath = destPath;
-      candidate.resumeUrl = `/uploads/resumes/${uniqueFileName}`;
-      if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
-        candidate.status = 'Resume Received';
-      }
+      if (isPdf) {
+        const resumesDir = path.join(__dirname, 'uploads', 'resumes');
+        const safeName = (messageData.mediaFilename || `resume_${Date.now()}.pdf`).replace(/[^a-zA-Z0-9._-]/g, '_');
+        const uniqueFileName = `${candidate.phone}_${Date.now()}_${safeName}`;
+        const destPath = path.join(resumesDir, uniqueFileName);
 
-      console.log(`📥 Downloading candidate media (${messageData.mediaId}) -> ${destPath}...`);
-      try {
-        await whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath);
-        console.log(`✅ Candidate resume file saved: ${uniqueFileName}`);
-        io.emit('log', {
-          type: 'success',
-          text: `📄 Resume saved for ${candidate.name} (+${candidate.phone}): ${safeName}`
-        });
-      } catch (dlErr) {
-        console.error('Error downloading candidate media:', dlErr.message);
+        candidate.resumeReceived = true;
+        candidate.resumeReceivedAt = new Date().toISOString();
+        candidate.resumeFileName = safeName;
+        candidate.resumePath = destPath;
+        candidate.resumeUrl = `/uploads/resumes/${uniqueFileName}`;
+        if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
+          candidate.status = 'Resume Received';
+        }
+
+        console.log(`📥 Downloading candidate PDF resume (${messageData.mediaId}) -> ${destPath}...`);
+        try {
+          await whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath);
+          console.log(`✅ Candidate PDF resume saved: ${uniqueFileName}`);
+          io.emit('log', {
+            type: 'success',
+            text: `📄 PDF Resume saved for ${candidate.name} (+${candidate.phone}): ${safeName}`
+          });
+        } catch (dlErr) {
+          console.error('Error downloading candidate PDF resume:', dlErr.message);
+        }
+        hiringService.saveCandidatesAndSyncExcel();
+      } else {
+        // Candidate sent an IMAGE, photo, screenshot, audio, or non-PDF file
+        console.log(`⚠️ Candidate ${candidate.name} (+${candidate.phone}) sent non-PDF media (${messageData.messageType}): Requesting proper PDF resume`);
+        const isEnglish = (candidate.lang === 'english');
+        const invalidMediaMsg = isEnglish
+          ? `📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍`
+          : `📌 *Resume Format Notice:*\n\nKripya apna updated resume **PDF format (.pdf)** me hi share karein (Photos/images accept nahi hote). 📄\n\nAgar aapke paas portfolio ya work samples hain, to uska **Google Drive, Behance, ya Figma link** yahan share karein. 👍`;
+
+        try {
+          const isMetaSource = messageData.source === 'meta';
+          await whatsappCloudService.sendWhatsAppText(replyRecipient, invalidMediaMsg, isMetaSource);
+          hiringService.appendChatHistory(candidate, 'assistant', invalidMediaMsg);
+          hiringService.saveCandidatesAndSyncExcel();
+          io.emit('hiring-updated', {
+            candidates: hiringService.getCandidates(),
+            stats: hiringService.getHiringStats(),
+            candidateId: candidate.id
+          });
+        } catch (sendErr) {
+          console.error('Error sending invalid media warning:', sendErr.message);
+        }
+        return; // Stop here, do not run downstream bot handlers on invalid media
       }
-      hiringService.saveCandidatesAndSyncExcel();
     }
   } catch (candErr) {
     console.error('Error tracking candidate from message:', candErr);
@@ -232,6 +262,39 @@ async function processIncomingWhatsAppMessage(messageData) {
       console.error('Error sending ack reply:', e.message);
     }
     return; // Don't reschedule or send repetitive messages!
+  }
+
+  // 1.8 Check for Off-Topic / Irrelevant Messages: 3-Warning Rule & Auto-Close
+  if (candidate && messageText && aiService.isOffTopicMessage(messageText, candidate)) {
+    candidate.offTopicCount = (candidate.offTopicCount || 0) + 1;
+    const warningMsg = aiService.getOffTopicWarningResponse(candidate.offTopicCount, candidate.lang);
+
+    if (candidate.offTopicCount >= 3) {
+      console.log(`🛑 Candidate ${candidate.name} (+${candidate.phone}) chat CLOSED after 3 off-topic warnings`);
+      candidate.status = 'Not Interested';
+      candidate.interviewDateTime = null;
+      candidate.resumeReminderSent = true;
+      candidate.interviewReminderSent = true;
+    } else {
+      console.log(`⚠️ Candidate ${candidate.name} (+${candidate.phone}) received off-topic warning ${candidate.offTopicCount}/3`);
+    }
+    candidate.updatedAt = new Date().toISOString();
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, warningMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', warningMsg);
+    } catch (sendErr) {
+      console.error('Error sending off-topic warning message:', sendErr.message);
+    }
+
+    hiringService.saveCandidatesAndSyncExcel();
+    io.emit('hiring-updated', {
+      candidates: hiringService.getCandidates(),
+      stats: hiringService.getHiringStats(),
+      candidateId: candidate.id
+    });
+    return; // Handled off-topic warning/close, stop downstream flow!
   }
 
   // 2. Check for Automatic Interview Scheduling Intent if candidate is active

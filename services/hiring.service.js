@@ -264,20 +264,25 @@ function trackCandidateFromMessage(messageData) {
   }
 
   // Strict Resume / Portfolio signal check:
-  // ONLY true if actual media/document uploaded OR actual portfolio/drive URL provided
-  const hasValidDocumentUpload = (msgType === 'document' || msgType === 'image');
+  // ONLY true if actual PDF document uploaded OR actual portfolio/drive URL provided
+  const hasValidDocumentUpload = (msgType === 'document' && (
+    (messageData.mimeType && messageData.mimeType.toLowerCase().includes('pdf')) ||
+    (messageData.mediaFilename && messageData.mediaFilename.toLowerCase().endsWith('.pdf')) ||
+    (text && text.toLowerCase().endsWith('.pdf'))
+  ));
+
   const hasPortfolioLink = (
+    extractedLink.length > 0 ||
     lower.includes('drive.google.com') ||
     lower.includes('docs.google.com') ||
     lower.includes('behance.net') ||
-    lower.includes('github.com') ||
-    lower.includes('linkedin.com/in') ||
+    lower.includes('figma.com') ||
     lower.includes('dribbble.com') ||
+    lower.includes('youtube.com') ||
+    lower.includes('youtu.be') ||
+    lower.includes('github.com') ||
     lower.includes('notion.site') ||
-    lower.includes('dropbox.com') ||
-    lower.includes('.pdf') ||
-    lower.includes('.docx') ||
-    lower.includes('.doc')
+    lower.includes('dropbox.com')
   );
 
   const hasResumeSignal = hasValidDocumentUpload || hasPortfolioLink;
@@ -409,6 +414,7 @@ function trackCandidateFromMessage(messageData) {
       console.log(`🔄 Candidate ${candidate.name} (+${candidate.phone}) restarted application flow`);
       candidate.role = detectedRole || 'General Applicant';
       candidate.experience = '';
+      candidate.offTopicCount = 0;
       candidate.interviewDateTime = null;
       candidate.status = candidate.resumeReceived ? 'Resume Received' : 'Applied';
     } else if (detectedRole) {
@@ -947,6 +953,18 @@ async function sendMessageToCandidate(candidateId, messageText) {
   return { candidate, message: cleanText, res };
 }
 
+function deleteCandidate(candidateIdOrPhone) {
+  const target = String(candidateIdOrPhone || '').trim();
+  const cleanedTarget = cleanPhone(target);
+  const index = candidates.findIndex(c => c.id === target || (c.phone && cleanPhone(c.phone) === cleanedTarget) || (cleanedTarget && c.phone && cleanPhone(c.phone).endsWith(cleanedTarget)));
+  if (index === -1) {
+    return false;
+  }
+  const deleted = candidates.splice(index, 1)[0];
+  saveCandidatesAndSyncExcel();
+  return deleted;
+}
+
 module.exports = {
   setHiringIo,
   loadCandidates,
@@ -973,6 +991,7 @@ module.exports = {
   getCandidateDisplayName,
   handleHrWhatsAppCommand,
   sendMessageToCandidate,
+  deleteCandidate,
   CANDIDATES_EXCEL_FILE
 };
 

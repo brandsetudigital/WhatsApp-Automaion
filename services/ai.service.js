@@ -293,6 +293,146 @@ function isDocumentQuery(rawText) {
   return /(?:d[aoe]c[uo]ment|doc\b|paper\b|kya\s*(?:kya\s*)?la(?:na|ne|kar|ke)|kya\s*(?:le\s*)?jana|kya\s*lekar|resume\s*la(?:na|ne)|hard\s*copy|print\s*out|printout|kya\s*chahiye|sath\s*me\s*kya|saath\s*me\s*kya|sath\s*kya|kya\s*leke)/i.test(text);
 }
 
+/**
+ * Detect completely off-topic / non-hiring messages (e.g. casual chit-chat, jokes, weather, loans, abusive, random nonsense)
+ */
+function isOffTopicMessage(rawText, candidate = null) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean || clean.length < 2) return false;
+
+  // Standard hiring intents are NEVER off-topic
+  if (isGreetingMessage(text) || isAcknowledgementMessage(text) || isNotInterestedMessage(text) || isArrivalStatusMessage(text) || isDocumentQuery(text)) {
+    return false;
+  }
+
+  // Pure role number selections e.g. "1", "2", "3", "4", "5", "6"
+  if (/^[1-6]$/.test(clean) || /^[1-6]\s+(?:role|job|apply|me|chahiye)?$/i.test(clean)) {
+    return false;
+  }
+
+  // 1. Explicit off-topic phrases & patterns (flirting, random chit-chat, personal questions, songs, jokes, abuse, loans, random sales)
+  const offTopicPatterns = [
+    /kya\s*(?:kr|kar)\s*rahe\s*ho/i,
+    /kya\s*kar\s*rhe\s*ho/i,
+    /kya\s*kar\s*rhi\s*ho/i,
+    /khana\s*khaya/i,
+    /dinner\s*(?:ho\s*gaya|kiya)/i,
+    /lunch\s*(?:ho\s*gaya|kiya)/i,
+    /aap\s*(?:kon|koun)\s*ho/i,
+    /tum\s*(?:kon|koun)\s*ho/i,
+    /who\s*are\s*you/i,
+    /song\s*(?:sunao|bhejo)/i,
+    /gaana\s*sunao/i,
+    /joke\s*sunao/i,
+    /shayari\s*sunao/i,
+    /weather/i,
+    /mausam/i,
+    /cricket\s*score/i,
+    /match\s*kaise/i,
+    /movie\s*kaisi/i,
+    /single\s*ho/i,
+    /friendship\s*karoge/i,
+    /dosti\s*karoge/i,
+    /love\s*you/i,
+    /miss\s*you/i,
+    /aur\s*batao/i,
+    /aur\s*btao/i,
+    /aur\s*kya\s*chal\s*raha/i,
+    /kya\s*chal\s*rha/i,
+    /bor\s*ho\s*raha/i,
+    /bore\s*ho\s*raha/i,
+    /loan\s*chahiye/i,
+    /paise\s*udhar/i,
+    /product\s*kharidna/i,
+    /rider/i,
+    /bike/i,
+    /delivery/i,
+    /driver/i,
+    /courier/i,
+    /swiggy/i,
+    /zomato/i,
+    /rapido/i,
+    /uber/i,
+    /ola/i
+  ];
+
+  if (offTopicPatterns.some(p => p.test(text))) {
+    return true;
+  }
+
+  // 2. Keywords directly related to hiring, roles, experience, portfolios, interviews, compensation, office
+  const hiringKeywords = [
+    'video', 'editor', 'editing', 'reels', 'ai', 'graphic', 'designer', 'design',
+    'seo', 'aeo', 'social', 'media', 'smm', 'digital', 'marketing', 'job', 'jobs', 'hiring', 'higing', 'hire',
+    'apply', 'intern', 'internship', 'fresher', 'freshor', 'experienced', 'experience', 'salary',
+    'stipend', 'ctc', 'package', 'resume', 'cv', 'portfolio', 'pdf', 'link', 'drive',
+    'behance', 'figma', 'github', 'youtube', 'interview', 'time', 'date', 'kal', 'aaj',
+    'parso', 'baje', 'am', 'pm', 'morning', 'afternoon', 'evening', 'office', 'location',
+    'address', 'bhawarkua', 'orange', 'hospital', 'indore', 'wfh', 'remote', 'work',
+    'role', 'position', 'openings', 'vacancy', 'vacancies', 'documents', 'doc', 'kaam', 'detail',
+    'jd', 'description', 'google meet', 'online', 'reschedule', 'cancel', 'sir', 'maam',
+    'number', 'hr', 'contact', 'call', 'joining', 'join', 'start', 'qualification', 'skills',
+    'exp', 'months', 'years', 'saal', 'mahine', 'bheja', 'send', 'share', 'haan', 'yes', 'no',
+    'web', 'website', 'developer', 'development', 'software', 'app', 'android', 'ios', 'flutter',
+    'react', 'python', 'java', 'node', 'fullstack', 'frontend', 'backend', 'telecaller', 'telecalling',
+    'calling', 'caller', 'sales', 'bpo', 'receptionist', 'accountant', 'accounts', 'finance',
+    'content', 'writer', 'writing', 'copywriter', 'data entry', 'back office', 'assistant',
+    'naukri', 'recruitment', 'opening', 'opportunity', 'post', 'posts'
+  ];
+
+  const words = clean.split(' ');
+  const hasHiringKeyword = words.some(w => hiringKeywords.includes(w)) ||
+    hiringKeywords.some(k => text.includes(k));
+
+  if (hasHiringKeyword) {
+    return false;
+  }
+
+  if (candidate && (candidate.role !== 'General Applicant' || (candidate.chatHistory && candidate.chatHistory.length > 2))) {
+    if (words.length >= 3 && !hasHiringKeyword) {
+      return true;
+    }
+  } else {
+    if (!hasHiringKeyword && words.length >= 2) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function getOffTopicBoundaryResponse(lang) {
+  const isHinglish = (lang === 'hinglish' || lang === 'hindi');
+  return isHinglish
+    ? `Yeh WhatsApp helpline strictly Brand Setu Digital ki hiring aur active job roles ke liye hai. 😊 Kripya open positions se related hi message karein. Dhanyawad! 🙏`
+    : `This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles. 😊 Please message regarding our open positions. Thank you! 🙏`;
+}
+
+function getOffTopicWarningResponse(count, lang = 'hinglish') {
+  const isHinglish = (lang === 'hinglish' || lang === 'hindi');
+  const num = Number(count) || 1;
+
+  if (num === 1) {
+    return isHinglish
+      ? `⚠️ *Warning (1/3):* Yeh helpline strictly Brand Setu Digital ki hiring aur active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*) ke liye hai. 😊\n\nKripya hiring se related hi message karein. Dhanyawad! 🙏`
+      : `⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏`;
+  }
+
+  if (num === 2) {
+    return isHinglish
+      ? `⚠️ *Warning (2/3):* Yeh helpline strictly Brand Setu Digital hiring ke liye hai. Kripya sirf job roles se related message karein, anyatha chat automatically close kar di jayegi. 🙏`
+      : `⚠️ *Warning (2/3):* This helpline is strictly for Brand Setu Digital recruitment. Please message regarding job positions only, otherwise this conversation will be closed. 🙏`;
+  }
+
+  // num >= 3: Final Close
+  return isHinglish
+    ? `🛑 *Chat Closed:* Baar-baar off-topic messages aane ke karan yeh conversation ab close kar di gayi hai. Hum aapko aage disturb nahi karenge. Best wishes! ✨`
+    : `🛑 *Chat Closed:* Due to repeated off-topic messages, this conversation has now been closed. We will not disturb you further. Best wishes! ✨`;
+}
+
+
 
 
 function parseInterviewScheduleLocal(userMessage, candidate = null) {
@@ -313,7 +453,7 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     const hasExplicitTime = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(text);
 
     // If there is no explicit day/time and no explicit reschedule keyword, DO NOT reschedule
-    if (!hasExplicitReschedule && !(hasExplicitDay && hasExplicitTime)) {
+    if (!hasExplicitReschedule && !hasExplicitDay && !hasExplicitTime) {
       return null;
     }
   }
@@ -605,9 +745,6 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     candName = '';
   }
   const firstName = candName ? candName.split(' ')[0] : '';
-  const greetingEn = firstName ? `Hello ${firstName}! 😊` : `Hello! 😊`;
-  const greetingHi = firstName ? `Namaste ${firstName}! 🙏` : `Namaste! 🙏`;
-
   const isHinglish = (lang === 'hinglish' || lang === 'hindi');
 
   // ── 0. NOT INTERESTED / CANCEL / DROP HANDLING ──
@@ -618,6 +755,17 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
       return `Thank you for letting us know! We have updated your status and will not disturb you further. We wish you all the best for your future endeavors! ✨`;
     }
   }
+
+  // ── 0.5. OFF-TOPIC / NON-HIRING QUERY HANDLING ──
+  if (isOffTopicMessage(text, candidate)) {
+    return getOffTopicBoundaryResponse(lang);
+  }
+
+  // Conversational Greeting Rule: ONLY greet on initial interaction (chatCount <= 2) or explicit greeting ("hi/hello")
+  const chatCount = (candidate.chatHistory || []).length;
+  const isInitialGreeting = chatCount <= 2 || isGreetingMessage(userMessage);
+  const prefixEn = isInitialGreeting ? (firstName ? `Hello ${firstName}! 😊\n\n` : `Hello! 😊\n\n`) : '';
+  const prefixHi = isInitialGreeting ? (firstName ? `Namaste ${firstName}! 🙏\n\n` : `Namaste! 🙏\n\n`) : '';
 
   let interviewFormatted = '';
   if (candidate.interviewDateTime) {
@@ -660,16 +808,16 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     // 3. Greeting when interview is already confirmed ("hii", "hello")
     if (isGreetingMessage(text)) {
       if (isHinglish) {
-        return `${greetingHi}\nKaise hain aap? Interview ke regarding koi question ya help chahiye to batayein! 👍`;
+        return `${prefixHi}Kaise hain aap? Interview ke regarding koi question ya help chahiye to batayein! 👍`;
       } else {
-        return `${greetingEn}\nHow can I help you regarding your scheduled interview? 👍`;
+        return `${prefixEn}How can I help you regarding your scheduled interview? 👍`;
       }
     }
 
     // 4. Documents to bring question
     if (isDocumentQuery(text)) {
       if (isHinglish) {
-        return `📌 Kripya apna updated *Resume (Hard Copy / PDF)* aur design/work samples saath lekar aayein. 👍`;
+        return `📌 Kripya apna updated *Resume (Hard Copy / PDF)* aur work samples/portfolio saath lekar aayein. 👍`;
       } else {
         return `📌 Please bring your updated *Resume (Hard Copy/PDF)* and work samples/portfolio with you. 👍`;
       }
@@ -688,9 +836,9 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     else if (text.includes('accountant')) mentionedRole = 'Accountant';
 
     if (isHinglish) {
-      return `${greetingHi}\n\nFilhal Brand Setu Digital me in 6 active roles ke liye hiring chal rahi hai:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nAbhi hamare paas *${mentionedRole}* ke liye vacancy open nahi hai. Humne aapki details note kar li hain, future opening aane par contact karenge! 👍✨`;
+      return `${prefixHi}Filhal Brand Setu Digital me in 6 active roles ke liye hiring chal rahi hai:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nAbhi hamare paas *${mentionedRole}* ke liye vacancy open nahi hai. Humne aapki details note kar li hain, future opening aane par contact karenge! 👍✨`;
     } else {
-      return `${greetingEn}\n\nCurrently, Brand Setu Digital is actively hiring for these 6 positions:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nWe do not have active openings for *${mentionedRole}* at the moment. We have saved your profile on file for future opportunities! 👍✨`;
+      return `${prefixEn}Currently, Brand Setu Digital is actively hiring for these 6 positions:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nWe do not have active openings for *${mentionedRole}* at the moment. We have saved your profile on file for future opportunities! 👍✨`;
     }
   }
 
@@ -699,46 +847,50 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (outOfIndorePattern.test(text)) {
     candidate.interviewMode = 'online';
     if (isHinglish) {
-      return `${greetingHi}\n\nKoi baat nahi! Agar aap filhal Indore se bahar hain, toh hum aapka *Online Google Meet Interview* conduct kar sakte hain. 💻✨\n\n👉 Kripya batayein aap kis din aur time par online interview ke liye available hain? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅\n\n📌 *(Interview shuru hone se 15 minute pehle aapko WhatsApp par Google Meet joining link mil jayegi).* 👍`;
+      return `${prefixHi}Koi baat nahi! Agar aap filhal Indore se bahar hain, toh hum aapka *Online Google Meet Interview* conduct kar sakte hain. 💻✨\n\n👉 Kripya batayein aap kis din aur time par online interview ke liye available hain? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅\n\n📌 *(Interview shuru hone se 15 minute pehle aapko WhatsApp par Google Meet joining link mil jayegi).* 👍`;
     } else {
-      return `${greetingEn}\n\nNo problem at all! If you are currently outside Indore, we can conduct your interview online via *Google Meet*. 💻✨\n\n👉 Please share your preferred Date and Time when you are available for the online interview (Monday to Saturday, 10:00 AM – 6:00 PM). 📅\n\n📌 *(You will receive the Google Meet joining link on WhatsApp 15 minutes prior to the interview).* 👍`;
+      return `${prefixEn}No problem at all! If you are currently outside Indore, we can conduct your interview online via *Google Meet*. 💻✨\n\n👉 Please share your preferred Date and Time when you are available for the online interview (Monday to Saturday, 10:00 AM – 6:00 PM). 📅\n\n📌 *(You will receive the Google Meet joining link on WhatsApp 15 minutes prior to the interview).* 👍`;
     }
   }
 
   // 3. NEGATION / CANNOT COME TOMORROW / RESCHEDULE REQUEST
   const unablePhrases = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi|busy\s*hu|busy|kisi\s*aur\s*din|nahi|nhi)/i;
   if (unablePhrases.test(text) && !text.includes('ha') && !text.includes('yes')) {
+    if (candidate && candidate.interviewDateTime) {
+      candidate.interviewDateTime = null;
+      candidate.status = 'Resume Received';
+    }
     if (isHinglish) {
-      return `${greetingHi}\n\nKoi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅`;
+      return `${prefixHi}Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅`;
     } else {
-      return `${greetingEn}\n\nNo problem at all! Please share your preferred Date and Time (Monday to Saturday, between 10:00 AM and 6:00 PM) when you would be available to visit for your in-person interview. 📅`;
+      return `${prefixEn}No problem at all! Please share your preferred Date and Time (Monday to Saturday, between 10:00 AM and 6:00 PM) when you would be available to visit for your in-person interview. 📅`;
     }
   }
 
   // 4. FAQ: SALARY / STIPEND / PAID INTERNSHIP QUESTIONS
   if (text.includes('salary') || text.includes('package') || text.includes('kitna milega') || text.includes('ctc') || text.includes('stipend') || text.includes('paise') || text.includes('per month') || text.includes('pay') || text.includes('internship') || text.includes('certificate')) {
     if (isHinglish) {
-      return `${greetingHi}\n\n💰 *Internship & Salary Details:*\nHamare yahan Paid Internship (3-6 Months) & Full-Time opportunities dono hain. Deserving candidates ko performance ke base par stipend/salary, Certificate of Completion, expert mentorship aur Full-Time placement offer milta hai. 🤝\n\nFinal stipend/salary practical assessment aur in-person interview ke baad decide hoti hai.\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄' : '👉 Aap kis role (1 to 6) ke liye apply karna chahte hain?'))}`;
+      return `${prefixHi}💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur In-Person Practical Interview* ke basis par decide hoti hai aur interview ke dauraan bata di jayegi. 🤝\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Kripya apna updated *Resume (PDF)* aur Portfolio link share karein taaki hum interview process aage badha sakein. 📄' : '👉 Aap kis role (1 to 6) ke liye apply karna chahte hain?'))}`;
     } else {
-      return `${greetingEn}\n\n💰 *Internship & Compensation Details:*\nWe offer Paid Internships (3-6 Months) as well as Full-Time roles. Deserving candidates receive a performance-based stipend/salary, Certificate of Completion, industry mentorship, and full-time placement opportunities. 🤝\n\nFinal compensation is negotiable and decided based on your practical skills and in-person interview.\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM* for your interview?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Please share your updated Resume or Portfolio link so we can schedule your interview. 📄' : '👉 Which position (1 to 6) would you like to apply for?'))}`;
+      return `${prefixEn}💰 *Salary / Compensation Details:*\nSalary / stipend is decided based on your *Experience, Skills, and In-Person Practical Interview*, and will be discussed and finalized during the interview. 🤝\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM* for your interview?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Please share your updated Resume (PDF) or Portfolio link so we can schedule your interview. 📄' : '👉 Which position (1 to 6) would you like to apply for?'))}`;
     }
   }
 
   // 5. FAQ: OFFICE ADDRESS / LOCATION
   if (text.includes('location') || text.includes('address') || text.includes('kahan') || text.includes('kaha') || text.includes('where') || text.includes('office') || text.includes('bhawarkua') || text.includes('apple hospital')) {
     if (isHinglish) {
-      return `${greetingHi}\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Mon–Sat (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
+      return `${prefixHi}📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Mon–Sat (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
     } else {
-      return `${greetingEn}\n\n📍 *Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
+      return `${prefixEn}📍 *Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
     }
   }
 
   // 6. FAQ: WORK FROM HOME / REMOTE
   if (text.includes('wfh') || text.includes('work from home') || text.includes('remote') || text.includes('ghar se')) {
     if (isHinglish) {
-      return `${greetingHi}\n\n🏢 Yeh Onsite *In-Office* role hai hamare Indore office (103 Orange Business Park, Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna Resume share karein. 👍`;
+      return `${prefixHi}🏢 Yeh Onsite *In-Office* role hai hamare Indore office (103 Orange Business Park, Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna *Resume (PDF)* share karein. 👍`;
     } else {
-      return `${greetingEn}\n\n🏢 This is an Onsite *In-Office* position at our Indore office (103 Orange Business Park, Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available for an in-office role in Indore, please share your resume or portfolio to proceed. 👍`;
+      return `${prefixEn}🏢 This is an Onsite *In-Office* position at our Indore office (103 Orange Business Park, Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available for an in-office role in Indore, please share your Resume (PDF) or portfolio to proceed. 👍`;
     }
   }
 
@@ -747,9 +899,9 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (jdKeywords.test(text)) {
     const jdText = getDetailedJobDescription(candidate.role, candidate.experience, lang);
     if (isHinglish) {
-      return `${greetingHi}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna time batayein). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Kripya apna updated Resume / Portfolio share karein taaki hum interview process aage badha sakein. 📄` : `👉 Aap inme se kis position ke liye apply karna chahte hain?`))}`;
+      return `${prefixHi}${jdText}\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna time batayein). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Kripya apna updated *Resume (PDF)* / Portfolio share karein taaki hum interview process aage badha sakein. 📄` : `👉 Aap inme se kis position ke liye apply karna chahte hain?`))}`;
     } else {
-      return `${greetingEn}\n\n${jdText}\n\n${candidate.interviewDateTime ? `Your interview is already confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Please share your updated Resume or Portfolio link so we can schedule your interview. 📄` : `👉 Which position would you like to apply for?`))}`;
+      return `${prefixEn}${jdText}\n\n${candidate.interviewDateTime ? `Your interview is already confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your in-person interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍` : (candidate.role && candidate.role !== 'General Applicant' ? `Please share your updated Resume (PDF) or Portfolio link so we can schedule your interview. 📄` : `👉 Which position would you like to apply for?`))}`;
     }
   }
 
@@ -757,27 +909,27 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (isDocumentQuery(text)) {
     const roleDoc = candidate.role && candidate.role !== 'General Applicant' ? `${candidate.role} work samples/portfolio` : 'work samples/portfolio';
     if (isHinglish) {
-      return `${greetingHi}\n\n📌 *Documents Required:*\nInterview ke liye aapko apna updated *Resume (Hard Copy / PDF)* aur ${roleDoc} saath lekar aana hoga. 👍\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢` : `👉 Kripya batayein aap kis position ke liye apply karna chahte hain?`)}`;
+      return `${prefixHi}📌 *Documents Required:*\nInterview ke liye aapko apna updated *Resume (Hard Copy / PDF)* aur ${roleDoc} saath lekar aana hoga. 👍\n\n${candidate.interviewDateTime ? `Aapka interview already confirmed hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢` : `👉 Kripya batayein aap kis position ke liye apply karna chahte hain?`)}`;
     } else {
-      return `${greetingEn}\n\n📌 *Documents Required:*\nPlease bring your updated *Resume (Hard Copy/PDF)* and ${roleDoc} with you for the interview. 👍\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM*? 🏢` : `👉 Which position would you like to apply for?`)}`;
+      return `${prefixEn}📌 *Documents Required:*\nPlease bring your updated *Resume (Hard Copy/PDF)* and ${roleDoc} with you for the interview. 👍\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? `👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM*? 🏢` : `👉 Which position would you like to apply for?`)}`;
     }
   }
 
   // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET (Or requested fresh start) ──
   if (!candidate.role || candidate.role === 'General Applicant') {
     if (isHinglish) {
-      return `${greetingHi}\nBrand Setu Digital me aapka swagat hai! 🎉\n\nHum Indore office ke liye in 6 active roles par hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (1 to 6 number ya role ka naam likhein) 📝`;
+      return `${prefixHi}Brand Setu Digital me aapka swagat hai! 🎉\n\nHum Indore office ke liye in 6 active roles par hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (1 to 6 number ya role ka naam likhein) 📝`;
     } else {
-      return `${greetingEn}\nWelcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
+      return `${prefixEn}Welcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
     }
   }
 
   // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER STATUS NOT PROVIDED YET ──
   if (!candidate.experience || candidate.experience === '') {
     if (isHinglish) {
-      return `${greetingHi}\nBahut badiya! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
+      return `${prefixHi}Bahut badiya! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
     } else {
-      return `${greetingEn}\nGreat! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
+      return `${prefixEn}Great! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
     }
   }
 
@@ -785,37 +937,37 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (!candidate.resumeReceived) {
     if (candidate.role === 'AI Video Expert') {
       return isHinglish
-        ? `${greetingHi}\nAwesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Midjourney, Kling, Pika, etc.) se banaye hue samples ka *Google Drive link* yahan share karein. 📄🎥`
-        : `${greetingEn}\nAwesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
+        ? `${prefixHi}Awesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Midjourney, Kling, Pika, etc.) ke samples ka *Google Drive link* yahan share karein. 📄🎥`
+        : `${prefixEn}Awesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
     } else if (candidate.role === 'Graphic Designer') {
       return isHinglish
-        ? `${greetingHi}\nPerfect! 🎨 Kripya apna updated *Resume (PDF)* aur *Design Portfolio link (Behance / Drive / Figma)* yahan share karein. 📄🎨`
-        : `${greetingEn}\nPerfect! 🎨 Please share your updated *Resume (PDF)* and your *Design Portfolio (Behance / Drive / Figma link)* here. 📄🎨`;
+        ? `${prefixHi}Perfect! 🎨 Kripya apna updated *Resume (PDF)* aur *Design Portfolio link (Behance / Drive / Figma)* yahan share karein. 📄🎨`
+        : `${prefixEn}Perfect! 🎨 Please share your updated *Resume (PDF)* and your *Design Portfolio (Behance / Drive / Figma link)* here. 📄🎨`;
     } else if (candidate.role === 'SEO & AEO Expert') {
       return isHinglish
-        ? `${greetingHi}\nGreat! 🔎 Kripya apna updated *Resume (PDF)* aur live SEO rankings / case studies details yahan share karein. 📄📊`
-        : `${greetingEn}\nGreat! 🔎 Please share your updated *Resume (PDF)* and your live SEO rankings / case studies proof here. 📄📊`;
+        ? `${prefixHi}Great! 🔎 Kripya apna updated *Resume (PDF)* aur live SEO rankings / case studies details yahan share karein. 📄📊`
+        : `${prefixEn}Great! 🔎 Please share your updated *Resume (PDF)* and your live SEO rankings / case studies proof here. 📄📊`;
     } else if (candidate.role === 'Social Media Manager') {
       return isHinglish
-        ? `${greetingHi}\nSuper! 📱 Kripya apna updated *Resume (PDF)* aur past managed social media profiles / growth proof share karein. 📄🚀`
-        : `${greetingEn}\nSuper! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀`;
+        ? `${prefixHi}Super! 📱 Kripya apna updated *Resume (PDF)* aur past managed social media profiles / growth proof share karein. 📄🚀`
+        : `${prefixEn}Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀`;
     } else if (candidate.role === 'Digital Marketing Manager') {
       return isHinglish
-        ? `${greetingHi}\nExcellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
-        : `${greetingEn}\nExcellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
+        ? `${prefixHi}Excellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
+        : `${prefixEn}Excellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
     } else {
       return isHinglish
-        ? `${greetingHi}\nBahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
-        : `${greetingEn}\nGreat! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
+        ? `${prefixHi}Bahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
+        : `${prefixEn}Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
     }
   }
 
   // ── STEP 4: RESUME / PORTFOLIO RECEIVED (Immediate acknowledgment, HR review) ──
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
     if (isHinglish) {
-      return `${greetingHi}\nAapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨\n\nHamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍`;
+      return `${prefixHi}Aapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨\n\nHamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍`;
     } else {
-      return `${greetingEn}\nThank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍`;
+      return `${prefixEn}Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍`;
     }
   }
 
@@ -886,6 +1038,12 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
 You are the professional, friendly HR & Recruitment Coordinator for Brand Setu Digital (Indore).
   `.trim();
 
+  // 0. Check off-topic before invoking Gemini or Fallback
+  if (isOffTopicMessage(userMessage, candidate)) {
+    console.log(`⚠️ Off-topic message intercepted from ${candidateSummary.name} (+${candidate.phone}): "${userMessage}"`);
+    return getOffTopicBoundaryResponse(lang);
+  }
+
   const prompt = `
 ${systemInstructions}
 
@@ -905,18 +1063,21 @@ ${historyLines ? historyLines : '(Start of chat)'}
 LATEST CANDIDATE MESSAGE:
 "${userMessage}"
 
-STRICT NAME & LANGUAGE DIRECTIVE (MANDATORY):
-- If Candidate Name is "Candidate" or unknown: Greet simply as "Hello! 😊" (English) or "Namaste! 🙏" (Hinglish). NEVER write "Hello Candidate!" or include emojis/phrases in the person's name!
-- If Candidate Name is a real valid name (e.g. "Arjun"): Greet as "Hello Arjun! 😊" or "Namaste Arjun! 🙏".
-- Candidate's Detected Language: ${lang.toUpperCase()}
-- If candidate wrote in ENGLISH: You MUST reply 100% in fluent, professional ENGLISH. Do NOT include ANY Hindi or Hinglish words.
-- If candidate wrote in HINDI / HINGLISH: You MUST reply in natural, polite HINGLISH.
+CRITICAL CONVERSATIONAL & GREETING RULES (MANDATORY):
+1. NO REPETITIVE GREETINGS: Do NOT start every single message with "Hello [Name]!" or "Namaste [Name]!". In ongoing conversation, speak naturally, politely, and directly like a human HR without repeating their name on every message.
+2. GREET ONLY ON INITIAL TURN: Only greet by name (e.g. "Hello Arjun!" or "Namaste Arjun!") on the VERY FIRST message of the chat or if candidate explicitly sends an initial greeting (Hi/Hello).
+3. Candidate's Detected Language: ${lang.toUpperCase()}
+   - If candidate wrote in ENGLISH: Reply 100% in fluent, professional ENGLISH.
+   - If candidate wrote in HINDI / HINGLISH: Reply in natural, polite HINGLISH.
+4. RESUME FORMAT REQUIREMENT: Resume MUST be in PDF format (.pdf). If candidate sends images/photos or asks about resume, remind them that only PDF resumes are accepted.
+5. PORTFOLIO FORMAT REQUIREMENT: Portfolio / work samples must be shared as a valid link (Google Drive, Behance, Figma, YouTube link).
+6. OFF-TOPIC MESSAGES: If the user message is irrelevant to hiring or job positions (e.g. casual chit-chat, personal questions, songs, jokes, loans, weather), politely remind them that this helpline is strictly for BrandSetu Digital recruitment.
 
 STRICT STEP-BY-STEP RECRUITMENT FUNNEL INSTRUCTIONS:
 Follow these 5 sequential qualification steps strictly:
 
 👉 STEP 1 (If candidate has NOT chosen a role yet):
-Greet candidate by name and present the 6 active openings:
+Present the 6 active openings:
 1. Video Editor
 2. AI Video Expert
 3. Graphic Designer
@@ -953,7 +1114,7 @@ Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Go
 
 - If candidate says "Not interested", "nhi chahiye", "no need", "not looking", "drop", "cancel", "nahi aana": Politely thank them and close the conversation with best wishes. DO NOT offer an interview or provide office address!
 - If candidate asks about Job Description (JD) / Work / Responsibilities: Share the clear, concise job description for their specific applied role (tailored for Fresher Internship or Experienced Full-Time).
-- If candidate asks about Stipend / Salary: Clarify that we offer Paid Internships (3-6 Months) & Full-Time roles with negotiable stipend/salary decided after practical assessment.
+- If candidate asks about Stipend / Salary: Explain clearly that salary/stipend is decided based on candidate's experience, skills, and in-person practical assessment, and will be finalized and communicated during the in-person interview. (Hinglish: "Hamare yahan salary/stipend aapke experience, skills aur in-person interview ke basis par decide hoti hai aur interview me bata di jayegi." | English: "Salary/stipend is decided based on your experience, skills, and in-person interview, and will be finalized during the interview.").
 - If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
 - OUTPUT ONLY the direct WhatsApp reply. No thinking, no extra notes.
 
@@ -1040,5 +1201,8 @@ module.exports = {
   parseInterviewScheduleLocal,
   isNotInterestedMessage,
   isAcknowledgementMessage,
+  isOffTopicMessage,
+  getOffTopicBoundaryResponse,
+  getOffTopicWarningResponse,
   detectLanguage
 };

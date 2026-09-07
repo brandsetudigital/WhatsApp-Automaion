@@ -124,14 +124,11 @@ function createCandidate(req, res) {
 function deleteCandidate(req, res) {
   try {
     const { id } = req.params;
-    let candidates = hiringService.getCandidates();
-    const index = candidates.findIndex(c => c.id === id || c.phone === id);
-    if (index === -1) {
+    const deleted = hiringService.deleteCandidate(id);
+    if (!deleted) {
       return res.status(404).json({ success: false, error: 'Candidate not found' });
     }
-    candidates.splice(index, 1);
-    hiringService.saveCandidatesAndSyncExcel();
-    res.json({ success: true, message: 'Candidate removed' });
+    res.json({ success: true, message: 'Candidate removed', candidate: deleted });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
