@@ -1,5 +1,71 @@
 [
   {
+    "id": "cand_1788772030874_nt0hf",
+    "phone": "919302051795",
+    "whatsappChatId": null,
+    "name": "Bhumi",
+    "role": "Graphic Designer",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Experienced (Full-Time)",
+    "portfolio": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-07T09:07:10.872Z",
+    "updatedAt": "2026-09-07T09:12:45.005Z",
+    "lastMessage": "Bhoomika Sankhla Resume.PNG",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello",
+        "timestamp": "2026-09-07T09:07:10.874Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Bhumi! Welcome to Brand Setu Digital. 😊\n\nWe are actively hiring for:\n1. Video Editor 🎬 | 2. AI Video Expert 🤖 | 3. Graphic Designer 🎨 | 4. SEO & AEO Expert 🔎 | 5. Social Media Manager 📱 | 6. Digital Marketing Manager 📢\n\nWhich position would you like to apply for?",
+        "timestamp": "2026-09-07T09:07:27.241Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager/Graphic designer",
+        "timestamp": "2026-09-07T09:08:27.308Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great choices! 📱🎨 \n\nAre you applying as a Fresher (for a Paid Internship) or do you have prior experience? If experienced, please mention how many months or years of experience you have in these roles. 😊",
+        "timestamp": "2026-09-07T09:08:32.259Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes I have 5 months of experience",
+        "timestamp": "2026-09-07T09:09:43.019Z"
+      },
+      {
+        "role": "assistant",
+        "text": "That's great to hear! 📱🎨 \n\nCould you please share your updated Resume in **PDF format (.pdf)** and your Portfolio / work samples link (Google Drive, Behance, or Figma)? 📄🔗",
+        "timestamp": "2026-09-07T09:10:04.832Z"
+      },
+      {
+        "role": "user",
+        "text": "Bhoomika Sankhla Resume.PNG",
+        "timestamp": "2026-09-07T09:12:45.006Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-07T09:12:46.154Z"
+      }
+    ],
+    "unreadCount": 2
+  },
+  {
     "id": "cand_1788767804268_3kok5",
     "phone": "918357977322",
     "whatsappChatId": null,
@@ -11,16 +77,16 @@
     "portfolio": "",
     "resumeReceived": true,
     "resumeFileName": "manisha_meena.pdf",
-    "status": "Resume Received",
-    "interviewDateTime": null,
-    "notes": "",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-09-08T05:30:00.000Z",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Yes\" (In-Person)",
     "resumeReminderSent": false,
     "resumeReminderSentAt": null,
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-09-07T07:56:44.263Z",
-    "updatedAt": "2026-09-07T07:59:41.757Z",
-    "lastMessage": "manisha meena.pdf",
+    "updatedAt": "2026-09-07T09:01:29.362Z",
+    "lastMessage": "Hm",
     "chatHistory": [
       {
         "role": "user",
@@ -81,13 +147,50 @@
         "role": "assistant",
         "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
         "timestamp": "2026-09-07T08:00:09.186Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun Meena! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-07T08:10:13.032Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-09-07T08:22:49.594Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🎉\n\nYour in-person interview for the *SEO & AEO Expert* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Tue, 8 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-07T08:22:50.869Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-09-07T08:23:37.175Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-07T08:23:38.279Z"
+      },
+      {
+        "role": "user",
+        "text": "Hm",
+        "timestamp": "2026-09-07T08:43:50.891Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-07T08:43:52.251Z"
       }
     ],
-    "unreadCount": 5,
+    "unreadCount": 0,
     "resumeReceivedAt": "2026-09-07T07:59:41.883Z",
-    "interviewSlotProposed": false,
+    "interviewSlotProposed": true,
     "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1788767981883_manisha_meena.pdf",
-    "resumeUrl": "/uploads/resumes/918357977322_1788767981883_manisha_meena.pdf"
+    "resumeUrl": "/uploads/resumes/918357977322_1788767981883_manisha_meena.pdf",
+    "interviewSlotProposedAt": "2026-09-07T08:10:11.934Z",
+    "interviewMode": "in_person"
   },
   {
     "id": "cand_1788761891266_hh3h2",
