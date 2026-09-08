@@ -99,10 +99,9 @@ function detectLanguage(text) {
  */
 async function callGeminiApi(promptText, apiKey, options = {}) {
   const candidateModels = [
-    'gemini-3.6-flash',
     'gemini-3.5-flash',
-    'gemini-3.7-flash',
-    'gemini-2.5-flash',
+    'gemini-flash-latest',
+    'gemini-3.6-flash',
     'gemini-3.1-pro-preview'
   ];
 
@@ -113,7 +112,8 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
         contents: [{ parts: [{ text: promptText }] }],
         generationConfig: {
           temperature: options.temperature ?? 0.65,
-          maxOutputTokens: options.maxTokens ?? 800
+          maxOutputTokens: options.maxTokens ?? 3000,
+          thinkingConfig: { thinkingBudget: 0 }
         }
       };
 
@@ -121,24 +121,38 @@ async function callGeminiApi(promptText, apiKey, options = {}) {
         payload.generationConfig.responseMimeType = 'application/json';
       }
 
-      const response = await axios.post(url, payload, {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: options.timeout ?? 10000
-      });
+      let response;
+      try {
+        response = await axios.post(url, payload, {
+          headers: { 'Content-Type': 'application/json' },
+          timeout: options.timeout ?? 12000
+        });
+      } catch (postErr) {
+        const errMsg = postErr.response?.data?.error?.message || '';
+        // If model doesn't support thinkingConfig, retry without it
+        if (errMsg.includes('thinkingConfig') || errMsg.includes('invalid argument') || errMsg.includes('Invalid JSON')) {
+          delete payload.generationConfig.thinkingConfig;
+          response = await axios.post(url, payload, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: options.timeout ?? 12000
+          });
+        } else {
+          throw postErr;
+        }
+      }
 
-      const candidates = response.data?.candidates;
-      if (candidates && candidates[0]?.content?.parts[0]?.text) {
-        const text = candidates[0].content.parts[0].text.trim();
+      const candidate = response.data?.candidates?.[0];
+      if (candidate && candidate.content?.parts?.[0]?.text) {
+        const text = candidate.content.parts[0].text.trim();
+        if (candidate.finishReason === 'MAX_TOKENS') {
+          console.warn(`⚠️ Warning: Gemini response was cut off by MAX_TOKENS on model ${model}`);
+        }
         return { text, model };
       }
     } catch (err) {
-      const is429 = err.response?.status === 429;
       const errDetail = err.response?.data?.error?.message || err.message;
       console.warn(`⚠️ Gemini model [${model}] error: ${errDetail}`);
-      if (is429) {
-        // Quota exceeded: fail fast to instant fallback engine
-        break;
-      }
+      // Continue to next model on 429 or any error
     }
   }
   return null;
@@ -1224,7 +1238,7 @@ Direct WhatsApp Message:
   // 1. Call Gemini AI with active modern models
   if (rawKey && rawKey.trim() !== '') {
     try {
-      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 800 });
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.6, maxTokens: 3000 });
       if (result && result.text) {
         const cleanedText = cleanAiResponseText(result.text);
         if (cleanedText.length > 5) {
@@ -1280,7 +1294,7 @@ Reply directly as HR Assistant:
 
   if (rawKey && rawKey.trim() !== '') {
     try {
-      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.65, maxTokens: 400 });
+      const result = await callGeminiApi(prompt, rawKey, { temperature: 0.65, maxTokens: 3000 });
       if (result && result.text) {
         return result.text;
       }
