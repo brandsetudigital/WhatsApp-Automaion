@@ -382,7 +382,7 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
     worksheet['!cols'] = [
       { wch: 6 },  // S.No
       { wch: 20 }, // Name
-      { wch:1 18 }, // Phone
+      { wch: 18 }, // Phone
       { wch: 18 }, // Role
       { wch: 16 }, // Resume Received
       { wch: 30 }, // Portfolio Link
