@@ -343,6 +343,17 @@ function getCandidateSalutation(candidate, lang = 'english') {
 }
 
 /**
+ * Welcome & 6 Roles Response (Step 0 -> Step 1: Initial Ad click / Greeting / Inquiry)
+ */
+function getWelcomeRolesReply(lang = 'english') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum Indore office ke liye in 6 active roles par hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (1 to 6 number ya role ka naam likhein) 📝`;
+  }
+  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
+}
+
+/**
  * Role Selected Response (Step 1 -> Step 2 transition)
  */
 function getRoleSelectedReply(role, lang = 'english') {
@@ -1208,6 +1219,7 @@ module.exports = {
   getCandidateSalutation,
   cleanCandidateName,
   extractNameFromResumeFilename,
+  getWelcomeRolesReply,
   getRoleSelectedReply,
   getExperienceAnsweredReply,
   isValidPortfolioUrl,

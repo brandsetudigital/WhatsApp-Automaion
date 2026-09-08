@@ -338,6 +338,39 @@ async function processIncomingWhatsAppMessage(messageData) {
     return; // STOP! Never auto-schedule an interview from a third-party forward!
   }
 
+  // 1.94 Candidate clicks Ad or sends Initial Greeting / Inquiry (Step 0 -> Step 1: Welcome & 6 Roles)
+  const isAdInquiry = aiService.isAdInquiryMessage(messageText);
+  const isGreeting = aiService.isGreetingMessage(messageText);
+  const cleanIncomingLower = (messageText || '').toLowerCase().trim();
+  const isFreshIntent = (cleanIncomingLower === 'apply' || cleanIncomingLower === 'job' || cleanIncomingLower === 'hiring' || isAdInquiry || isGreeting);
+  const isSpecificFaq = (
+    aiService.isPartTimeQuery(messageText) ||
+    aiService.isDocumentQuery(messageText) ||
+    /(?:salary|stipend|office|location|address|timing|time|wfh|remote|kahan|kitna|kitni)/i.test(messageText)
+  );
+
+  const isGeneralCandidate = candidate && (!candidate.role || candidate.role === 'General Applicant');
+  const hasNoResumeOrExp = candidate && !candidate.resumeReceived && (!candidate.experience || candidate.experience === '');
+
+  if (isGeneralCandidate && hasNoResumeOrExp && !isSpecificFaq && !candidate.justSelectedRole && (isFreshIntent || (candidate.chatHistory && candidate.chatHistory.length <= 1))) {
+    console.log(`👋 New/Ad Inquiry from +${customerPhone} ("${messageText}") -> Sending Welcome & 6 Roles`);
+    const welcomeMsg = hiringService.getWelcomeRolesReply(candidate.lang);
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, welcomeMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', welcomeMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+      return; // Handled immediately with 100% precision!
+    } catch (sendErr) {
+      console.error('Error sending welcome roles reply:', sendErr.message);
+    }
+  }
+
   // 1.95 Candidate Selected a Role (Step 1 -> Step 2 Qualification Question)
   if (candidate && candidate.justSelectedRole && (!candidate.experience || candidate.experience === '')) {
     console.log(`🎯 Candidate ${candidate.name} (+${candidate.phone}) selected role: ${candidate.role}`);

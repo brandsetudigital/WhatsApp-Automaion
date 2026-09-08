@@ -303,6 +303,57 @@ function isPartTimeQuery(rawText) {
 }
 
 /**
+ * Detect Meta/Instagram/Facebook ad pre-filled messages and general info queries
+ */
+function isAdInquiryMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  const adPhrases = [
+    'can i get more info',
+    'get more info',
+    'more info',
+    'more information',
+    'more details',
+    'share details',
+    'share more',
+    'saw your ad',
+    'saw ad',
+    'on instagram',
+    'from instagram',
+    'on facebook',
+    'from facebook',
+    'interested in this',
+    'interested in job',
+    'tell me more',
+    'info on this',
+    'kya details hai',
+    'kya opening hai',
+    'details batao',
+    'details chahiye',
+    'info chahiye',
+    'info please',
+    'details please',
+    'want to know more',
+    'know more',
+    'about this job',
+    'job info',
+    'ad info'
+  ];
+
+  if (adPhrases.some(p => text.includes(p))) {
+    return true;
+  }
+
+  if (clean === 'info' || clean === 'details' || clean === 'detail' || clean === 'interested') {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Detect completely off-topic / non-hiring messages (e.g. casual chit-chat, jokes, weather, loans, abusive, random nonsense)
  */
 function isOffTopicMessage(rawText, candidate = null) {
@@ -311,8 +362,16 @@ function isOffTopicMessage(rawText, candidate = null) {
   const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
   if (!clean || clean.length < 2) return false;
 
-  // Standard hiring intents are NEVER off-topic
-  if (isGreetingMessage(text) || isAcknowledgementMessage(text) || isNotInterestedMessage(text) || isArrivalStatusMessage(text) || isDocumentQuery(text) || isPartTimeQuery(text)) {
+  // Standard hiring intents & ad inquiries are NEVER off-topic
+  if (
+    isGreetingMessage(text) ||
+    isAdInquiryMessage(text) ||
+    isAcknowledgementMessage(text) ||
+    isNotInterestedMessage(text) ||
+    isArrivalStatusMessage(text) ||
+    isDocumentQuery(text) ||
+    isPartTimeQuery(text)
+  ) {
     return false;
   }
 
@@ -371,7 +430,7 @@ function isOffTopicMessage(rawText, candidate = null) {
     return true;
   }
 
-  // 2. Keywords directly related to hiring, roles, experience, portfolios, interviews, compensation, office
+  // 2. Comprehensive hiring keywords
   const hiringKeywords = [
     'video', 'editor', 'editing', 'reels', 'ai', 'graphic', 'designer', 'design',
     'seo', 'aeo', 'social', 'media', 'smm', 'digital', 'marketing', 'job', 'jobs', 'hiring', 'higing', 'hire',
@@ -381,6 +440,7 @@ function isOffTopicMessage(rawText, candidate = null) {
     'parso', 'baje', 'am', 'pm', 'morning', 'afternoon', 'evening', 'office', 'location',
     'address', 'bhawarkua', 'orange', 'hospital', 'indore', 'wfh', 'remote', 'work',
     'role', 'position', 'openings', 'vacancy', 'vacancies', 'documents', 'doc', 'kaam', 'detail',
+    'details', 'info', 'information', 'ad', 'ads', 'instagram', 'facebook', 'post', 'story',
     'jd', 'description', 'google meet', 'online', 'reschedule', 'cancel', 'sir', 'maam',
     'number', 'hr', 'contact', 'call', 'joining', 'join', 'start', 'qualification', 'skills',
     'exp', 'months', 'years', 'saal', 'mahine', 'bheja', 'send', 'share', 'haan', 'yes', 'no',
@@ -388,7 +448,8 @@ function isOffTopicMessage(rawText, candidate = null) {
     'react', 'python', 'java', 'node', 'fullstack', 'frontend', 'backend', 'telecaller', 'telecalling',
     'calling', 'caller', 'sales', 'bpo', 'receptionist', 'accountant', 'accounts', 'finance',
     'content', 'writer', 'writing', 'copywriter', 'data entry', 'back office', 'assistant',
-    'naukri', 'recruitment', 'opening', 'opportunity', 'post', 'posts'
+    'naukri', 'recruitment', 'opening', 'opportunity', 'post', 'posts', 'kya', 'kaise', 'batao',
+    'bataye', 'bataiye', 'chahiye', 'interested', 'know', 'tell', 'help'
   ];
 
   const words = clean.split(' ');
@@ -399,14 +460,15 @@ function isOffTopicMessage(rawText, candidate = null) {
     return false;
   }
 
-  if (candidate && (candidate.role !== 'General Applicant' || (candidate.chatHistory && candidate.chatHistory.length > 2))) {
-    if (words.length >= 3 && !hasHiringKeyword) {
-      return true;
-    }
-  } else {
-    if (!hasHiringKeyword && words.length >= 2) {
-      return true;
-    }
+  // A brand new candidate or someone in initial stages (chatHistory <= 2) should NEVER get an off-topic warning unless explicit offTopicPattern matched above!
+  const chatCount = (candidate && candidate.chatHistory) ? candidate.chatHistory.length : 0;
+  if (!candidate || candidate.role === 'General Applicant' || chatCount <= 2) {
+    return false;
+  }
+
+  // In ongoing chats, only flag if long message with zero hiring keywords
+  if (words.length >= 4 && !hasHiringKeyword) {
+    return true;
   }
 
   return false;
@@ -1241,6 +1303,7 @@ module.exports = {
   isAcknowledgementMessage,
   isOffTopicMessage,
   isPartTimeQuery,
+  isAdInquiryMessage,
   getOffTopicBoundaryResponse,
   getOffTopicWarningResponse,
   detectLanguage
