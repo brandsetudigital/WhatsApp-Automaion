@@ -61,9 +61,15 @@
     },
     {
       "topic": "Work From Home (WFH) / Remote",
-      "triggers": ["wfh", "work from home", "remote", "ghar se", "online job", "part time"],
+      "triggers": ["wfh", "work from home", "remote", "ghar se", "online job"],
       "hinglish": "🏢 Yeh position strictly **Onsite In-Office** role hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office me full-time kaam karne ke liye comfortable hain, toh kripya apna **Resume (PDF)** yahan share karein. 👍",
       "english": "🏢 This is strictly an **Onsite In-Office** position at our Indore office (*103 Orange Business Park, Bhawarkua*). We currently do not offer remote or work-from-home options.\n\nIf you are available to work from our Indore office, please share your updated **Resume (PDF)** to proceed. 👍"
+    },
+    {
+      "topic": "Part-Time & Short Hours (2-3 hrs/day)",
+      "triggers": ["part time", "part-time", "2 and half hrs", "2 hrs", "3 hrs", "half day", "short time", "2 ghante", "3 ghante", "few hours"],
+      "hinglish": "🏢 Hamare yahan internships aur full-time roles strictly **Full-Time In-Office (10:00 AM se 7:00 PM, Monday to Saturday)** hote hain hamare Indore office (*103 Orange Business Park, Bhawarkua*) me.\n\nFilhal 2-3 ghante ya Part-Time option available nahi hai. Agar aap full-time in-office internship/job ke liye comfortable hain, toh kripya apna updated **Resume (PDF)** share karein! 👍",
+      "english": "🏢 All our internship and job opportunities are strictly **Full-Time In-Office (10:00 AM – 7:00 PM, Monday to Saturday)** at our Indore office (*103 Orange Business Park, Bhawarkua*).\n\nWe currently do not offer part-time (2-3 hours/day) roles. If you are available for a full-time in-office role, please share your updated **Resume (PDF)** to proceed! 👍"
     },
     {
       "topic": "Office Location & Address",

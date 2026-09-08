@@ -213,25 +213,178 @@ function cleanCandidateName(rawName) {
 
   if (!cleaned || cleaned.length < 2) return 'Candidate';
 
-  const blacklisted = [
+  const blacklistedWords = new Set([
     'candidate', 'customer', 'user', 'allhumdullillha', 'alhamdulillah', 'allah',
     'sunshine', 'admin', 'brandsetu', 'brandsetudigital', 'snacks', 'house of snacks',
-    'status', 'broadcast', 'unknown', 'null', 'undefined'
-  ];
+    'status', 'broadcast', 'unknown', 'null', 'undefined',
+    'looking', 'apply', 'applying', 'interested', 'searching', 'seeking', 'fresher',
+    'student', 'intern', 'internship', 'developer', 'designer', 'editor', 'writer',
+    'working', 'coming', 'waiting', 'available', 'ready', 'living', 'graduate',
+    'doing', 'learning', 'here', 'from', 'sir', 'maam', 'madam', 'mam', 'bro',
+    'brother', 'regarding', 'about', 'please', 'kripya', 'namaste', 'hello', 'good',
+    'morning', 'evening', 'digital', 'marketing', 'manager', 'video', 'expert',
+    'graphic', 'seo', 'aeo', 'smm', 'profile', 'resume', 'cv', 'portfolio', 'link',
+    'drive', 'call', 'message', 'help', 'enquiry', 'query', 'opportunity', 'vacancy',
+    'openings', 'job', 'jobs', 'hours', 'time', 'day', 'office', 'indore', 'company',
+    'hiring', 'want', 'need', 'yes', 'no', 'haan', 'nahi', 'karo', 'karna', 'krna',
+    'chahiye', 'batao', 'bhejo', 'send', 'share', 'contact', 'number', 'phone'
+  ]);
 
-  if (blacklisted.some(b => cleaned.toLowerCase().includes(b))) {
+  const lowerWords = cleaned.toLowerCase().split(' ').filter(Boolean);
+  if (lowerWords.length === 0) return 'Candidate';
+
+  if (lowerWords.every(w => blacklistedWords.has(w)) || lowerWords.some(w => ['looking', 'applying', 'interested', 'fresher', 'intern', 'student', 'candidate', 'customer'].includes(w))) {
     return 'Candidate';
   }
 
-  return cleaned.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+  const validWords = lowerWords.filter(w => !blacklistedWords.has(w) && w.length >= 2);
+  if (validWords.length === 0) return 'Candidate';
+
+  return validWords.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+}
+
+/**
+ * Extract human name from resume filename e.g. "Bhoomika_Sankhla_Resume.PNG" -> "Bhoomika Sankhla"
+ */
+function extractNameFromResumeFilename(filename) {
+  if (!filename) return null;
+  let base = path.basename(filename);
+  base = base.replace(/\.[a-zA-Z0-9]+$/, '');
+  base = base.replace(/[\(_\-]?\d+[\)\_\-]?/g, ' ');
+  base = base.replace(/\b(?:resume|cv|biodata|bio\s*data|curriculum|vitae|updated|update|new|final|latest|profile|document|doc|pdf|png|jpg|jpeg|draft|brandsetu)\b/gi, ' ');
+  base = base.replace(/[\._\-]/g, ' ');
+  base = base.replace(/([a-z])([A-Z])/g, '$1 $2');
+  base = base.replace(/[^a-zA-Z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (!base || base.length < 3) return null;
+  const words = base.split(' ').filter(w => w.length >= 2);
+  if (words.length >= 1 && words.length <= 3) {
+    const candidateName = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+    const cleaned = cleanCandidateName(candidateName);
+    if (cleaned !== 'Candidate') {
+      return cleaned;
+    }
+  }
+  return null;
+}
+
+/**
+ * Check if URL belongs to a valid portfolio or creative hosting service
+ */
+function isValidPortfolioUrl(url) {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  const validDomains = [
+    'drive.google.com',
+    'docs.google.com',
+    'behance.net',
+    'figma.com',
+    'dribbble.com',
+    'github.com',
+    'youtube.com',
+    'youtu.be',
+    'vimeo.com',
+    'notion.site',
+    'notion.so',
+    'carrd.co',
+    'artstation.com',
+    'adobe.com',
+    'canva.com',
+    'dropbox.com',
+    'onedrive.live.com',
+    'linkedin.com/in/'
+  ];
+  return validDomains.some(d => lower.includes(d));
+}
+
+/**
+ * Detect forwarded recruitment/interview notices from other companies (e.g. IIFL Securities, other HRs)
+ */
+function isThirdPartyRecruitmentForward(text) {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+
+  const thirdPartySignatures = [
+    /greetings\s+from\s+(?!brand\s*setu)/i,
+    /best\s+regards\s+hr\s+(?!brand\s*setu)/i,
+    /regards\s*[:,-]?\s*hr\s+(?!brand\s*setu)/i,
+    /team\s+hr\s+(?!brand\s*setu)/i,
+    /interview\s+time\s*[-:]\s*\d/i,
+    /interview\s+schedule\s*[-:]/i,
+    /corporate\s+house/i,
+    /securities\s+pvt\s+ltd/i,
+    /here(?:'?s|\s+is)\s+the\s+interview\s+schedule/i,
+    /as\s+we\s+discussed,?\s*here/i,
+    /confirm\s+your\s+availability\s+for\s+the\s+scheduled\s+time/i
+  ];
+
+  return thirdPartySignatures.some(pattern => pattern.test(lower));
 }
 
 /**
  * Helper to get clean candidate first or display name
  */
 function getCandidateDisplayName(candidate) {
-  if (!candidate) return 'Candidate';
-  return cleanCandidateName(candidate.name);
+  if (!candidate || !candidate.name) return '';
+  const cleaned = cleanCandidateName(candidate.name);
+  if (cleaned === 'Candidate') return '';
+  return cleaned;
+}
+
+/**
+ * Get proper candidate salutation (never "Dear Looking!" or "Dear Candidate!")
+ */
+function getCandidateSalutation(candidate, lang = 'english') {
+  const name = getCandidateDisplayName(candidate);
+  if (!name || name === 'Candidate' || name.toLowerCase() === 'looking') {
+    return (lang === 'english' || lang === 'en') ? 'Hello!' : 'Namaste!';
+  }
+  return `Dear ${name}!`;
+}
+
+/**
+ * Role Selected Response (Step 1 -> Step 2 transition)
+ */
+function getRoleSelectedReply(role, lang = 'english') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `Bahut badiya! Aapne *${role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
+  }
+  return `Great! You have selected *${role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
+}
+
+/**
+ * Experience Answered Response (Step 2 -> Step 3 transition: Next Process is Resume & Portfolio)
+ */
+function getExperienceAnsweredReply(candidate, lang = 'english') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  const role = (candidate && candidate.role && candidate.role !== 'General Applicant') ? candidate.role : 'Video Editor';
+
+  if (role === 'AI Video Expert') {
+    return isHi
+      ? `Awesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Kling, Midjourney, etc.) ke samples ka *Google Drive link* yahan share karein. 📄🎥`
+      : `Awesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
+  } else if (role === 'Graphic Designer') {
+    return isHi
+      ? `Perfect! 🎨 Kripya apna updated *Resume (PDF)* aur *Design Portfolio link (Behance / Drive / Figma)* yahan share karein. 📄🎨`
+      : `Perfect! 🎨 Please share your updated *Resume (PDF)* and your *Design Portfolio (Behance / Drive / Figma link)* here. 📄🎨`;
+  } else if (role === 'SEO & AEO Expert') {
+    return isHi
+      ? `Great! 🔎 Kripya apna updated *Resume (PDF)* aur live SEO rankings / case studies details yahan share karein. 📄📊`
+      : `Great! 🔎 Please share your updated *Resume (PDF)* and your live SEO rankings / case studies proof here. 📄📊`;
+  } else if (role === 'Social Media Manager') {
+    return isHi
+      ? `Super! 📱 Kripya apna updated *Resume (PDF)* aur past managed social media profiles / growth proof share karein. 📄🚀`
+      : `Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀`;
+  } else if (role === 'Digital Marketing Manager') {
+    return isHi
+      ? `Excellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
+      : `Excellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
+  } else {
+    return isHi
+      ? `Bahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
+      : `Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
+  }
 }
 
 /**
@@ -260,19 +413,24 @@ function trackCandidateFromMessage(messageData) {
   let extractedLink = '';
   const urlMatch = text.match(/(https?:\/\/[^\s]+)/gi);
   if (urlMatch && urlMatch.length > 0) {
-    extractedLink = urlMatch[0];
+    for (const u of urlMatch) {
+      if (isValidPortfolioUrl(u)) {
+        extractedLink = u;
+        break;
+      }
+    }
   }
 
-  // Strict Resume / Portfolio signal check:
-  // ONLY true if actual PDF document uploaded OR actual portfolio/drive URL provided
-  const hasValidDocumentUpload = (msgType === 'document' && (
-    (messageData.mimeType && messageData.mimeType.toLowerCase().includes('pdf')) ||
+  // Check if message is a third party recruitment invite
+  const isForward = isThirdPartyRecruitmentForward(text);
+
+  const hasValidDocumentUpload = !isForward && (msgType === 'document' || (
     (messageData.mediaFilename && messageData.mediaFilename.toLowerCase().endsWith('.pdf')) ||
     (text && text.toLowerCase().endsWith('.pdf'))
   ));
 
-  const hasPortfolioLink = (
-    extractedLink.length > 0 ||
+  const hasPortfolioLink = !isForward && (
+    (extractedLink && isValidPortfolioUrl(extractedLink)) ||
     lower.includes('drive.google.com') ||
     lower.includes('docs.google.com') ||
     lower.includes('behance.net') ||
@@ -287,59 +445,84 @@ function trackCandidateFromMessage(messageData) {
 
   const hasResumeSignal = hasValidDocumentUpload || hasPortfolioLink;
 
-  // Detect role from 6 active job ad openings (handles numbers 1-6 or role keywords)
+  // Check if candidate is currently awaiting Step 2 (Experience / Fresher qualification)
+  const isAwaitingExperience = candidate && candidate.role && candidate.role !== 'General Applicant' && (!candidate.experience || candidate.experience === '');
+
   const cleanTrimmed = lower.replace(/[^\w\s]/g, '').trim();
   let detectedRole = null;
-
-  if (cleanTrimmed === '1' || cleanTrimmed.startsWith('1 ') || lower.includes('video editor') || lower.includes('video editing') || lower.includes('reels edit') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
-    detectedRole = 'Video Editor';
-  } else if (cleanTrimmed === '2' || cleanTrimmed.startsWith('2 ') || lower.includes('ai video') || lower.includes('ai reels') || lower.includes('runway') || lower.includes('kling') || lower.includes('midjourney') || lower.includes('pika') || lower.includes('heygen')) {
-    detectedRole = 'AI Video Expert';
-  } else if (cleanTrimmed === '3' || cleanTrimmed.startsWith('3 ') || lower.includes('graphic') || lower.includes('designer') || lower.includes('designing') || lower.includes('photoshop') || lower.includes('illustrator') || lower.includes('figma') || lower.includes('canva')) {
-    detectedRole = 'Graphic Designer';
-  } else if (cleanTrimmed === '4' || cleanTrimmed.startsWith('4 ') || lower.includes('seo') || lower.includes('aeo') || lower.includes('search engine') || lower.includes('ranking') || lower.includes('backlink')) {
-    detectedRole = 'SEO & AEO Expert';
-  } else if (cleanTrimmed === '5' || cleanTrimmed.startsWith('5 ') || lower.includes('social media') || lower.includes('smm') || lower.includes('instagram manager') || lower.includes('social manager')) {
-    detectedRole = 'Social Media Manager';
-  } else if (cleanTrimmed === '6' || cleanTrimmed.startsWith('6 ') || lower.includes('digital marketing') || lower.includes('performance marketing') || lower.includes('meta ads') || lower.includes('facebook ads') || lower.includes('google ads') || lower.includes('media buyer')) {
-    detectedRole = 'Digital Marketing Manager';
-  }
-
-  // Detect Experience / Fresher status
   let detectedExperience = null;
-  const isFresherOrIntern = lower.includes('fresher') || lower.includes('freshor') || lower.includes('internship') || lower.includes('intern') || lower.includes('no experience') || lower.includes('learning');
-  const isFullTimeOrExp = lower.includes('full time') || lower.includes('full-time') || lower.includes('fulltime') || lower.includes('experienced') || lower.includes('experience');
 
   const expMatch = text.match(/(\d+(?:\.\d+)?\s*(?:year|yr|saal|month|mahine|yrs|mths)\b(?:[^\n,]*experience)?)/i) ||
                    text.match(/(?:experience|exp|experience:)\s*(\d+(?:\.\d+)?(?:\s*(?:year|yr|saal|month|mahine|yrs|mths))?)/i) ||
                    text.match(/^\s*(\d+(?:\.\d+)?)\s*$/m);
 
-  if (isFresherOrIntern) {
-    detectedExperience = 'Fresher (Paid Internship)';
-  } else if (expMatch) {
-    const rawExp = expMatch[1] || expMatch[0];
-    const formattedExp = (rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`;
-    detectedExperience = isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp;
-  } else if (isFullTimeOrExp) {
-    detectedExperience = 'Experienced (Full-Time)';
-  }
+  const isFresherOrIntern = lower.includes('fresher') || lower.includes('freshor') || lower.includes('internship') || lower.includes('intern') || lower.includes('no experience') || lower.includes('learning');
+  const isFullTimeOrExp = lower.includes('full time') || lower.includes('full-time') || lower.includes('fulltime') || lower.includes('experienced') || lower.includes('experience');
 
-  // Detect Candidate Name if sent in message (e.g. "My name is Arjun", "Mera naam Arjun hai", "I am Arjun Meena", "Name: Arjun")
-  let extractedName = null;
-  const namePattern = /(?:my name is|mera naam|i am|name\s*[:=-]?)\s+([A-Za-z\s]{2,25}?)(?:\r?\n|,\s*|\s+(?:role|apply|for|mobile|phone|exp|city|$))/i;
-  const nameMatch = text.match(namePattern);
-  if (nameMatch && nameMatch[1]) {
-    const rawN = nameMatch[1].trim();
-    if (rawN.length >= 2 && !['here', 'applying', 'seo', 'video', 'expert', 'editor', 'is', 'am'].includes(rawN.toLowerCase())) {
-      extractedName = rawN;
+  if (isAwaitingExperience) {
+    // In Step 2, "1" means Fresher (Option 1️⃣), "2" means Experienced (Option 2️⃣)
+    if (cleanTrimmed === '1' || isFresherOrIntern) {
+      detectedExperience = 'Fresher (Paid Internship)';
+    } else if (cleanTrimmed === '2' || isFullTimeOrExp || expMatch) {
+      const rawExp = expMatch ? (expMatch[1] || expMatch[0]) : null;
+      const formattedExp = rawExp ? ((rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`) : null;
+      detectedExperience = formattedExp ? (isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp) : 'Experienced (Full-Time)';
     }
   } else {
-    // Simple line-based fallback check e.g. "Name: Arjun Meena"
-    const simpleNameMatch = text.match(/(?:my name is|mera naam|i am|name\s*[:=-]?)\s+([A-Za-z\s]{2,25})/i);
-    if (simpleNameMatch && simpleNameMatch[1]) {
-      const rawN = simpleNameMatch[1].split(/\r?\n/)[0].replace(/\b(role|for|apply|seo|editor).*/i, '').trim();
-      if (rawN.length >= 2) {
-        extractedName = rawN;
+    // In Step 1, "1" to "6" or role keywords select the active opening
+    if (cleanTrimmed === '1' || cleanTrimmed.startsWith('1 ') || lower.includes('video editor') || lower.includes('video editing') || lower.includes('reels edit') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
+      detectedRole = 'Video Editor';
+    } else if (cleanTrimmed === '2' || cleanTrimmed.startsWith('2 ') || lower.includes('ai video') || lower.includes('ai reels') || lower.includes('runway') || lower.includes('kling') || lower.includes('midjourney') || lower.includes('pika') || lower.includes('heygen')) {
+      detectedRole = 'AI Video Expert';
+    } else if (cleanTrimmed === '3' || cleanTrimmed.startsWith('3 ') || lower.includes('graphic') || lower.includes('designer') || lower.includes('designing') || lower.includes('photoshop') || lower.includes('illustrator') || lower.includes('figma') || lower.includes('canva')) {
+      detectedRole = 'Graphic Designer';
+    } else if (cleanTrimmed === '4' || cleanTrimmed.startsWith('4 ') || lower.includes('seo') || lower.includes('aeo') || lower.includes('search engine') || lower.includes('ranking') || lower.includes('backlink')) {
+      detectedRole = 'SEO & AEO Expert';
+    } else if (cleanTrimmed === '5' || cleanTrimmed.startsWith('5 ') || lower.includes('social media') || lower.includes('smm') || lower.includes('instagram manager') || lower.includes('social manager')) {
+      detectedRole = 'Social Media Manager';
+    } else if (cleanTrimmed === '6' || cleanTrimmed.startsWith('6 ') || lower.includes('digital marketing') || lower.includes('performance marketing') || lower.includes('meta ads') || lower.includes('facebook ads') || lower.includes('google ads') || lower.includes('media buyer')) {
+      detectedRole = 'Digital Marketing Manager';
+    }
+
+    // Only lock detectedExperience if explicitly stated together with role in this message
+    if (detectedRole && (isFresherOrIntern || isFullTimeOrExp || expMatch)) {
+      if (isFresherOrIntern) {
+        detectedExperience = 'Fresher (Paid Internship)';
+      } else if (expMatch) {
+        const rawExp = expMatch[1] || expMatch[0];
+        const formattedExp = (rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`;
+        detectedExperience = isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp;
+      } else if (isFullTimeOrExp) {
+        detectedExperience = 'Experienced (Full-Time)';
+      }
+    }
+  }
+
+  // Detect Candidate Name if sent in message or resume filename
+  let extractedName = null;
+  const nameFromFilename = extractNameFromResumeFilename(messageData.mediaFilename || (text.toLowerCase().endsWith('.pdf') || text.toLowerCase().endsWith('.png') || text.toLowerCase().endsWith('.jpg') ? text : ''));
+  if (nameFromFilename) {
+    extractedName = nameFromFilename;
+  }
+
+  if (!extractedName && !isForward) {
+    const explicitNamePattern = /(?:my name is|mera naam\s*(?:hai)?|name\s*[:=-]|myself)\s+([A-Za-z\s]{2,30}?)(?:\r?\n|,\s*|\s+(?:hai|role|apply|for|mobile|phone|exp|city|$))/i;
+    const explicitMatch = text.match(explicitNamePattern);
+    if (explicitMatch && explicitMatch[1]) {
+      const cleanN = cleanCandidateName(explicitMatch[1].trim());
+      if (cleanN !== 'Candidate') {
+        extractedName = cleanN;
+      }
+    }
+
+    // Only allow "I am [Name]" if strictly capitalized proper noun and not a verb/adjective
+    if (!extractedName) {
+      const iAmMatch = text.match(/\b(?:i\s*am|i'm)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b/);
+      if (iAmMatch && iAmMatch[1]) {
+        const cleanN = cleanCandidateName(iAmMatch[1].trim());
+        if (cleanN !== 'Candidate') {
+          extractedName = cleanN;
+        }
       }
     }
   }
@@ -390,6 +573,8 @@ function trackCandidateFromMessage(messageData) {
       createdAt: nowIso,
       updatedAt: nowIso,
       lastMessage: text,
+      justSelectedRole: Boolean(detectedRole && !detectedExperience),
+      justAnsweredExperience: Boolean(detectedRole && detectedExperience),
       chatHistory: []
     };
     appendChatHistory(candidate, 'user', text);
@@ -403,22 +588,51 @@ function trackCandidateFromMessage(messageData) {
     if (text) candidate.lang = msgLang;
     appendChatHistory(candidate, 'user', text);
 
-    if (extractedName) {
+    if (extractedName && extractedName !== 'Candidate') {
       candidate.name = cleanCandidateName(extractedName);
-    } else if (validProfileName && (candidate.name === 'Candidate' || candidate.name === 'Customer' || !candidate.name)) {
-      candidate.name = cleanCandidateName(validProfileName);
+    } else if (nameFromFilename && (candidate.name === 'Candidate' || candidate.name === 'Customer' || candidate.name.toLowerCase() === 'looking' || !candidate.name)) {
+      candidate.name = nameFromFilename;
+    } else if (validProfileName && (candidate.name === 'Candidate' || candidate.name === 'Customer' || candidate.name.toLowerCase() === 'looking' || !candidate.name)) {
+      const cleanProfile = cleanCandidateName(validProfileName);
+      if (cleanProfile !== 'Candidate') candidate.name = cleanProfile;
     }
+
+    // Clean up if candidate currently has an invalid/blacklisted name
+    if (candidate.name && cleanCandidateName(candidate.name) === 'Candidate') {
+      candidate.name = 'Candidate';
+    }
+
+    // Reset temporary action flags
+    candidate.justSelectedRole = false;
+    candidate.justAnsweredExperience = false;
 
     // If candidate sends a fresh apply intent, reset stale interview/role state for the new flow
     if (isFreshApplyIntent) {
       console.log(`🔄 Candidate ${candidate.name} (+${candidate.phone}) restarted application flow`);
       candidate.role = detectedRole || 'General Applicant';
-      candidate.experience = '';
+      candidate.experience = detectedExperience || '';
+      candidate.justSelectedRole = Boolean(detectedRole && !detectedExperience);
+      candidate.justAnsweredExperience = Boolean(detectedRole && detectedExperience);
       candidate.offTopicCount = 0;
       candidate.interviewDateTime = null;
       candidate.status = candidate.resumeReceived ? 'Resume Received' : 'Applied';
-    } else if (detectedRole) {
+    } else if (detectedRole && (candidate.role === 'General Applicant' || candidate.role !== detectedRole)) {
+      console.log(`🎯 Candidate ${candidate.name} (+${candidate.phone}) selected role: ${detectedRole}`);
       candidate.role = detectedRole;
+      if (detectedExperience) {
+        candidate.experience = detectedExperience;
+        candidate.justAnsweredExperience = true;
+      } else {
+        candidate.experience = '';
+        candidate.justSelectedRole = true;
+      }
+    } else if (isAwaitingExperience && detectedExperience) {
+      console.log(`💼 Candidate ${candidate.name} (+${candidate.phone}) provided experience: ${detectedExperience}`);
+      candidate.experience = detectedExperience;
+      candidate.justAnsweredExperience = true;
+    } else if (detectedExperience && (!candidate.experience || candidate.experience === '')) {
+      candidate.experience = detectedExperience;
+      candidate.justAnsweredExperience = true;
     }
 
     // If candidate had an old interview in the past, clear the expired interview date
@@ -427,10 +641,6 @@ function trackCandidateFromMessage(messageData) {
       if (candidate.status === 'Interview Scheduled') {
         candidate.status = candidate.resumeReceived ? 'Resume Received' : 'Applied';
       }
-    }
-
-    if (detectedExperience) {
-      candidate.experience = detectedExperience;
     }
 
     if (extractedLink) {
@@ -444,6 +654,9 @@ function trackCandidateFromMessage(messageData) {
       candidate.resumeFileName = msgType === 'document' ? (messageData.messageText || 'Resume Document') : 'Portfolio Link';
       if (candidate.status === 'Applied' || candidate.status === 'Resume Pending') {
         candidate.status = 'Resume Received';
+      }
+      if (nameFromFilename && (candidate.name === 'Candidate' || candidate.name === 'Customer' || candidate.name.toLowerCase() === 'looking' || !candidate.name)) {
+        candidate.name = nameFromFilename;
       }
       console.log(`📄 Resume / Portfolio Received from candidate: ${candidate.name} (+${candidate.phone})`);
     }
@@ -540,26 +753,29 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       });
 
       let confirmMsg = '';
+      const salutationEn = getCandidateSalutation(candidate, 'english');
+      const salutationHi = getCandidateSalutation(candidate, 'hinglish');
+
       if (isEnglish) {
         if (isOnline) {
           confirmMsg = isRescheduled
-            ? `Dear ${candidate.name}! 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `Dear ${candidate.name}! 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         } else {
           confirmMsg = isRescheduled
-            ? `Dear ${candidate.name}! 🔄\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
-            : `Dear ${candidate.name}! 🎉\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
+            ? `${salutationEn} 🔄\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
+            : `${salutationEn} 🎉\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
         }
       } else {
         // Hinglish
         if (isOnline) {
           confirmMsg = isRescheduled
-            ? `Dear ${candidate.name}! 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `Dear ${candidate.name}! 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         } else {
           confirmMsg = isRescheduled
-            ? `Dear ${candidate.name}! 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview *reschedule* ho gaya hai.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
-            : `Dear ${candidate.name}! 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview schedule ho gaya hai.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital`;
+            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview *reschedule* ho gaya hai.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
+            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview schedule ho gaya hai.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital`;
         }
       }
 
@@ -989,6 +1205,13 @@ module.exports = {
   sendResumeReminder,
   sendInterview1HrReminder,
   getCandidateDisplayName,
+  getCandidateSalutation,
+  cleanCandidateName,
+  extractNameFromResumeFilename,
+  getRoleSelectedReply,
+  getExperienceAnsweredReply,
+  isValidPortfolioUrl,
+  isThirdPartyRecruitmentForward,
   handleHrWhatsAppCommand,
   sendMessageToCandidate,
   deleteCandidate,

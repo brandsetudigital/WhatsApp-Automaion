@@ -154,7 +154,7 @@ function extractJsonFromString(str) {
     if (match) {
       try {
         return JSON.parse(match[0]);
-      } catch (e2) {}
+      } catch (e2) { }
     }
   }
   return null;
@@ -294,6 +294,15 @@ function isDocumentQuery(rawText) {
 }
 
 /**
+ * Detect queries about part-time, limited hours, or short working shifts (e.g. "2 and half hrs in a day", "2 ghante")
+ */
+function isPartTimeQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:\b(?:2|3|4|5)\s*(?:and\s*(?:a\s*)?half\s*)?(?:hr|hrs|hour|hours|ghante|ghanta)\b|part\s*time|parttime|half\s*day|short\s*(?:time|hours)|flexible\s*hours|few\s*hours|2\s*ghante|3\s*ghante|kuch\s*ghante)/i.test(text);
+}
+
+/**
  * Detect completely off-topic / non-hiring messages (e.g. casual chit-chat, jokes, weather, loans, abusive, random nonsense)
  */
 function isOffTopicMessage(rawText, candidate = null) {
@@ -303,7 +312,7 @@ function isOffTopicMessage(rawText, candidate = null) {
   if (!clean || clean.length < 2) return false;
 
   // Standard hiring intents are NEVER off-topic
-  if (isGreetingMessage(text) || isAcknowledgementMessage(text) || isNotInterestedMessage(text) || isArrivalStatusMessage(text) || isDocumentQuery(text)) {
+  if (isGreetingMessage(text) || isAcknowledgementMessage(text) || isNotInterestedMessage(text) || isArrivalStatusMessage(text) || isDocumentQuery(text) || isPartTimeQuery(text)) {
     return false;
   }
 
@@ -440,7 +449,18 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   const rawText = String(userMessage).trim();
   const text = rawText.toLowerCase();
 
-  // 0. If candidate ALREADY has an interview scheduled:
+  // 0. Check if message is a third-party recruiter forward (e.g. IIFL Securities, other HR)
+  const hiringService = require('./hiring.service');
+  if (hiringService.isThirdPartyRecruitmentForward(userMessage)) {
+    return null;
+  }
+
+  // 0.1 Interview scheduling is strictly allowed ONLY if candidate has submitted resume or received slot proposal
+  if (candidate && !candidate.resumeReceived && !candidate.interviewSlotProposed) {
+    return null;
+  }
+
+  // 0.2 If candidate ALREADY has an interview scheduled:
   if (candidate && candidate.interviewDateTime) {
     // Pure acknowledgments, arrival updates, greetings, doc questions must NEVER reschedule
     if (isAcknowledgementMessage(text) || isArrivalStatusMessage(text) || isGreetingMessage(text) || isDocumentQuery(text)) {
@@ -584,6 +604,15 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
   const localParsed = parseInterviewScheduleLocal(userMessage, candidate);
   if (localParsed && localParsed.isScheduling) {
     return localParsed;
+  }
+
+  const hiringService = require('./hiring.service');
+  if (hiringService.isThirdPartyRecruitmentForward(userMessage)) {
+    return null;
+  }
+
+  if (candidate && !candidate.resumeReceived && !candidate.interviewSlotProposed) {
+    return null;
   }
 
   if (candidate && candidate.interviewDateTime) {
@@ -894,6 +923,15 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // 6.5. FAQ: PART-TIME / LIMITED HOURS (e.g. "2 and half hrs in a day", "2 ghante", "part time")
+  if (isPartTimeQuery(text)) {
+    if (isHinglish) {
+      return `${prefixHi}🏢 Hamare yahan internships aur full-time roles strictly **Full-Time In-Office (10:00 AM se 7:00 PM, Monday to Saturday)** hote hain hamare Indore office (*103 Orange Business Park, Bhawarkua*) me.\n\nFilhal 2-3 ghante ya Part-Time option available nahi hai. Agar aap full-time in-office internship/job ke liye comfortable hain, toh kripya apna updated **Resume (PDF)** share karein! 👍`;
+    } else {
+      return `${prefixEn}🏢 All our internship and job opportunities are strictly **Full-Time In-Office (10:00 AM – 7:00 PM, Monday to Saturday)** at our Indore office (*103 Orange Business Park, Bhawarkua*).\n\nWe currently do not offer part-time (2-3 hours/day) roles. If you are available for a full-time in-office role, please share your updated **Resume (PDF)** to proceed! 👍`;
+    }
+  }
+
   // 7. FAQ: JOB DESCRIPTION (JD) / WORK RESPONSIBILITIES
   const jdKeywords = /(?:\bjd\b|job\s*description|description|responsibilit|kaam\s*kya|work\s*detail|role\s*detail|profile\s*detail)/i;
   if (jdKeywords.test(text)) {
@@ -927,9 +965,9 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER STATUS NOT PROVIDED YET ──
   if (!candidate.experience || candidate.experience === '') {
     if (isHinglish) {
-      return `${prefixHi}Bahut badiya! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
+      return `Bahut badiya! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
     } else {
-      return `${prefixEn}Great! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
+      return `Great! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
     }
   }
 
@@ -1013,7 +1051,7 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
   let candName = (candidate.name || '').trim();
   candName = candName.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F900}-\u{1F9FF}\u{1FA70}-\u{1FAFF}]/gu, '');
   candName = candName.replace(/[^a-zA-Z\s\u0900-\u097F]/g, ' ').replace(/\s+/g, ' ').trim();
-  
+
   if (!candName || candName.length < 2 || ['candidate', 'customer', 'user', 'allhumdullillha', 'alhamdulillah', 'allah', 'sunshine', 'admin', 'brandsetu', 'snacks'].some(b => candName.toLowerCase().includes(b))) {
     candName = 'Candidate';
   }
@@ -1202,6 +1240,7 @@ module.exports = {
   isNotInterestedMessage,
   isAcknowledgementMessage,
   isOffTopicMessage,
+  isPartTimeQuery,
   getOffTopicBoundaryResponse,
   getOffTopicWarningResponse,
   detectLanguage

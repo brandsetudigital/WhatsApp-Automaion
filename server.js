@@ -165,6 +165,13 @@ async function processIncomingWhatsAppMessage(messageData) {
           candidate.status = 'Resume Received';
         }
 
+        // Extract Candidate Name from PDF filename if current name is generic or unverified
+        const nameFromPdf = hiringService.extractNameFromResumeFilename(safeName);
+        if (nameFromPdf && (candidate.name === 'Candidate' || candidate.name === 'Customer' || candidate.name.toLowerCase() === 'looking' || !candidate.name)) {
+          console.log(`👤 Updated Candidate Name from PDF Resume: "${candidate.name}" -> "${nameFromPdf}"`);
+          candidate.name = nameFromPdf;
+        }
+
         console.log(`📥 Downloading candidate PDF resume (${messageData.mediaId}) -> ${destPath}...`);
         try {
           await whatsappCloudService.downloadMediaFromWhatsApp(messageData.mediaId, destPath);
@@ -180,6 +187,14 @@ async function processIncomingWhatsAppMessage(messageData) {
       } else {
         // Candidate sent an IMAGE, photo, screenshot, audio, or non-PDF file
         console.log(`⚠️ Candidate ${candidate.name} (+${candidate.phone}) sent non-PDF media (${messageData.messageType}): Requesting proper PDF resume`);
+
+        // Check if image filename contains candidate's name (e.g. "Bhoomika Sankhla Resume.PNG")
+        const nameFromMedia = hiringService.extractNameFromResumeFilename(messageData.mediaFilename);
+        if (nameFromMedia && (candidate.name === 'Candidate' || candidate.name === 'Customer' || candidate.name.toLowerCase() === 'looking' || !candidate.name)) {
+          console.log(`👤 Updated Candidate Name from Media Filename: "${candidate.name}" -> "${nameFromMedia}"`);
+          candidate.name = nameFromMedia;
+        }
+
         const isEnglish = (candidate.lang === 'english');
         const invalidMediaMsg = isEnglish
           ? `📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍`
@@ -297,9 +312,78 @@ async function processIncomingWhatsAppMessage(messageData) {
     return; // Handled off-topic warning/close, stop downstream flow!
   }
 
-  // 2. Check for Automatic Interview Scheduling Intent if candidate is active
+  // 1.9 Check for Third-Party / Forwarded Interview Invites (e.g. pasted message from IIFL Securities / other HR)
+  if (hiringService.isThirdPartyRecruitmentForward(messageText)) {
+    console.log(`⚠️ Candidate +${customerPhone} pasted third-party forwarded job/interview invite`);
+    const isEnglish = (candidate?.lang === 'english');
+    const forwardMsg = isEnglish
+      ? `📌 *Notice:* This message appears to be a forwarded interview invitation from another organization / recruiter. 😊\n\nIf you would like to apply for open positions at *Brand Setu Digital* (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager), please share your updated **Resume (PDF)** here! 👍`
+      : `📌 *Notice:* Yeh message kisi dusri company / HR ka forwarded interview invite lag raha hai. 😊\n\nAgar aap *Brand Setu Digital* ke active job roles (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager) ke liye apply karna chahte hain, toh kripya apna updated **Resume (PDF)** yahan share karein! 👍`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, forwardMsg, isMetaSource);
+      if (candidate) {
+        hiringService.appendChatHistory(candidate, 'assistant', forwardMsg);
+        hiringService.saveCandidatesAndSyncExcel();
+        io.emit('hiring-updated', {
+          candidates: hiringService.getCandidates(),
+          stats: hiringService.getHiringStats(),
+          candidateId: candidate.id
+        });
+      }
+    } catch (e) {
+      console.error('Error sending forwarded message notice:', e.message);
+    }
+    return; // STOP! Never auto-schedule an interview from a third-party forward!
+  }
+
+  // 1.95 Candidate Selected a Role (Step 1 -> Step 2 Qualification Question)
+  if (candidate && candidate.justSelectedRole && (!candidate.experience || candidate.experience === '')) {
+    console.log(`🎯 Candidate ${candidate.name} (+${candidate.phone}) selected role: ${candidate.role}`);
+    const roleSelectedMsg = hiringService.getRoleSelectedReply(candidate.role, candidate.lang);
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, roleSelectedMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', roleSelectedMsg);
+      candidate.justSelectedRole = false;
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+      return; // Handled immediately with 100% precision!
+    } catch (sendErr) {
+      console.error('Error sending role selected reply:', sendErr.message);
+    }
+  }
+
+  // 1.96 Candidate Answered Experience / Fresher Question (Step 2 -> Step 3: Next Process is Resume & Portfolio Request)
+  if (candidate && candidate.justAnsweredExperience && !candidate.resumeReceived) {
+    console.log(`💼 Candidate ${candidate.name} (+${candidate.phone}) answered experience: ${candidate.experience} for ${candidate.role}`);
+    const expAnsweredMsg = hiringService.getExperienceAnsweredReply(candidate, candidate.lang);
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, expAnsweredMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', expAnsweredMsg);
+      candidate.justAnsweredExperience = false;
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+      return; // Handled immediately with 100% precision!
+    } catch (sendErr) {
+      console.error('Error sending experience answered reply:', sendErr.message);
+    }
+  }
+
+  // 2. Check for Automatic Interview Scheduling Intent ONLY if candidate has active application AND submitted resume/received proposal
   let interviewScheduledNow = false;
-  if (candidate && messageText && messageText.length > 2) {
+  const isEligibleForScheduling = candidate && (candidate.resumeReceived || candidate.interviewSlotProposed);
+  if (isEligibleForScheduling && messageText && messageText.length > 2 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
     try {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
       if (scheduleIntent && scheduleIntent.isScheduling && scheduleIntent.proposedDateTimeIso) {

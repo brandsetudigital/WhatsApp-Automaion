@@ -25,9 +25,45 @@ function verifyWebhook(req, res) {
   return res.status(400).json({ error: 'Missing hub parameters' });
 }
 
-// Buffer for debouncing rapid consecutive messages from the same user
-const messageBuffers = new Map();
-const DEBOUNCE_WAIT_MS = 1200; // 1.2s delay to collect rapid typing
+// State management for per-user debouncing & sequential execution
+const messageBuffers = new Map(); // phone -> { texts: string[], lastData: object, timer: NodeJS.Timeout }
+const processingLock = new Set(); // phone -> true if in-flight async processing is running for this phone
+const pendingQueues = new Map(); // phone -> { texts: string[], lastData: object }
+const DEBOUNCE_WAIT_MS = 2000; // 2s debounce to capture multi-message typing bursts
+
+async function executeBufferedMessage(phone, processIncomingFn) {
+  const buf = messageBuffers.get(phone);
+  messageBuffers.delete(phone);
+  if (!buf) return;
+
+  processingLock.add(phone);
+
+  const combinedText = buf.texts.filter(Boolean).join('\n');
+  buf.lastData.messageText = combinedText;
+
+  try {
+    if (typeof processIncomingFn === 'function') {
+      await processIncomingFn(buf.lastData);
+    }
+  } catch (err) {
+    console.error(`❌ Error processing WhatsApp message for +${phone}:`, err.message || err);
+  } finally {
+    processingLock.delete(phone);
+
+    // If candidate sent new messages while we were busy processing, process them sequentially
+    if (pendingQueues.has(phone)) {
+      const pending = pendingQueues.get(phone);
+      pendingQueues.delete(phone);
+      messageBuffers.set(phone, {
+        texts: pending.texts,
+        lastData: pending.lastData,
+        timer: setTimeout(() => {
+          executeBufferedMessage(phone, processIncomingFn);
+        }, 1200)
+      });
+    }
+  }
+}
 
 /**
  * Handle Meta Webhook Event Notifications (POST /api/whatsapp/webhook)
@@ -58,6 +94,24 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
 
   // 5. Debounce & Batch Rapid Consecutive Messages from the same sender
   const phone = messageData.customerPhone;
+
+  // If already processing for this phone, buffer incoming message into pendingQueue
+  if (processingLock.has(phone)) {
+    console.log(`⏳ Message buffered for +${phone} (processing already in progress)`);
+    if (!pendingQueues.has(phone)) {
+      pendingQueues.set(phone, {
+        texts: [messageData.messageText],
+        lastData: { ...messageData, source: 'meta' }
+      });
+    } else {
+      const q = pendingQueues.get(phone);
+      q.texts.push(messageData.messageText);
+      q.lastData = { ...messageData, source: 'meta' };
+    }
+    return;
+  }
+
+  // Otherwise, debounce incoming messages
   if (!messageBuffers.has(phone)) {
     messageBuffers.set(phone, {
       texts: [messageData.messageText],
@@ -68,24 +122,12 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
     const buf = messageBuffers.get(phone);
     if (buf.timer) clearTimeout(buf.timer);
     buf.texts.push(messageData.messageText);
-    if (messageData.messageType !== 'text') {
-      buf.lastData = { ...messageData };
-    }
+    buf.lastData = { ...messageData, source: 'meta' };
   }
 
   const userBuf = messageBuffers.get(phone);
   userBuf.timer = setTimeout(() => {
-    messageBuffers.delete(phone);
-
-    // Combine distinct lines from rapid messages into one clean query
-    const combinedText = userBuf.texts.filter(Boolean).join('\n');
-    userBuf.lastData.messageText = combinedText;
-
-    if (typeof processIncomingFn === 'function') {
-      processIncomingFn(userBuf.lastData).catch(err => {
-        console.error('❌ Error processing incoming WhatsApp message:', err.message || err);
-      });
-    }
+    executeBufferedMessage(phone, processIncomingFn);
   }, DEBOUNCE_WAIT_MS);
 }
 
