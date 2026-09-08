@@ -58,14 +58,14 @@ async function initMongoDb() {
     candidatesCollection = mongoDb.collection(colName);
     console.log(`🍃 [MongoDB Atlas] Connected successfully to "${dbName}" -> "${colName}"!`);
 
-    // Fetch and merge cloud candidates
+    // Fetch cloud candidates (Single source of truth)
     const cloudDocs = await candidatesCollection.find({}).toArray();
     if (cloudDocs.length > 0) {
       const cloudCandidates = cloudDocs.map(c => {
         const { _id, ...rest } = c;
         return { ...rest, id: rest.id || String(_id) };
       });
-      candidates = mergeCandidates(candidates, cloudCandidates);
+      candidates = cloudCandidates;
       console.log(`🍃 [MongoDB Atlas] Synchronized ${cloudDocs.length} candidates from cloud database!`);
       saveCandidatesAndSyncExcel(false);
       if (ioInstance) {
@@ -74,10 +74,15 @@ async function initMongoDb() {
           stats: getHiringStats()
         });
       }
-    } else if (candidates.length > 0) {
-      console.log(`🍃 [MongoDB Atlas] Seeding ${candidates.length} candidates into cloud collection...`);
-      for (const c of candidates) {
-        await candidatesCollection.updateOne({ phone: c.phone }, { $set: { ...c, _id: c.id } }, { upsert: true });
+    } else {
+      candidates = [];
+      saveCandidatesAndSyncExcel(false);
+      console.log('🍃 [MongoDB Atlas] Cloud database is clean (0 records). Ready for live WhatsApp candidates!');
+      if (ioInstance) {
+        ioInstance.emit('hiring:update', {
+          candidates: candidates,
+          stats: getHiringStats()
+        });
       }
     }
   } catch (err) {
@@ -377,7 +382,7 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
     worksheet['!cols'] = [
       { wch: 6 },  // S.No
       { wch: 20 }, // Name
-      { wch: 18 }, // Phone
+      { wch:1 18 }, // Phone
       { wch: 18 }, // Role
       { wch: 16 }, // Resume Received
       { wch: 30 }, // Portfolio Link
