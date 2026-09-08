@@ -48,7 +48,11 @@ async function initMongoDb() {
     const dbName = process.env.MONGODB_DB || 'Aotumation';
     const colName = process.env.MONGODB_COLLECTION || 'Brandsetu Digital';
 
-    mongoClient = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
+    mongoClient = new MongoClient(uri, {
+      serverSelectionTimeoutMS: 15000,
+      family: 4,
+      tls: true
+    });
     await mongoClient.connect();
     mongoDb = mongoClient.db(dbName);
     candidatesCollection = mongoDb.collection(colName);
