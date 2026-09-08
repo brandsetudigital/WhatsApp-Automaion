@@ -28,9 +28,57 @@ if (!fs.existsSync(BACKUPS_DIR)) {
 let candidates = [];
 let ioInstance = null;
 let lastSnapshotHour = '';
+let mongoClient = null;
+let mongoDb = null;
+let candidatesCollection = null;
 
 function setHiringIo(io) {
   ioInstance = io;
+}
+
+/**
+ * Initialize MongoDB Atlas connection for real-time cloud synchronization
+ */
+async function initMongoDb() {
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URL;
+  if (!uri || !uri.startsWith('mongodb')) return;
+
+  try {
+    const { MongoClient } = require('mongodb');
+    const dbName = process.env.MONGODB_DB || 'Aotumation';
+    const colName = process.env.MONGODB_COLLECTION || 'Brandsetu Digital';
+
+    mongoClient = new MongoClient(uri, { serverSelectionTimeoutMS: 8000 });
+    await mongoClient.connect();
+    mongoDb = mongoClient.db(dbName);
+    candidatesCollection = mongoDb.collection(colName);
+    console.log(`🍃 [MongoDB Atlas] Connected successfully to "${dbName}" -> "${colName}"!`);
+
+    // Fetch and merge cloud candidates
+    const cloudDocs = await candidatesCollection.find({}).toArray();
+    if (cloudDocs.length > 0) {
+      const cloudCandidates = cloudDocs.map(c => {
+        const { _id, ...rest } = c;
+        return { ...rest, id: rest.id || String(_id) };
+      });
+      candidates = mergeCandidates(candidates, cloudCandidates);
+      console.log(`🍃 [MongoDB Atlas] Synchronized ${cloudDocs.length} candidates from cloud database!`);
+      saveCandidatesAndSyncExcel(false);
+      if (ioInstance) {
+        ioInstance.emit('hiring:update', {
+          candidates: candidates,
+          stats: getHiringStats()
+        });
+      }
+    } else if (candidates.length > 0) {
+      console.log(`🍃 [MongoDB Atlas] Seeding ${candidates.length} candidates into cloud collection...`);
+      for (const c of candidates) {
+        await candidatesCollection.updateOne({ phone: c.phone }, { $set: { ...c, _id: c.id } }, { upsert: true });
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ [MongoDB Atlas] Connection notice (falling back to local files):', err.message);
+  }
 }
 
 /**
@@ -224,7 +272,7 @@ function loadCandidates() {
 /**
  * Save candidates to JSON, Mirror Backup, Hourly Snapshot, and Excel file
  */
-function saveCandidatesAndSyncExcel() {
+function saveCandidatesAndSyncExcel(syncToMongo = true) {
   try {
     const jsonStr = JSON.stringify(candidates, null, 2);
 
@@ -251,6 +299,23 @@ function saveCandidatesAndSyncExcel() {
         }
       }
     } catch (snapErr) {}
+
+    // 4. Background Sync to MongoDB Atlas (Cloud Permanent Storage)
+    if (candidatesCollection && syncToMongo) {
+      Promise.resolve().then(async () => {
+        try {
+          for (const c of candidates) {
+            await candidatesCollection.updateOne(
+              { phone: c.phone },
+              { $set: { ...c, _id: c.id } },
+              { upsert: true }
+            );
+          }
+        } catch (mErr) {
+          console.warn('⚠️ [MongoDB] Background sync notice:', mErr.message);
+        }
+      });
+    }
 
     // 2. Format data for Excel Export
     const excelRows = candidates.map((c, index) => {
@@ -339,6 +404,11 @@ function saveCandidatesAndSyncExcel() {
 // Initial Load
 loadCandidates();
 saveCandidatesAndSyncExcel();
+if (process.env.MONGODB_URI || process.env.MONGO_URL) {
+  initMongoDb().catch(err => {
+    console.warn('⚠️ [MongoDB Atlas] Startup connection error:', err.message);
+  });
+}
 
 /**
  * Get Hiring Pipeline Statistics
@@ -1389,6 +1459,14 @@ function deleteCandidate(candidateIdOrPhone) {
   const deleted = candidates.splice(index, 1)[0];
   if (deleted && deleted.phone) {
     saveDeletedPhone(deleted.phone);
+    if (candidatesCollection) {
+      candidatesCollection.deleteOne({
+        $or: [
+          { id: deleted.id },
+          { phone: deleted.phone }
+        ]
+      }).catch(err => console.warn('⚠️ [MongoDB] Delete notice:', err.message));
+    }
   }
   saveCandidatesAndSyncExcel();
   return deleted;
@@ -1411,6 +1489,7 @@ function restoreFromBackup(importedCandidates) {
 }
 
 module.exports = {
+  initMongoDb,
   setHiringIo,
   loadCandidates,
   getCandidates: () => {
