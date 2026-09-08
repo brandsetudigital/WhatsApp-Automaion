@@ -943,6 +943,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Restore Database Backup Handler
+  const restoreBackupBtn = document.getElementById('restoreBackupBtn');
+  const backupFileInput = document.getElementById('backupFileInput');
+
+  if (restoreBackupBtn && backupFileInput) {
+    restoreBackupBtn.addEventListener('click', () => {
+      backupFileInput.click();
+    });
+
+    backupFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!confirm(`Restore candidates & chat history from "${file.name}"? Existing data will be safely merged without losing current chats.`)) {
+        backupFileInput.value = '';
+        return;
+      }
+
+      try {
+        const text = await file.text();
+        const json = JSON.parse(text);
+        const res = await fetch('/api/hiring/backup/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(json)
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert(`✅ ${result.message || 'Database restored and merged successfully!'}`);
+          loadCandidates();
+          appendLog('success', `Database restored from ${file.name}`);
+        } else {
+          alert(`❌ Restore error: ${result.error || 'Failed to import backup'}`);
+        }
+      } catch (parseErr) {
+        alert(`❌ Invalid JSON file: ${parseErr.message}`);
+      } finally {
+        backupFileInput.value = '';
+      }
+    });
+  }
+
+
   // Schedule Modal Event Listeners
   if (closeScheduleModal) closeScheduleModal.addEventListener('click', () => scheduleModal.style.display = 'none');
   if (cancelScheduleBtn) cancelScheduleBtn.addEventListener('click', () => scheduleModal.style.display = 'none');

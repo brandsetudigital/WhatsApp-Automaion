@@ -29,4 +29,9 @@ router.delete('/candidate/:id', hiringController.deleteCandidate);
 // Export Live Excel File
 router.get('/export-excel', hiringController.exportExcel);
 
+// Database JSON Backup Download & Restore
+router.get('/backup/export', hiringController.exportBackupJson);
+router.post('/backup/import', hiringController.importBackupJson);
+
 module.exports = router;
+

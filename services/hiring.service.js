@@ -3,55 +3,254 @@ const path = require('path');
 const xlsx = require('xlsx');
 const whatsappCloudService = require('./whatsappCloud.service');
 
-const CANDIDATES_JSON_FILE = path.join(__dirname, '..', 'candidates_data.json');
-const CANDIDATES_EXCEL_FILE = path.join(__dirname, '..', 'candidates_hiring.xlsx');
+// Persistent storage directory (supports Render/Railway disks via DATA_DIR)
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(__dirname, '..');
+if (!fs.existsSync(DATA_DIR)) {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  } catch (e) {
+    console.error('Error creating DATA_DIR:', e.message);
+  }
+}
+
+const CANDIDATES_JSON_FILE = path.join(DATA_DIR, 'candidates_data.json');
+const CANDIDATES_BACKUP_FILE = path.join(DATA_DIR, 'candidates_data.backup.json');
+const CANDIDATES_EXCEL_FILE = path.join(DATA_DIR, 'candidates_hiring.xlsx');
+const DELETED_PHONES_FILE = path.join(DATA_DIR, 'deleted_candidates.json');
+const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
+
+if (!fs.existsSync(BACKUPS_DIR)) {
+  try {
+    fs.mkdirSync(BACKUPS_DIR, { recursive: true });
+  } catch (e) {}
+}
 
 let candidates = [];
 let ioInstance = null;
+let lastSnapshotHour = '';
 
 function setHiringIo(io) {
   ioInstance = io;
 }
 
 /**
- * Load candidates from JSON storage
+ * Get list of permanently deleted candidate phone numbers
  */
-function loadCandidates() {
-  if (fs.existsSync(CANDIDATES_JSON_FILE)) {
-    try {
-      const data = fs.readFileSync(CANDIDATES_JSON_FILE, 'utf8');
-      const loaded = JSON.parse(data);
-      if (Array.isArray(loaded)) {
-        candidates = loaded.filter(c => {
-          const name = (c.name || '').trim().toLowerCase();
-          if (name === 'candidate' || name === 'customer' || name === '') return false;
-          if (name.includes('dainik bhaskar') || name.includes('news') || name.includes('bct consulting') || name.includes('web developer')) return false;
-          if (['ritz', 'bhumi', 'abhi', 'sunshine ✨', 'manuuu😎', 'ultramodern technologies pvt ltd', 'rounak jain', 'rahul indore', 'priyanshu', 'viney dubey hr'].includes(name)) return false;
-          return true;
-        });
-
-        candidates.forEach(candidate => {
-          if (candidate.unreadCount === undefined) {
-            candidate.unreadCount = 0;
-          }
-        });
+function getDeletedPhones() {
+  try {
+    if (fs.existsSync(DELETED_PHONES_FILE)) {
+      const content = fs.readFileSync(DELETED_PHONES_FILE, 'utf8');
+      const list = JSON.parse(content);
+      if (Array.isArray(list)) {
+        return list.map(p => cleanPhone(p)).filter(Boolean);
       }
-    } catch (err) {
-      console.error('Error reading candidates_data.json:', err);
-      candidates = [];
     }
-  } else {
-    candidates = [];
+  } catch (e) {
+    console.error('Error reading deleted_candidates.json:', e.message);
+  }
+  return [];
+}
+
+/**
+ * Record a candidate phone as permanently deleted
+ */
+function saveDeletedPhone(phone) {
+  try {
+    const cleaned = cleanPhone(phone);
+    if (!cleaned) return;
+    const list = getDeletedPhones();
+    if (!list.includes(cleaned)) {
+      list.push(cleaned);
+      fs.writeFileSync(DELETED_PHONES_FILE, JSON.stringify(list, null, 2), 'utf8');
+    }
+  } catch (e) {
+    console.error('Error saving deleted phone:', e.message);
   }
 }
 
 /**
- * Save candidates to JSON and generate Excel file
+ * Remove a phone from deleted list (if re-allowing candidate)
+ */
+function removeDeletedPhone(phone) {
+  try {
+    const cleaned = cleanPhone(phone);
+    if (!cleaned) return;
+    let list = getDeletedPhones();
+    list = list.filter(p => p !== cleaned);
+    fs.writeFileSync(DELETED_PHONES_FILE, JSON.stringify(list, null, 2), 'utf8');
+  } catch (e) {
+    console.error('Error removing deleted phone:', e.message);
+  }
+}
+
+/**
+ * Safely merge two candidate lists by phone, preserving chat history and latest statuses
+ */
+function mergeCandidates(primary, secondary) {
+  const map = new Map();
+  const deletedPhones = new Set(getDeletedPhones());
+
+  const addOrMerge = (c) => {
+    if (!c) return;
+    const phoneKey = c.phone ? cleanPhone(c.phone) : (c.id || Math.random().toString());
+    if (deletedPhones.has(phoneKey)) return;
+
+    // Filter spam/garbage names
+    const name = (c.name || '').trim().toLowerCase();
+    if (name === 'candidate' || name === 'customer' || name === '') return;
+    if (name.includes('dainik bhaskar') || name.includes('news') || name.includes('bct consulting') || name.includes('web developer')) return;
+    if (['ritz', 'bhumi', 'abhi', 'sunshine ✨', 'manuuu😎', 'ultramodern technologies pvt ltd', 'rounak jain', 'rahul indore', 'priyanshu', 'viney dubey hr'].includes(name)) return;
+
+    if (!map.has(phoneKey)) {
+      map.set(phoneKey, {
+        ...c,
+        unreadCount: c.unreadCount || 0,
+        chatHistory: Array.isArray(c.chatHistory) ? [...c.chatHistory] : []
+      });
+    } else {
+      const existing = map.get(phoneKey);
+      const existingTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+      const newTime = new Date(c.updatedAt || c.createdAt || 0).getTime();
+
+      // Merge chat messages without duplicate duplicates
+      const chatMap = new Map();
+      const addMsg = (m) => {
+        if (!m || !m.text) return;
+        const ts = m.timestamp ? new Date(m.timestamp).toISOString().substring(0, 16) : '';
+        const msgKey = `${m.role || 'user'}_${ts}_${(m.text || '').trim()}`;
+        if (!chatMap.has(msgKey)) {
+          chatMap.set(msgKey, m);
+        }
+      };
+
+      (existing.chatHistory || []).forEach(addMsg);
+      (c.chatHistory || []).forEach(addMsg);
+
+      const mergedChat = Array.from(chatMap.values()).sort((m1, m2) => {
+        return new Date(m1.timestamp || 0).getTime() - new Date(m2.timestamp || 0).getTime();
+      });
+
+      const base = newTime >= existingTime ? c : existing;
+      const fallback = newTime >= existingTime ? existing : c;
+
+      map.set(phoneKey, {
+        ...base,
+        name: (base.name && base.name !== 'Candidate' ? base.name : fallback.name) || 'Candidate',
+        role: (base.role && base.role !== 'General Applicant' ? base.role : fallback.role) || 'General Applicant',
+        experience: base.experience || fallback.experience || '',
+        portfolio: base.portfolio || fallback.portfolio || '',
+        resumeReceived: Boolean(base.resumeReceived || fallback.resumeReceived),
+        resumeFileName: base.resumeFileName || fallback.resumeFileName || '',
+        interviewDateTime: base.interviewDateTime || fallback.interviewDateTime || null,
+        status: (base.status && base.status !== 'Applied' ? base.status : fallback.status) || 'Applied',
+        unreadCount: Math.max(existing.unreadCount || 0, c.unreadCount || 0),
+        chatHistory: mergedChat.slice(-100),
+        lastMessage: mergedChat.length > 0 ? mergedChat[mergedChat.length - 1].text : (base.lastMessage || fallback.lastMessage || '')
+      });
+    }
+  };
+
+  (primary || []).forEach(addOrMerge);
+  (secondary || []).forEach(addOrMerge);
+
+  return Array.from(map.values());
+}
+
+/**
+ * Load candidates with smart merge across primary JSON, backup mirror, and snapshot archives
+ */
+function loadCandidates() {
+  let primaryList = [];
+  let backupList = [];
+
+  // 1. Read Primary File
+  if (fs.existsSync(CANDIDATES_JSON_FILE)) {
+    try {
+      const data = fs.readFileSync(CANDIDATES_JSON_FILE, 'utf8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) primaryList = parsed;
+    } catch (err) {
+      console.error('Error reading primary candidates_data.json:', err.message);
+    }
+  }
+
+  // 2. Read Mirror Backup File
+  if (fs.existsSync(CANDIDATES_BACKUP_FILE)) {
+    try {
+      const bData = fs.readFileSync(CANDIDATES_BACKUP_FILE, 'utf8');
+      const bParsed = JSON.parse(bData);
+      if (Array.isArray(bParsed)) backupList = bParsed;
+    } catch (bErr) {
+      console.error('Error reading backup candidates file:', bErr.message);
+    }
+  }
+
+  // 3. If primary was wiped or missing, recover from latest snapshot in backups/
+  if (primaryList.length === 0 && fs.existsSync(BACKUPS_DIR)) {
+    try {
+      const files = fs.readdirSync(BACKUPS_DIR)
+        .filter(f => f.endsWith('.json'))
+        .sort()
+        .reverse();
+      if (files.length > 0) {
+        const latestSnapshot = path.join(BACKUPS_DIR, files[0]);
+        const sData = fs.readFileSync(latestSnapshot, 'utf8');
+        const sParsed = JSON.parse(sData);
+        if (Array.isArray(sParsed)) {
+          backupList = [...backupList, ...sParsed];
+          console.log(`📦 Restored candidates from backup snapshot: ${files[0]} (${sParsed.length} records)`);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // 4. Merge candidates safely (preventing data loss on server redeploys)
+  candidates = mergeCandidates(primaryList, backupList);
+
+  candidates.forEach(candidate => {
+    if (candidate.unreadCount === undefined) {
+      candidate.unreadCount = 0;
+    }
+  });
+
+  console.log(`📋 Candidates Loaded: ${candidates.length} active candidates in pipeline.`);
+
+  // Auto-sync back to primary and mirror backup if we recovered data
+  if (candidates.length > 0 && (!fs.existsSync(CANDIDATES_JSON_FILE) || primaryList.length === 0)) {
+    saveCandidatesAndSyncExcel();
+  }
+}
+
+/**
+ * Save candidates to JSON, Mirror Backup, Hourly Snapshot, and Excel file
  */
 function saveCandidatesAndSyncExcel() {
   try {
-    // 1. Save JSON
-    fs.writeFileSync(CANDIDATES_JSON_FILE, JSON.stringify(candidates, null, 2));
+    const jsonStr = JSON.stringify(candidates, null, 2);
+
+    // 1. Save Primary JSON
+    fs.writeFileSync(CANDIDATES_JSON_FILE, jsonStr, 'utf8');
+
+    // 2. Save Redundant Mirror Backup
+    fs.writeFileSync(CANDIDATES_BACKUP_FILE, jsonStr, 'utf8');
+
+    // 3. Hourly Snapshot in backups/ (keeps last 10 snapshots)
+    try {
+      const currentHour = new Date().toISOString().substring(0, 13);
+      if (currentHour !== lastSnapshotHour) {
+        lastSnapshotHour = currentHour;
+        const snapshotFile = path.join(BACKUPS_DIR, `candidates_${currentHour.replace(/[^0-9]/g, '_')}.json`);
+        fs.writeFileSync(snapshotFile, jsonStr, 'utf8');
+
+        const allSnapshots = fs.readdirSync(BACKUPS_DIR)
+          .filter(f => f.startsWith('candidates_') && f.endsWith('.json'))
+          .sort();
+        while (allSnapshots.length > 10) {
+          const oldFile = path.join(BACKUPS_DIR, allSnapshots.shift());
+          fs.unlinkSync(oldFile);
+        }
+      }
+    } catch (snapErr) {}
 
     // 2. Format data for Excel Export
     const excelRows = candidates.map((c, index) => {
@@ -197,9 +396,9 @@ function appendChatHistory(candidate, role, text) {
     candidate.unreadCount = (Number(candidate.unreadCount) || 0) + 1;
   }
 
-  // Keep last 20 messages for memory efficiency
-  if (candidate.chatHistory.length > 20) {
-    candidate.chatHistory = candidate.chatHistory.slice(-20);
+  // Keep last 100 messages for full context
+  if (candidate.chatHistory.length > 100) {
+    candidate.chatHistory = candidate.chatHistory.slice(-100);
   }
 }
 
@@ -1188,8 +1387,27 @@ function deleteCandidate(candidateIdOrPhone) {
     return false;
   }
   const deleted = candidates.splice(index, 1)[0];
+  if (deleted && deleted.phone) {
+    saveDeletedPhone(deleted.phone);
+  }
   saveCandidatesAndSyncExcel();
   return deleted;
+}
+
+/**
+ * Restore or import candidates from a JSON backup, safely merging records
+ */
+function restoreFromBackup(importedCandidates) {
+  if (!Array.isArray(importedCandidates)) return 0;
+  candidates = mergeCandidates(candidates, importedCandidates);
+  saveCandidatesAndSyncExcel();
+  if (ioInstance) {
+    ioInstance.emit('hiring:update', {
+      candidates: candidates,
+      stats: getHiringStats()
+    });
+  }
+  return candidates.length;
 }
 
 module.exports = {
@@ -1209,6 +1427,7 @@ module.exports = {
   },
   getHiringStats,
   saveCandidatesAndSyncExcel,
+  restoreFromBackup,
   trackCandidateFromMessage,
   appendChatHistory,
   markCandidateMessagesRead,
@@ -1227,6 +1446,13 @@ module.exports = {
   handleHrWhatsAppCommand,
   sendMessageToCandidate,
   deleteCandidate,
-  CANDIDATES_EXCEL_FILE
+  getDeletedPhones,
+  saveDeletedPhone,
+  removeDeletedPhone,
+  CANDIDATES_JSON_FILE,
+  CANDIDATES_BACKUP_FILE,
+  CANDIDATES_EXCEL_FILE,
+  DELETED_PHONES_FILE
 };
+
 

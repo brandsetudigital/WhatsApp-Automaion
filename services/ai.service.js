@@ -280,8 +280,8 @@ function isArrivalStatusMessage(rawText) {
  */
 function isGreetingMessage(rawText) {
   if (!rawText) return false;
-  const clean = String(rawText).toLowerCase().replace(/[^a-z\s]/g, '').trim();
-  return /^(?:hi|hii|hiii|hiiii|hello|helo|hey|heyy|namaste|namaskar|good\s*morning|good\s*afternoon|good\s*evening)$/i.test(clean);
+  const clean = String(rawText).toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  return /^(?:hi|hii|hiii|hiiii|hello|helo|hey|heyy|namaste|namaskar|good\s*morning|good\s*afternoon|good\s*evening)(?:\s+(?:sir|maam|madam|mam|bro|team|brandsetu))?$/i.test(clean);
 }
 
 /**
@@ -1304,6 +1304,9 @@ module.exports = {
   isOffTopicMessage,
   isPartTimeQuery,
   isAdInquiryMessage,
+  isGreetingMessage,
+  isDocumentQuery,
+  isArrivalStatusMessage,
   getOffTopicBoundaryResponse,
   getOffTopicWarningResponse,
   detectLanguage

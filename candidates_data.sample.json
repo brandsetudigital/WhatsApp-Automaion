@@ -1,0 +1,33 @@
+[
+  {
+    "id": "cand_sample_01",
+    "phone": "919999999999",
+    "whatsappChatId": null,
+    "name": "Sample Candidate",
+    "role": "Video Editor",
+    "city": "Indore",
+    "lang": "hinglish",
+    "experience": "Experienced (Full-Time)",
+    "portfolio": "https://drive.google.com/sample",
+    "resumeReceived": true,
+    "resumeFileName": "sample_resume.pdf",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "Sample candidate template",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-08T10:00:00.000Z",
+    "updatedAt": "2026-09-08T10:00:00.000Z",
+    "lastMessage": "Hello, applying for Video Editor",
+    "unreadCount": 0,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello, applying for Video Editor",
+        "timestamp": "2026-09-08T10:00:00.000Z"
+      }
+    ]
+  }
+]

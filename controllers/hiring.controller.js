@@ -162,6 +162,40 @@ async function sendCandidateMessage(req, res) {
   }
 }
 
+function exportBackupJson(req, res) {
+  try {
+    hiringService.saveCandidatesAndSyncExcel();
+    const backupData = hiringService.getCandidates();
+    const dateStr = new Date().toISOString().split('T')[0];
+    const filename = `brandsetu_candidates_backup_${dateStr}.json`;
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(JSON.stringify(backupData, null, 2));
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+function importBackupJson(req, res) {
+  try {
+    let importedData = null;
+    if (req.body && Array.isArray(req.body)) {
+      importedData = req.body;
+    } else if (req.body && req.body.candidates && Array.isArray(req.body.candidates)) {
+      importedData = req.body.candidates;
+    }
+
+    if (!Array.isArray(importedData)) {
+      return res.status(400).json({ success: false, error: 'Invalid backup format. Must be an array of candidates.' });
+    }
+
+    const count = hiringService.restoreFromBackup(importedData);
+    res.json({ success: true, message: `Successfully restored and merged ${count} candidates!`, totalCandidates: count });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 module.exports = {
   getCandidates,
   markCandidateMessagesRead,
@@ -171,6 +205,9 @@ module.exports = {
   updateCandidate,
   createCandidate,
   deleteCandidate,
-  exportExcel
+  exportExcel,
+  exportBackupJson,
+  importBackupJson
 };
+
 

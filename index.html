@@ -575,6 +575,13 @@
               <a href="/api/hiring/export-excel" id="exportExcelBtn" class="btn btn-success" download>
                 <i class="fa-solid fa-file-excel"></i> Download Excel (.xlsx)
               </a>
+              <a href="/api/hiring/backup/export" id="backupDownloadBtn" class="btn btn-outline-primary" download title="Download full candidates & chats backup JSON">
+                <i class="fa-solid fa-cloud-arrow-down"></i> Backup JSON
+              </a>
+              <button id="restoreBackupBtn" class="btn btn-outline-warning" title="Restore or merge candidates from backup JSON">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Restore JSON
+              </button>
+              <input type="file" id="backupFileInput" accept=".json" style="display: none;">
               <button id="addCandidateBtn" class="btn btn-primary">
                 <i class="fa-solid fa-user-plus"></i> Add Candidate
               </button>

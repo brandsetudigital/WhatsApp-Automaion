@@ -6,3 +6,10 @@ node_modules/
 uploads/
 *.log
 
+# Hiring & Candidate Live Database Persistence
+candidates_data.json
+candidates_data.backup.json
+candidates_hiring.xlsx
+deleted_candidates.json
+backups/
+uploads/backups/
