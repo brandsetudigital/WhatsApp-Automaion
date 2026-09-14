@@ -58,32 +58,29 @@ async function initMongoDb() {
     candidatesCollection = mongoDb.collection(colName);
     console.log(`🍃 [MongoDB Atlas] Connected successfully to "${dbName}" -> "${colName}"!`);
 
-    // Fetch cloud candidates (Single source of truth)
+    // Fetch cloud candidates & safely merge with local candidates (Two-way non-destructive sync)
     const cloudDocs = await candidatesCollection.find({}).toArray();
     if (cloudDocs.length > 0) {
       const cloudCandidates = cloudDocs.map(c => {
         const { _id, ...rest } = c;
         return { ...rest, id: rest.id || String(_id) };
       });
-      candidates = cloudCandidates;
-      console.log(`🍃 [MongoDB Atlas] Synchronized ${cloudDocs.length} candidates from cloud database!`);
-      saveCandidatesAndSyncExcel(false);
+      // Non-destructive merge: preserve both cloud and local records and all chats
+      candidates = mergeCandidates(candidates, cloudCandidates);
+      console.log(`🍃 [MongoDB Atlas] Synchronized & merged ${cloudDocs.length} cloud records with local candidates! Total: ${candidates.length}`);
+      saveCandidatesAndSyncExcel(true);
       if (ioInstance) {
         ioInstance.emit('hiring:update', {
           candidates: candidates,
           stats: getHiringStats()
         });
       }
-    } else {
-      candidates = [];
-      saveCandidatesAndSyncExcel(false);
-      console.log('🍃 [MongoDB Atlas] Cloud database is clean (0 records). Ready for live WhatsApp candidates!');
-      if (ioInstance) {
-        ioInstance.emit('hiring:update', {
-          candidates: candidates,
-          stats: getHiringStats()
-        });
+    } else if (candidates.length > 0) {
+      console.log(`🍃 [MongoDB Atlas] Cloud collection clean. Seeding ${candidates.length} local candidates into cloud collection...`);
+      for (const c of candidates) {
+        await candidatesCollection.updateOne({ phone: c.phone }, { $set: { ...c, _id: c.id } }, { upsert: true });
       }
+      console.log('🍃 [MongoDB Atlas] Cloud collection seeded successfully!');
     }
   } catch (err) {
     console.warn('⚠️ [MongoDB Atlas] Connection notice (falling back to local files):', err.message);
@@ -152,11 +149,9 @@ function mergeCandidates(primary, secondary) {
     const phoneKey = c.phone ? cleanPhone(c.phone) : (c.id || Math.random().toString());
     if (deletedPhones.has(phoneKey)) return;
 
-    // Filter spam/garbage names
+    // Filter known spam entities only (never drop candidates named 'Candidate' or with pending names)
     const name = (c.name || '').trim().toLowerCase();
-    if (name === 'candidate' || name === 'customer' || name === '') return;
-    if (name.includes('dainik bhaskar') || name.includes('news') || name.includes('bct consulting') || name.includes('web developer')) return;
-    if (['ritz', 'bhumi', 'abhi', 'sunshine ✨', 'manuuu😎', 'ultramodern technologies pvt ltd', 'rounak jain', 'rahul indore', 'priyanshu', 'viney dubey hr'].includes(name)) return;
+    if (name.includes('dainik bhaskar') || name.includes('bct consulting') || name.includes('ultramodern technologies')) return;
 
     if (!map.has(phoneKey)) {
       map.set(phoneKey, {
@@ -194,8 +189,11 @@ function mergeCandidates(primary, secondary) {
         ...base,
         name: (base.name && base.name !== 'Candidate' ? base.name : fallback.name) || 'Candidate',
         role: (base.role && base.role !== 'General Applicant' ? base.role : fallback.role) || 'General Applicant',
+        workType: base.workType || fallback.workType || 'Full-Time',
         experience: base.experience || fallback.experience || '',
         portfolio: base.portfolio || fallback.portfolio || '',
+        socialHandle: base.socialHandle || fallback.socialHandle || '',
+        followers: base.followers || fallback.followers || '',
         resumeReceived: Boolean(base.resumeReceived || fallback.resumeReceived),
         resumeFileName: base.resumeFileName || fallback.resumeFileName || '',
         interviewDateTime: base.interviewDateTime || fallback.interviewDateTime || null,
@@ -242,8 +240,8 @@ function loadCandidates() {
     }
   }
 
-  // 3. If primary was wiped or missing, recover from latest snapshot in backups/
-  if (primaryList.length === 0 && fs.existsSync(BACKUPS_DIR)) {
+  // 3. Always check snapshots in backups/ to recover and merge any historical candidates & chats
+  if (fs.existsSync(BACKUPS_DIR)) {
     try {
       const files = fs.readdirSync(BACKUPS_DIR)
         .filter(f => f.endsWith('.json'))
@@ -253,15 +251,14 @@ function loadCandidates() {
         const latestSnapshot = path.join(BACKUPS_DIR, files[0]);
         const sData = fs.readFileSync(latestSnapshot, 'utf8');
         const sParsed = JSON.parse(sData);
-        if (Array.isArray(sParsed)) {
+        if (Array.isArray(sParsed) && sParsed.length > 0) {
           backupList = [...backupList, ...sParsed];
-          console.log(`📦 Restored candidates from backup snapshot: ${files[0]} (${sParsed.length} records)`);
         }
       }
     } catch (e) {}
   }
 
-  // 4. Merge candidates safely (preventing data loss on server redeploys)
+  // 4. Merge candidates safely across all sources (preventing data loss on git pull, git push, or redeploys)
   candidates = mergeCandidates(primaryList, backupList);
 
   candidates.forEach(candidate => {
@@ -272,7 +269,7 @@ function loadCandidates() {
 
   console.log(`📋 Candidates Loaded: ${candidates.length} active candidates in pipeline.`);
 
-  // Auto-sync back to primary and mirror backup if we recovered data
+  // Auto-sync back to primary and mirror backup if we merged or recovered data
   if (candidates.length > 0 && (!fs.existsSync(CANDIDATES_JSON_FILE) || primaryList.length === 0)) {
     saveCandidatesAndSyncExcel();
   }
@@ -283,12 +280,24 @@ function loadCandidates() {
  */
 function saveCandidatesAndSyncExcel(syncToMongo = true) {
   try {
+    if (!Array.isArray(candidates) || candidates.length === 0) {
+      if (fs.existsSync(CANDIDATES_JSON_FILE)) {
+        try {
+          const diskData = JSON.parse(fs.readFileSync(CANDIDATES_JSON_FILE, 'utf8'));
+          if (Array.isArray(diskData) && diskData.length > 0) {
+            console.warn('⚠️ [Data Protection] Blocked destructive overwrite: candidates array is empty while on-disk data exists.');
+            return;
+          }
+        } catch (e) {}
+      }
+    }
+
     const jsonStr = JSON.stringify(candidates, null, 2);
 
     // 1. Save Primary JSON
     fs.writeFileSync(CANDIDATES_JSON_FILE, jsonStr, 'utf8');
 
-    // 2. Save Redundant Mirror Backup
+    // 2. Save Redundant Mirror Backup (Untracked by Git, completely safe)
     fs.writeFileSync(CANDIDATES_BACKUP_FILE, jsonStr, 'utf8');
 
     // 3. Hourly Snapshot in backups/ (keeps last 10 snapshots)
@@ -360,9 +369,10 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
         'Candidate Name': c.name || 'Candidate',
         'WhatsApp Phone': c.phone ? `+${c.phone}` : '',
         'Role Applied': c.role || 'Not Specified',
+        'Work Mode': c.workType || 'Full-Time',
         'Interview Mode': c.interviewMode === 'online' ? 'Online (Google Meet)' : 'In-Person (Indore Office)',
         'Resume Received': c.resumeReceived ? 'YES' : 'PENDING',
-        'Portfolio / Drive Link': c.portfolio || '',
+        'Portfolio / Drive / Social Link': c.portfolio || (c.socialHandle ? `Social: ${c.socialHandle} (${c.followers || 'N/A'})` : ''),
         'Candidate Status': c.status || 'Applied',
         'Interview Date & Time': interviewFormatted,
         'Experience': c.experience || '',
@@ -383,12 +393,13 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
       { wch: 6 },  // S.No
       { wch: 20 }, // Name
       { wch: 18 }, // Phone
-      { wch: 18 }, // Role
+      { wch: 22 }, // Role
+      { wch: 16 }, // Work Mode
       { wch: 16 }, // Resume Received
-      { wch: 30 }, // Portfolio Link
+      { wch: 32 }, // Portfolio / Social Link
       { wch: 20 }, // Status
       { wch: 24 }, // Interview Date & Time
-      { wch: 14 }, // Experience
+      { wch: 16 }, // Experience
       { wch: 14 }, // City
       { wch: 22 }, // Resume Reminder
       { wch: 22 }, // Interview Reminder
@@ -621,14 +632,14 @@ function getCandidateSalutation(candidate, lang = 'english') {
 }
 
 /**
- * Welcome & 6 Roles Response (Step 0 -> Step 1: Initial Ad click / Greeting / Inquiry)
+ * Welcome & Roles Response (Step 0 -> Step 1: Initial Ad click / Greeting / Inquiry)
  */
 function getWelcomeRolesReply(lang = 'english') {
   const isHi = (lang === 'hinglish' || lang === 'hindi');
   if (isHi) {
-    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum Indore office ke liye in 6 active roles par hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (1 to 6 number ya role ka naam likhein) 📝`;
+    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum in active positions aur collaborations ke liye onboarding kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* Agar aap kisi anya *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) ke liye apply karna chahte hain, toh aap uska naam bhi likh sakte hain.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Aap **kis position ya collaboration** ke liye apply/connect kar rahe hain? (1 to 7 number ya role ka naam likhein) 📝`;
   }
-  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
+  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝`;
 }
 
 /**
@@ -636,10 +647,33 @@ function getWelcomeRolesReply(lang = 'english') {
  */
 function getRoleSelectedReply(role, lang = 'english') {
   const isHi = (lang === 'hinglish' || lang === 'hindi');
-  if (isHi) {
-    return `Bahut badiya! Aapne *${role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
+
+  // Special Track: Influencer Collaboration
+  if (role === 'Influencer Collaboration' || (role && role.toLowerCase().includes('influencer'))) {
+    return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
   }
-  return `Great! You have selected *${role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
+
+  // Tailored Track: Video Editor
+  if (role === 'Video Editor' || (role && role.toLowerCase().includes('video editor'))) {
+    if (isHi) {
+      return `Bahut badiya! Aapne *Video Editor* select kiya hai. 🎬👍\n\nKripya batayein:\n1️⃣ Aap kaunse software use karte hain? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ Kis type ke videos edit karte hain? (Instagram Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Aap kis work mode ke liye apply kar rahe hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ Aapko kitna experience hai (Fresher / Experienced)? 💼`;
+    }
+    return `Great! You have selected *Video Editor*. 🎬👍\n\nPlease let us know:\n1️⃣ Which software do you use? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ What type of videos do you edit? (Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ How much experience do you have (Fresher / Experienced)? 💼`;
+  }
+
+  // Tailored Track: Other Digital Marketing Roles (Content Writer, Web Developer, etc.)
+  if (role === 'Other Digital Marketing Roles' || (role && (role.toLowerCase().includes('content') || role.toLowerCase().includes('web') || role.toLowerCase().includes('digital marketing') || role.toLowerCase().includes('telecaller')))) {
+    if (isHi) {
+      return `Bahut badiya! Aapne *${role}* select kiya hai. 💼✨\n\nKripya batayein:\n1️⃣ Aapka is field me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aap kis work mode me interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ Aapki core skills aur tools kya hain? 📝`;
+    }
+    return `Great! You have selected *${role}*. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in this field (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ What are your core skills and tools? 📝`;
+  }
+
+  // Standard Openings (Graphic Designer, AI Video, SEO, Social Media, etc.)
+  if (isHi) {
+    return `Bahut badiya! Aapne *${role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher* ke liye apply kar rahe hain ya *Experienced* ke liye? (Agar experienced hain, to kitne time ka experience hai?)\n2️⃣ Aap kis work mode ke liye interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼`;
+  }
+  return `Great! You have selected *${role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼`;
 }
 
 /**
@@ -649,7 +683,11 @@ function getExperienceAnsweredReply(candidate, lang = 'english') {
   const isHi = (lang === 'hinglish' || lang === 'hindi');
   const role = (candidate && candidate.role && candidate.role !== 'General Applicant') ? candidate.role : 'Video Editor';
 
-  if (role === 'AI Video Expert') {
+  if (role === 'Influencer Collaboration' || role.toLowerCase().includes('influencer')) {
+    return isHi
+      ? `Dhanyawad! ✨ Aapki details note kar li gayi hain. Kripya apna Instagram profile link ya insights screenshot yahan share karein, hamari collaboration team aapse jald connect karegi! 🤝`
+      : `Thank you! ✨ Your details have been noted. Please share your Instagram profile link or insights screenshot here, and our collaboration team will connect with you shortly! 🤝`;
+  } else if (role === 'AI Video Expert') {
     return isHi
       ? `Awesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Kling, Midjourney, etc.) ke samples ka *Google Drive link* yahan share karein. 📄🎥`
       : `Awesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
@@ -669,10 +707,14 @@ function getExperienceAnsweredReply(candidate, lang = 'english') {
     return isHi
       ? `Excellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
       : `Excellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
+  } else if (role === 'Video Editor') {
+    return isHi
+      ? `Bahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapke best work samples evaluate kar sakein. 📄🎥`
+      : `Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can evaluate your best work samples. 📄🎥`;
   } else {
     return isHi
-      ? `Bahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
-      : `Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
+      ? `Bahut badiya! 💼 Kripya apna updated *Resume (PDF)* aur past work samples / portfolio / live links yahan share karein taaki hamari team aapki profile review kar sake. 📄✨`
+      : `Great! 💼 Please share your updated *Resume (PDF)* and your past work samples / portfolio / live links here so our team can review your profile. 📄✨`;
   }
 }
 
@@ -734,12 +776,36 @@ function trackCandidateFromMessage(messageData) {
 
   const hasResumeSignal = hasValidDocumentUpload || hasPortfolioLink;
 
-  // Check if candidate is currently awaiting Step 2 (Experience / Fresher qualification)
+  // Check if candidate is currently awaiting Step 2 (Experience / Qualification / Work mode)
   const isAwaitingExperience = candidate && candidate.role && candidate.role !== 'General Applicant' && (!candidate.experience || candidate.experience === '');
 
   const cleanTrimmed = lower.replace(/[^\w\s]/g, '').trim();
   let detectedRole = null;
   let detectedExperience = null;
+
+  // 1. Detect Work Mode preference (Freelancer, Work From Home, Part-Time, Full-Time)
+  let detectedWorkType = null;
+  if (lower.includes('freelance') || lower.includes('freelancer') || lower.includes('freelancing') || lower.includes('project basis')) {
+    detectedWorkType = 'Freelancer';
+  } else if (lower.includes('wfh') || lower.includes('work from home') || lower.includes('remote') || lower.includes('ghar se')) {
+    detectedWorkType = 'Work From Home';
+  } else if (lower.includes('part time') || lower.includes('parttime') || lower.includes('half day') || /(?:\b(?:2|3|4|5)\s*(?:and\s*(?:a\s*)?half\s*)?(?:hr|hrs|hour|hours|ghante|ghanta)\b)/i.test(lower)) {
+    detectedWorkType = 'Part-Time';
+  } else if (lower.includes('full time') || lower.includes('full-time') || lower.includes('fulltime') || lower.includes('in office') || lower.includes('in-office') || lower.includes('onsite')) {
+    detectedWorkType = 'Full-Time';
+  }
+
+  // 2. Detect Influencer details (social handles & followers)
+  let detectedSocialHandle = null;
+  let detectedFollowers = null;
+  const handleMatch = text.match(/(?:@|https?:\/\/(?:www\.)?instagram\.com\/|https?:\/\/(?:www\.)?youtube\.com\/(?:@)?)([A-Za-z0-9._]{3,30})/i);
+  if (handleMatch) {
+    detectedSocialHandle = handleMatch[0];
+  }
+  const followerMatch = text.match(/(\d+(?:\.\d+)?\s*(?:k|m|million|lakh|thousand|followers|subs|subscribers)\b)/i);
+  if (followerMatch) {
+    detectedFollowers = followerMatch[1];
+  }
 
   const expMatch = text.match(/(\d+(?:\.\d+)?\s*(?:year|yr|saal|month|mahine|yrs|mths)\b(?:[^\n,]*experience)?)/i) ||
                    text.match(/(?:experience|exp|experience:)\s*(\d+(?:\.\d+)?(?:\s*(?:year|yr|saal|month|mahine|yrs|mths))?)/i) ||
@@ -749,17 +815,27 @@ function trackCandidateFromMessage(messageData) {
   const isFullTimeOrExp = lower.includes('full time') || lower.includes('full-time') || lower.includes('fulltime') || lower.includes('experienced') || lower.includes('experience');
 
   if (isAwaitingExperience) {
-    // In Step 2, "1" means Fresher (Option 1️⃣), "2" means Experienced (Option 2️⃣)
-    if (cleanTrimmed === '1' || isFresherOrIntern) {
-      detectedExperience = 'Fresher (Paid Internship)';
+    // If candidate replied with Influencer details or Work Mode or Experience
+    if (candidate && candidate.role === 'Influencer Collaboration') {
+      detectedExperience = detectedFollowers ? `${detectedFollowers} followers` : (text.length > 5 ? text.substring(0, 80) : 'Influencer Profile');
+    } else if (cleanTrimmed === '1' || isFresherOrIntern) {
+      detectedExperience = detectedWorkType ? `Fresher (${detectedWorkType})` : 'Fresher (Paid Internship)';
     } else if (cleanTrimmed === '2' || isFullTimeOrExp || expMatch) {
       const rawExp = expMatch ? (expMatch[1] || expMatch[0]) : null;
       const formattedExp = rawExp ? ((rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`) : null;
-      detectedExperience = formattedExp ? (isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp) : 'Experienced (Full-Time)';
+      const baseExp = formattedExp ? (isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp) : 'Experienced';
+      detectedExperience = detectedWorkType ? `${baseExp} [${detectedWorkType}]` : baseExp;
+    } else if (detectedWorkType) {
+      detectedExperience = `Work Mode: ${detectedWorkType}`;
+    } else if (text.length > 3) {
+      detectedExperience = text.substring(0, 80);
     }
   } else {
-    // In Step 1, "1" to "6" or role keywords select the active opening
-    if (cleanTrimmed === '1' || cleanTrimmed.startsWith('1 ') || lower.includes('video editor') || lower.includes('video editing') || lower.includes('reels edit') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
+    // Step 1: Detect Role from options 1 to 7 or keywords
+    if (cleanTrimmed === '7' || cleanTrimmed.startsWith('7 ') || cleanTrimmed === '8' || cleanTrimmed.startsWith('8 ') || lower.includes('influencer') || lower.includes('collab') || lower.includes('collaboration') || lower.includes('creator') || lower.includes('pr package') || lower.includes('brand deal') || lower.includes('sponsorship')) {
+      detectedRole = 'Influencer Collaboration';
+      if (!detectedWorkType) detectedWorkType = 'Influencer Collaboration';
+    } else if (cleanTrimmed === '1' || cleanTrimmed.startsWith('1 ') || lower.includes('video editor') || lower.includes('video editing') || lower.includes('reels edit') || lower.includes('premiere') || lower.includes('after effects') || lower.includes('davinci')) {
       detectedRole = 'Video Editor';
     } else if (cleanTrimmed === '2' || cleanTrimmed.startsWith('2 ') || lower.includes('ai video') || lower.includes('ai reels') || lower.includes('runway') || lower.includes('kling') || lower.includes('midjourney') || lower.includes('pika') || lower.includes('heygen')) {
       detectedRole = 'AI Video Expert';
@@ -769,20 +845,28 @@ function trackCandidateFromMessage(messageData) {
       detectedRole = 'SEO & AEO Expert';
     } else if (cleanTrimmed === '5' || cleanTrimmed.startsWith('5 ') || lower.includes('social media') || lower.includes('smm') || lower.includes('instagram manager') || lower.includes('social manager')) {
       detectedRole = 'Social Media Manager';
-    } else if (cleanTrimmed === '6' || cleanTrimmed.startsWith('6 ') || lower.includes('digital marketing') || lower.includes('performance marketing') || lower.includes('meta ads') || lower.includes('facebook ads') || lower.includes('google ads') || lower.includes('media buyer')) {
+    } else if (cleanTrimmed === '6' || cleanTrimmed.startsWith('6 ') || lower.includes('performance marketing') || lower.includes('media buyer') || lower.includes('meta ads') || lower.includes('facebook ads') || lower.includes('google ads') || (lower.includes('digital marketing') && (lower.includes('manager') || lower.includes('lead') || lower.includes('head')))) {
       detectedRole = 'Digital Marketing Manager';
+    } else if (lower.includes('content writer') || lower.includes('copywriter') || lower.includes('content writing') || lower.includes('blog writer')) {
+      detectedRole = 'Content Writer / Copywriter';
+    } else if (lower.includes('web developer') || lower.includes('website developer') || lower.includes('wordpress') || lower.includes('frontend') || lower.includes('fullstack') || lower.includes('backend') || lower.includes('web development')) {
+      detectedRole = 'Web Developer';
+    } else if (lower.includes('telecaller') || lower.includes('telecalling') || lower.includes('caller') || lower.includes('inside sales') || lower.includes('calling')) {
+      detectedRole = 'Telecaller / Inside Sales';
+    } else if (lower.includes('lead gen') || lower.includes('digital marketing') || lower.includes('marketing')) {
+      detectedRole = 'Other Digital Marketing Roles';
     }
 
-    // Only lock detectedExperience if explicitly stated together with role in this message
-    if (detectedRole && (isFresherOrIntern || isFullTimeOrExp || expMatch)) {
+    // Capture experience if explicitly stated in initial role message
+    if (detectedRole && (isFresherOrIntern || isFullTimeOrExp || expMatch || detectedWorkType)) {
       if (isFresherOrIntern) {
-        detectedExperience = 'Fresher (Paid Internship)';
+        detectedExperience = detectedWorkType ? `Fresher (${detectedWorkType})` : 'Fresher (Paid Internship)';
       } else if (expMatch) {
         const rawExp = expMatch[1] || expMatch[0];
         const formattedExp = (rawExp.includes('year') || rawExp.includes('month') || rawExp.includes('yr')) ? rawExp : `${rawExp} years`;
-        detectedExperience = isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp;
-      } else if (isFullTimeOrExp) {
-        detectedExperience = 'Experienced (Full-Time)';
+        detectedExperience = detectedWorkType ? `${formattedExp} [${detectedWorkType}]` : (isFullTimeOrExp ? `Full-Time (${formattedExp})` : formattedExp);
+      } else if (isFullTimeOrExp || detectedWorkType) {
+        detectedExperience = detectedWorkType ? `Preferred: ${detectedWorkType}` : 'Experienced';
       }
     }
   }
@@ -846,10 +930,13 @@ function trackCandidateFromMessage(messageData) {
       whatsappChatId: messageData.chatId || null,
       name: initialName,
       role: detectedRole || 'General Applicant',
+      workType: detectedWorkType || (detectedRole === 'Influencer Collaboration' ? 'Influencer Collaboration' : 'Full-Time'),
       city: 'Indore',
       lang: msgLang,
       experience: detectedExperience || '',
       portfolio: extractedLink,
+      socialHandle: detectedSocialHandle || '',
+      followers: detectedFollowers || '',
       resumeReceived: hasResumeSignal,
       resumeFileName: msgType === 'document' ? (messageData.messageText || 'Resume Document') : (hasResumeSignal ? 'Portfolio Link' : ''),
       status: hasResumeSignal ? 'Resume Received' : 'Applied',
@@ -868,13 +955,16 @@ function trackCandidateFromMessage(messageData) {
     };
     appendChatHistory(candidate, 'user', text);
     candidates.unshift(candidate);
-    console.log(`📋 New Candidate Registered: ${candidate.name} (+${candidate.phone}) for ${candidate.role} [Lang: ${candidate.lang}]`);
+    console.log(`📋 New Candidate Registered: ${candidate.name} (+${candidate.phone}) for ${candidate.role} [WorkType: ${candidate.workType}]`);
   } else {
     // Update existing candidate
     if (messageData.chatId) candidate.whatsappChatId = messageData.chatId;
     candidate.updatedAt = nowIso;
     candidate.lastMessage = text;
     if (text) candidate.lang = msgLang;
+    if (detectedWorkType) candidate.workType = detectedWorkType;
+    if (detectedSocialHandle) candidate.socialHandle = detectedSocialHandle;
+    if (detectedFollowers) candidate.followers = detectedFollowers;
     appendChatHistory(candidate, 'user', text);
 
     if (extractedName && extractedName !== 'Candidate') {

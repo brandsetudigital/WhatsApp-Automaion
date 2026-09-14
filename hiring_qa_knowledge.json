@@ -50,26 +50,40 @@
       "tools": ["Meta Ads Manager", "Google Ads", "GA4", "Funnel Analytics"],
       "scope": "High-ROI Paid Ads on Meta and Google, lead gen, media planning, funnel optimization.",
       "portfolioRequired": "Ad campaign case studies / ROAS track record + PDF Resume"
+    },
+    {
+      "id": 7,
+      "title": "Influencer Collaboration",
+      "tools": ["Instagram", "YouTube", "Content Creation", "Reels"],
+      "scope": "Brand partnerships, paid reels, barter deals, and content creator campaigns.",
+      "portfolioRequired": "Instagram/YouTube profile link, follower count, content niche & audience insights"
+    },
+    {
+      "id": 8,
+      "title": "Other Digital Marketing Roles (In Description)",
+      "tools": ["Content Writing", "WordPress", "Web Development", "SEO", "Copywriting", "Telecalling", "Lead Gen"],
+      "scope": "Candidates can also apply for any other digital marketing profiles mentioned in description.",
+      "portfolioRequired": "Work samples / live links / portfolio + PDF Resume"
     }
   ],
   "frequentlyAskedQuestions": [
     {
       "topic": "Salary & Stipend",
       "triggers": ["salary", "package", "stipend", "kitna milega", "ctc", "per month", "pay"],
-      "hinglish": "💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur In-Person Practical Interview* ke basis par decide hoti hai aur interview ke dauraan finalize kar di jayegi. 🤝\n\nKripya apna updated *Resume (PDF)* aur portfolio link share karein taaki hum aapka interview schedule kar sakein. 📄",
-      "english": "💰 *Salary / Compensation Details:*\nSalary and stipend are decided based on your *Experience, Skills, and In-Person Practical Interview performance*, and will be discussed and finalized during the interview. 🤝\n\nPlease share your updated *Resume (PDF)* or portfolio link so we can proceed with scheduling your interview. 📄"
+      "hinglish": "💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur Practical Assessment / Interview* ke basis par decide hoti hai aur discussion ke dauraan finalize kar di jayegi. 🤝\n\nKripya apna updated *Resume (PDF)* aur portfolio link share karein taaki hum aage ka process start karein. 📄",
+      "english": "💰 *Salary / Compensation Details:*\nSalary and stipend are decided based on your *Experience, Skills, and Practical Assessment / Interview performance*, and will be discussed and finalized during the process. 🤝\n\nPlease share your updated *Resume (PDF)* or portfolio link so we can proceed. 📄"
     },
     {
       "topic": "Work From Home (WFH) / Remote",
       "triggers": ["wfh", "work from home", "remote", "ghar se", "online job"],
-      "hinglish": "🏢 Yeh position strictly **Onsite In-Office** role hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office me full-time kaam karne ke liye comfortable hain, toh kripya apna **Resume (PDF)** yahan share karein. 👍",
-      "english": "🏢 This is strictly an **Onsite In-Office** position at our Indore office (*103 Orange Business Park, Bhawarkua*). We currently do not offer remote or work-from-home options.\n\nIf you are available to work from our Indore office, please share your updated **Resume (PDF)** to proceed. 👍"
+      "hinglish": "💻 *Work From Home (WFH) / Remote:*\nHaan bilkul! Hamare yahan **Work From Home (WFH) / Remote** aur **Freelancer** roles ke liye bhi candidates onboard kiye jaate hain. ✨\n\nKripya batayein aap kis role me WFH chahte hain aur apna updated **Resume (PDF)** aur portfolio / Google Drive link share karein! 👍",
+      "english": "💻 *Work From Home (WFH) / Remote:*\nYes, absolutely! We onboard candidates for **Work From Home (WFH) / Remote** and **Freelancer** roles as well. ✨\n\nPlease let us know which role you are seeking WFH in, and share your updated **Resume (PDF)** and portfolio / Google Drive link to proceed! 👍"
     },
     {
-      "topic": "Part-Time & Short Hours (2-3 hrs/day)",
-      "triggers": ["part time", "part-time", "2 and half hrs", "2 hrs", "3 hrs", "half day", "short time", "2 ghante", "3 ghante", "few hours"],
-      "hinglish": "🏢 Hamare yahan internships aur full-time roles strictly **Full-Time In-Office (10:00 AM se 7:00 PM, Monday to Saturday)** hote hain hamare Indore office (*103 Orange Business Park, Bhawarkua*) me.\n\nFilhal 2-3 ghante ya Part-Time option available nahi hai. Agar aap full-time in-office internship/job ke liye comfortable hain, toh kripya apna updated **Resume (PDF)** share karein! 👍",
-      "english": "🏢 All our internship and job opportunities are strictly **Full-Time In-Office (10:00 AM – 7:00 PM, Monday to Saturday)** at our Indore office (*103 Orange Business Park, Bhawarkua*).\n\nWe currently do not offer part-time (2-3 hours/day) roles. If you are available for a full-time in-office role, please share your updated **Resume (PDF)** to proceed! 👍"
+      "topic": "Part-Time & Freelance",
+      "triggers": ["part time", "part-time", "freelance", "freelancer", "2 and half hrs", "2 hrs", "3 hrs", "half day", "short time", "2 ghante", "3 ghante", "few hours"],
+      "hinglish": "🤝 *Part-Time & Freelancer Details:*\nHaan! Hamare yahan **Freelancer** aur **Part-Time / Flexible hours** ke liye bhi opportunities open hain. 🚀\n\nKripya batayein aap kis role me kaam karna chahte hain aur daily/weekly kitne ghante de sakte hain. Saath hi apna updated **Resume (PDF)** aur best work samples share karein! 👍",
+      "english": "🤝 *Part-Time & Freelancer Details:*\nYes! We offer opportunities for **Freelancers** and **Part-Time / Flexible hours** as well. 🚀\n\nPlease let us know which position you want to work in, how many hours per day/week you can dedicate, and share your updated **Resume (PDF)** and work samples! 👍"
     },
     {
       "topic": "Office Location & Address",

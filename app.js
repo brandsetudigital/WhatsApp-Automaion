@@ -716,8 +716,11 @@ document.addEventListener('DOMContentLoaded', () => {
     candidatesTableBody.innerHTML = filtered.map(c => {
       // Role Badge
       let roleClass = 'badge-role-general';
-      if ((c.role || '').toLowerCase().includes('seo')) roleClass = 'badge-role-seo';
-      else if ((c.role || '').toLowerCase().includes('video')) roleClass = 'badge-role-video';
+      const roleLower = (c.role || '').toLowerCase();
+      if (roleLower.includes('influencer')) roleClass = 'badge-role-influencer';
+      else if (roleLower.includes('seo') || roleLower.includes('aeo')) roleClass = 'badge-role-seo';
+      else if (roleLower.includes('video')) roleClass = 'badge-role-video';
+      else if (roleLower.includes('content') || roleLower.includes('web') || roleLower.includes('marketing') || roleLower.includes('graphic')) roleClass = 'badge-role-digital';
 
       // Resume Badge & Links
       let resumeBadge = c.resumeReceived
@@ -769,6 +772,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <span class="badge-role ${roleClass}">${escapeHtml(c.role || 'General')}</span>
+            ${c.workType ? `<div class="text-dim mt-1" style="font-size:0.7rem;"><i class="fa-solid fa-briefcase me-1"></i>${escapeHtml(c.workType)}</div>` : ''}
+            ${c.socialHandle ? `<div class="text-dim mt-1" style="font-size:0.7rem;"><i class="fa-brands fa-instagram me-1 text-warning"></i>${escapeHtml(c.socialHandle)} ${c.followers ? `(${escapeHtml(c.followers)})` : ''}</div>` : ''}
           </td>
           <td>
             <div>${resumeBadge}</div>

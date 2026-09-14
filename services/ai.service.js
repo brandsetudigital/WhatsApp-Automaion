@@ -317,6 +317,24 @@ function isPartTimeQuery(rawText) {
 }
 
 /**
+ * Detect queries about Influencer Collaboration, creator deals, and brand promotions
+ */
+function isInfluencerQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:influencer|creator|collab|collaboration|sponsorship|brand\s*deal|pr\s*package|followers|instagram\s*page|paid\s*reel|barter|promotion)/i.test(text);
+}
+
+/**
+ * Detect queries about Freelance and Work From Home / Remote options
+ */
+function isFreelanceOrWfhQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:freelance|freelancer|freelancing|project\s*basis|wfh|work\s*from\s*home|remote|ghar\s*se|online\s*work|online\s*job)/i.test(text);
+}
+
+/**
  * Detect Meta/Instagram/Facebook ad pre-filled messages and general info queries
  */
 function isAdInquiryMessage(rawText) {
@@ -384,7 +402,9 @@ function isOffTopicMessage(rawText, candidate = null) {
     isNotInterestedMessage(text) ||
     isArrivalStatusMessage(text) ||
     isDocumentQuery(text) ||
-    isPartTimeQuery(text)
+    isPartTimeQuery(text) ||
+    isInfluencerQuery(text) ||
+    isFreelanceOrWfhQuery(text)
   ) {
     return false;
   }
@@ -462,6 +482,8 @@ function isOffTopicMessage(rawText, candidate = null) {
     'react', 'python', 'java', 'node', 'fullstack', 'frontend', 'backend', 'telecaller', 'telecalling',
     'calling', 'caller', 'sales', 'bpo', 'receptionist', 'accountant', 'accounts', 'finance',
     'content', 'writer', 'writing', 'copywriter', 'data entry', 'back office', 'assistant',
+    'influencer', 'collab', 'collaboration', 'creator', 'followers', 'follower', 'sponsorship', 'pr',
+    'freelance', 'freelancer', 'freelancing', 'parttime', 'part-time',
     'naukri', 'recruitment', 'opening', 'opportunity', 'post', 'posts', 'kya', 'kaise', 'batao',
     'bataye', 'bataiye', 'chahiye', 'interested', 'know', 'tell', 'help'
   ];
@@ -929,22 +951,27 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
-  // 1. OTHER ROLE CHECK (Roles not in current 6 active openings e.g. Website Developer, Telecaller, Accountant, etc.)
-  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|telecaller|caller|calling|sales|bpo|receptionist|accountant|data\s*entry)/i;
-  const isExcludedRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media') && !text.includes('digital marketing');
+  // 1. DIGITAL MARKETING & OTHER ROLES CHECK (Content Writer, Web Dev, Telecaller, Media Buyer, etc.)
+  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|telecaller|caller|calling|sales|bpo|receptionist|accountant|data\s*entry|marketing|media\s*buyer|funnel)/i;
+  const isExcludedRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media');
 
   if (isExcludedRole) {
-    let mentionedRole = 'this role';
-    if (text.includes('web') || text.includes('developer')) mentionedRole = 'Website Developer';
-    else if (text.includes('content') || text.includes('writer')) mentionedRole = 'Content Writer';
-    else if (text.includes('telecaller') || text.includes('caller')) mentionedRole = 'Telecaller';
-    else if (text.includes('accountant')) mentionedRole = 'Accountant';
+    let mentionedRole = 'Digital Marketing Role';
+    if (text.includes('web') || text.includes('developer')) mentionedRole = 'Web / Website Developer';
+    else if (text.includes('content') || text.includes('writer') || text.includes('copywriter')) mentionedRole = 'Content Writer / Copywriter';
+    else if (text.includes('telecaller') || text.includes('caller') || text.includes('calling')) mentionedRole = 'Telecaller / Inside Sales';
+    else if (text.includes('accountant')) mentionedRole = 'Accounts / Finance';
 
     if (isHinglish) {
-      return `${prefixHi}Filhal Brand Setu Digital me in 6 active roles ke liye hiring chal rahi hai:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nAbhi hamare paas *${mentionedRole}* ke liye vacancy open nahi hai. Humne aapki details note kar li hain, future opening aane par contact karenge! 👍✨`;
+      return `${prefixHi}Bahut badiya! Brand Setu Digital me *${mentionedRole}* aur digital marketing/creative roles ke liye opportunities open hain. 💼✨\n\nKripya batayein:\n1️⃣ Aapka *${mentionedRole}* me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aap kis work mode me interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nKripya apna updated *Resume (PDF)* aur work samples / links yahan share karein taaki hamari team aapki profile review kar sake. 📄👍`;
     } else {
-      return `${prefixEn}Currently, Brand Setu Digital is actively hiring for these 6 positions:\n🎬 1. Video Editor\n🤖 2. AI Video Expert\n🎨 3. Graphic Designer\n🔎 4. SEO & AEO Expert\n📱 5. Social Media Manager\n📢 6. Digital Marketing Manager\n\nWe do not have active openings for *${mentionedRole}* at the moment. We have saved your profile on file for future opportunities! 👍✨`;
+      return `${prefixEn}Great! At Brand Setu Digital, we welcome applications for *${mentionedRole}* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *${mentionedRole}* (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our team can evaluate your profile. 📄👍`;
     }
+  }
+
+  // 1.5 INFLUENCER COLLABORATION INQUIRY
+  if (isInfluencerQuery(text) || (candidate && candidate.role === 'Influencer Collaboration')) {
+    return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
   }
 
   // 2. OUT OF INDORE / ONLINE GOOGLE MEET INTERVIEW CHECK
@@ -975,9 +1002,9 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   // 4. FAQ: SALARY / STIPEND / PAID INTERNSHIP QUESTIONS
   if (text.includes('salary') || text.includes('package') || text.includes('kitna milega') || text.includes('ctc') || text.includes('stipend') || text.includes('paise') || text.includes('per month') || text.includes('pay') || text.includes('internship') || text.includes('certificate')) {
     if (isHinglish) {
-      return `${prefixHi}💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur In-Person Practical Interview* ke basis par decide hoti hai aur interview ke dauraan bata di jayegi. 🤝\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Kripya apna updated *Resume (PDF)* aur Portfolio link share karein taaki hum interview process aage badha sakein. 📄' : '👉 Aap kis role (1 to 6) ke liye apply karna chahte hain?'))}`;
+      return `${prefixHi}💰 *Salary / Stipend Details:*\nHamare yahan salary / stipend aapke *Experience, Skills aur Practical Assessment / Interview* ke basis par decide hoti hai aur discussion ke dauraan bata di jayegi. 🤝\n\n${candidate.interviewDateTime ? `Aapka interview already scheduled hai for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Kripya apna updated *Resume (PDF)* aur Portfolio link share karein taaki hum process aage badha sakein. 📄' : '👉 Aap kis role ya collaboration ke liye apply karna chahte hain?'))}`;
     } else {
-      return `${prefixEn}💰 *Salary / Compensation Details:*\nSalary / stipend is decided based on your *Experience, Skills, and In-Person Practical Interview*, and will be discussed and finalized during the interview. 🤝\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM* for your interview?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Please share your updated Resume (PDF) or Portfolio link so we can schedule your interview. 📄' : '👉 Which position (1 to 6) would you like to apply for?'))}`;
+      return `${prefixEn}💰 *Salary / Compensation Details:*\nSalary / stipend is decided based on your *Experience, Skills, and Practical Assessment / Interview*, and will be discussed and finalized during the process. 🤝\n\n${candidate.interviewDateTime ? `Your interview is confirmed for: *${interviewFormatted}*.` : (candidate.resumeReceived ? '👉 Are you available to visit our Indore office tomorrow morning between *10:00 AM and 12:00 PM* for your interview?' : (candidate.role && candidate.role !== 'General Applicant' ? 'Please share your updated Resume (PDF) or Portfolio link so we can schedule your interview. 📄' : '👉 Which position or collaboration would you like to apply for?'))}`;
     }
   }
 
@@ -993,18 +1020,18 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   // 6. FAQ: WORK FROM HOME / REMOTE
   if (text.includes('wfh') || text.includes('work from home') || text.includes('remote') || text.includes('ghar se')) {
     if (isHinglish) {
-      return `${prefixHi}🏢 Yeh Onsite *In-Office* role hai hamare Indore office (103 Orange Business Park, Bhawarkua) ke liye. Remote ya Work-From-Home option available nahi hai.\n\nAgar aap Indore office visit kar sakte hain to kripya apna *Resume (PDF)* share karein. 👍`;
+      return `${prefixHi}Haan bilkul! Hamare yahan *Work From Home (WFH) / Remote* aur *Freelancer* roles ke liye bhi candidates onboard kiye jaate hain. 💻✨\n\nKripya batayein:\n1️⃣ Aap kis position (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) ke liye WFH chahte hain?\n2️⃣ Aapka is field me kitna experience hai?\n\nKripya apna updated *Resume (PDF)* aur portfolio / Google Drive link share karein taaki hum aage badhein! 📄👍`;
     } else {
-      return `${prefixEn}🏢 This is an Onsite *In-Office* position at our Indore office (103 Orange Business Park, Bhawarkua). We currently do not offer remote/work-from-home options.\n\nIf you are available for an in-office role in Indore, please share your Resume (PDF) or portfolio to proceed. 👍`;
+      return `${prefixEn}Yes, absolutely! We onboard candidates for *Work From Home (WFH) / Remote* and *Freelancer* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which position (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking for WFH in?\n2️⃣ How much experience do you have in this field?\n\nPlease share your updated *Resume (PDF)* and portfolio / Google Drive link so our team can evaluate your profile. 📄👍`;
     }
   }
 
-  // 6.5. FAQ: PART-TIME / LIMITED HOURS (e.g. "2 and half hrs in a day", "2 ghante", "part time")
-  if (isPartTimeQuery(text)) {
+  // 6.5. FAQ: PART-TIME / FREELANCER / LIMITED HOURS
+  if (isPartTimeQuery(text) || text.includes('freelance') || text.includes('freelancer')) {
     if (isHinglish) {
-      return `${prefixHi}🏢 Hamare yahan internships aur full-time roles strictly **Full-Time In-Office (10:00 AM se 7:00 PM, Monday to Saturday)** hote hain hamare Indore office (*103 Orange Business Park, Bhawarkua*) me.\n\nFilhal 2-3 ghante ya Part-Time option available nahi hai. Agar aap full-time in-office internship/job ke liye comfortable hain, toh kripya apna updated **Resume (PDF)** share karein! 👍`;
+      return `${prefixHi}Bahut badiya! Hamare yahan *Freelancer* aur *Part-Time / Flexible hours* ke liye bhi opportunities open hain. 🤝✨\n\nKripya batayein:\n1️⃣ Aap kis role me freelance ya part-time kaam karna chahte hain?\n2️⃣ Aap daily ya weekly kitne hours dedicate kar sakte hain?\n\nKripya apna updated *Resume (PDF)* aur best work samples ka link yahan share karein! 📄🎥`;
     } else {
-      return `${prefixEn}🏢 All our internship and job opportunities are strictly **Full-Time In-Office (10:00 AM – 7:00 PM, Monday to Saturday)** at our Indore office (*103 Orange Business Park, Bhawarkua*).\n\nWe currently do not offer part-time (2-3 hours/day) roles. If you are available for a full-time in-office role, please share your updated **Resume (PDF)** to proceed! 👍`;
+      return `${prefixEn}Great! We offer opportunities for *Freelancers* and *Part-Time / Flexible hours* as well. 🤝✨\n\nPlease let us know:\n1️⃣ Which role are you looking to work freelance or part-time in?\n2️⃣ How many hours per day or week can you dedicate?\n\nPlease share your updated *Resume (PDF)* and your best work samples / portfolio link here! 📄🎥`;
     }
   }
 
@@ -1031,49 +1058,20 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
 
   // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET (Or requested fresh start) ──
   if (!candidate.role || candidate.role === 'General Applicant') {
-    if (isHinglish) {
-      return `${prefixHi}Brand Setu Digital me aapka swagat hai! 🎉\n\nHum Indore office ke liye in 6 active roles par hiring kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Aap **kis position/role** ke liye apply karna chahte hain? (1 to 6 number ya role ka naam likhein) 📝`;
-    } else {
-      return `${prefixEn}Welcome to Brand Setu Digital! 🎉\n\nWe are actively hiring for these 6 positions at our Indore office:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n\n👉 Which **position/role** would you like to apply for? (Please reply with number 1 to 6 or the role name) 📝`;
-    }
+    const hiringService = require('./hiring.service');
+    return `${prefixHi}${hiringService.getWelcomeRolesReply(lang)}`;
   }
 
-  // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER STATUS NOT PROVIDED YET ──
+  // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER / QUALIFICATION NOT PROVIDED YET ──
   if (!candidate.experience || candidate.experience === '') {
-    if (isHinglish) {
-      return `Bahut badiya! Aapne *${candidate.role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher (Paid Internship)* ke liye apply kar rahe hain ya *Experienced (Full-Time Role)* ke liye?\n2️⃣ Agar experienced hain, to aapko kitne time (months/years) ka experience hai? 💼`;
-    } else {
-      return `Great! You have selected *${candidate.role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher (Paid Internship)* or *Experienced (Full-Time Role)*?\n2️⃣ If experienced, how many months/years of experience do you have? 💼`;
-    }
+    const hiringService = require('./hiring.service');
+    return hiringService.getRoleSelectedReply(candidate.role, lang);
   }
 
   // ── STEP 3: EXPERIENCE PROVIDED, BUT RESUME / PORTFOLIO PENDING ──
   if (!candidate.resumeReceived) {
-    if (candidate.role === 'AI Video Expert') {
-      return isHinglish
-        ? `${prefixHi}Awesome! 🤖 Kripya apna updated *Resume (PDF)* aur AI video tools (Runway, Midjourney, Kling, Pika, etc.) ke samples ka *Google Drive link* yahan share karein. 📄🎥`
-        : `${prefixEn}Awesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥`;
-    } else if (candidate.role === 'Graphic Designer') {
-      return isHinglish
-        ? `${prefixHi}Perfect! 🎨 Kripya apna updated *Resume (PDF)* aur *Design Portfolio link (Behance / Drive / Figma)* yahan share karein. 📄🎨`
-        : `${prefixEn}Perfect! 🎨 Please share your updated *Resume (PDF)* and your *Design Portfolio (Behance / Drive / Figma link)* here. 📄🎨`;
-    } else if (candidate.role === 'SEO & AEO Expert') {
-      return isHinglish
-        ? `${prefixHi}Great! 🔎 Kripya apna updated *Resume (PDF)* aur live SEO rankings / case studies details yahan share karein. 📄📊`
-        : `${prefixEn}Great! 🔎 Please share your updated *Resume (PDF)* and your live SEO rankings / case studies proof here. 📄📊`;
-    } else if (candidate.role === 'Social Media Manager') {
-      return isHinglish
-        ? `${prefixHi}Super! 📱 Kripya apna updated *Resume (PDF)* aur past managed social media profiles / growth proof share karein. 📄🚀`
-        : `${prefixEn}Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀`;
-    } else if (candidate.role === 'Digital Marketing Manager') {
-      return isHinglish
-        ? `${prefixHi}Excellent! 📢 Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
-        : `${prefixEn}Excellent! 📢 Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
-    } else {
-      return isHinglish
-        ? `${prefixHi}Bahut badiya! 🎬 Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapka in-person practical interview schedule kar sakein. 📄🎥`
-        : `${prefixEn}Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can schedule your interview. 📄🎥`;
-    }
+    const hiringService = require('./hiring.service');
+    return `${prefixHi}${hiringService.getExperienceAnsweredReply(candidate, lang)}`;
   }
 
   // ── STEP 4: RESUME / PORTFOLIO RECEIVED (Immediate acknowledgment, HR review) ──
@@ -1158,6 +1156,33 @@ You are the professional, friendly HR & Recruitment Coordinator for Brand Setu D
     return getOffTopicBoundaryResponse(lang);
   }
 
+  // 0.5. Fast Deterministic Handlers for Direct Candidate Questions (Guaranteed positive & instantaneous)
+  const isDocOrLink = messageData.messageType === 'document' ||
+    (userMessage && /(?:https?:\/\/|\.pdf\b)/i.test(userMessage));
+
+  if (!isDocOrLink && !candidate.interviewDateTime) {
+    if (isInfluencerQuery(userMessage)) {
+      console.log(`✨ Direct Influencer Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
+      return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
+    }
+
+    if (isPartTimeQuery(userMessage)) {
+      console.log(`⏰ Direct Part-Time Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
+      const isHi = (lang === 'hinglish' || lang === 'hindi');
+      return isHi
+        ? `Haan bilkul! Hamare yahan *Part-Time / Flexible hours* ke liye bhi opportunities available hain. 🤝✨\n\nKripya batayein:\n1️⃣ Aap kis position (Video Editor, Graphic Designer, Social Media, Content Writer, Telecaller, etc.) me part-time kaam karna chahte hain?\n2️⃣ Aap daily kitne hours dedicate kar sakte hain (e.g. 2-4 hours)?\n\nKripya apna updated *Resume (PDF)* aur portfolio / work sample link share karein! 📄👍`
+        : `Yes, absolutely! We offer opportunities for *Part-Time / Flexible hours* as well. 🤝✨\n\nPlease let us know:\n1️⃣ Which role are you looking to work part-time in (Video Editor, Graphic Designer, Social Media, Content Writer, etc.)?\n2️⃣ How many hours per day or week can you dedicate?\n\nPlease share your updated *Resume (PDF)* and your work samples / portfolio link here! 📄👍`;
+    }
+
+    if (isFreelanceOrWfhQuery(userMessage)) {
+      console.log(`💻 Direct Freelance/WFH Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
+      const isHi = (lang === 'hinglish' || lang === 'hindi');
+      return isHi
+        ? `Bahut badiya! Hamare yahan *Freelancer* aur *Work From Home (WFH)* roles ke liye bhi opportunities open hain. 💻✨\n\nKripya batayein:\n1️⃣ Aap kis role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) me freelance / WFH karna chahte hain?\n2️⃣ Aap daily ya weekly kitne hours dedicate kar sakte hain aur aapka kitna experience hai?\n\nKripya apna updated *Resume (PDF)* aur work samples / portfolio link yahan share karein! 📄🎥`
+        : `Great! We welcome candidates for *Freelancer* and *Work From Home (WFH)* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking to work freelance / WFH in?\n2️⃣ How much experience do you have and how many hours can you dedicate?\n\nPlease share your updated *Resume (PDF)* and portfolio / work samples link here! 📄🎥`;
+    }
+  }
+
   const prompt = `
 ${systemInstructions}
 
@@ -1187,49 +1212,66 @@ CRITICAL CONVERSATIONAL & GREETING RULES (MANDATORY):
 5. PORTFOLIO FORMAT REQUIREMENT: Portfolio / work samples must be shared as a valid link (Google Drive, Behance, Figma, YouTube link).
 6. OFF-TOPIC MESSAGES: If the user message is irrelevant to hiring or job positions (e.g. casual chit-chat, personal questions, songs, jokes, loans, weather), politely remind them that this helpline is strictly for BrandSetu Digital recruitment.
 
-STRICT STEP-BY-STEP RECRUITMENT FUNNEL INSTRUCTIONS:
-Follow these 5 sequential qualification steps strictly:
+STRICT STEP-BY-STEP RECRUITMENT & COLLABORATION FUNNEL INSTRUCTIONS:
+Follow these sequential qualification steps strictly:
 
-👉 STEP 1 (If candidate has NOT chosen a role yet):
-Present the 6 active openings:
-1. Video Editor
-2. AI Video Expert
-3. Graphic Designer
-4. SEO & AEO Expert
-5. Social Media Manager
-6. Digital Marketing Manager
-Ask which position (1 to 6) they want to apply for.
+👉 STEP 1 (If candidate has NOT chosen a role or collaboration yet):
+Present the open positions & influencer collaborations:
+1️⃣ 🎬 Video Editor (Reels, YouTube, Commercials)
+2️⃣ 🤖 AI Video Expert (Gen-AI, Runway, Kling, Avatars)
+3️⃣ 🎨 Graphic Designer (Social Media, Branding, Creatives)
+4️⃣ 🔎 SEO & AEO Expert (Search & AI Search Optimization)
+5️⃣ 📱 Social Media Manager (Growth & Strategy)
+6️⃣ 📢 Digital Marketing Manager (Performance Marketing & Ads)
+7️⃣ ✨ Influencer Collaboration!
 
-👉 STEP 2 (If role is chosen, but Experience / Fresher status is not known yet):
-Acknowledge the chosen role and ask:
-1. Are they applying as a Fresher (Paid Internship) or Experienced (Full-Time)?
-2. If experienced, how many months/years of experience do they have?
+Note: Candidates for other Digital Marketing Roles (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) can also apply by mentioning their role.
+Work Modes Available: Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time.
+Ask which position or collaboration they are applying for (reply 1 to 7 or role name).
 
-👉 STEP 3 (If role & experience are known, but Resume / Portfolio is pending):
-Ask for their updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link based on the job requirements.
+👉 STEP 2 (If role is chosen, but Experience / Work Mode / Qualification is pending):
+- If candidate selected 🎬 Video Editor:
+  Ask:
+  1. Which software do they use? (Premiere Pro, After Effects, DaVinci, CapCut)
+  2. What type of video editing do they specialize in? (Reels/Shorts, YouTube, Commercials, Motion Graphics)
+  3. What is their preferred work mode? (Full-Time In-Office / Work From Home / Freelancer / Part-Time)
+  4. Are they Fresher or Experienced?
+- If candidate selected ✨ Influencer Collaboration:
+  Send this exact collaboration onboarding message:
+  "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:"
+  And ask:
+  1. What type/niche of content/videos do they create? (Tech, Lifestyle, Comedy, Fashion, Education, etc.)
+  2. What is their Instagram / YouTube profile handle or link?
+  3. How many followers do they have and what are their average views?
+  4. What type of collaboration do they prefer? (Paid Reel, Barter, Campaign, Brand Ambassador)
+- If candidate selected 💼 Other Digital Marketing Roles (Content Writer, Web Developer, Telecaller, etc.):
+  CRITICAL: NEVER say "hiring nahi hai" or "no vacancy"! Warmly welcome them, ask about their experience, skills/tools, and preferred work mode (Full-Time / WFH / Freelancer / Part-Time).
+- If candidate selected other roles (Graphic Designer, AI Video, SEO, Social Media, Digital Marketing):
+  Ask if Fresher or Experienced, and their preferred work mode (Full-Time / WFH / Freelancer / Part-Time).
 
-👉 STEP 4 (If Resume / Portfolio has just been received, but not reviewed yet):
-- Acknowledge receipt warmly and inform that HR is reviewing:
-  - English: "Thank you for sharing your resume/portfolio! 📄✨ Our HR team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍"
-  - Hinglish: "Aapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨ Hamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍"
+👉 STEP 3 (If role & experience/qualification are known, but Resume / Portfolio is pending):
+- For Influencers: Ask for their Instagram/social media profile link or insights screenshot.
+- For Video Editors: Ask for updated Resume (PDF) + Video Portfolio / Google Drive link of best video edits.
+- For other roles: Ask for updated Resume (PDF) + role-specific work samples / portfolio / Google Drive link.
+
+👉 STEP 4 (If Resume / Portfolio / Social Link has been received, but not reviewed yet):
+- Acknowledge receipt warmly and inform that the team is reviewing:
+  - English: "Thank you for sharing your details! 📄✨ Our team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍"
+  - Hinglish: "Aapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨ Hamari team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aapse connect karenge! 👍"
 - If candidate says NO / Cannot come / Busy for interview:
-  - English: "No problem! Please share your preferred Date and Time (Monday to Saturday, 10:00 AM to 6:00 PM) when you can visit for the interview."
-  - Hinglish: "Koi baat nahi! Aap apni suvidha ke anusaar preferred Date aur Time bata dijiye (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) kab aap interview ke liye aa sakte hain? 📅"
+  - Offer flexible options (e.g. preferred date/time or online Google Meet interview).
 
 👉 STEP 5 (If interview is ALREADY scheduled and confirmed):
-- If candidate sends simple acknowledgment ("ok", "thik h", "haa thik h", "hmm", "done", "yes", "sure", "thanks", "acha"):
-  Reply with a SHORT, friendly closing acknowledgment (e.g. English: "Great! See you at the interview. 👍 All the best! 😊" | Hinglish: "Bahut badiya! Interview me milte hain. 👍 All the best! 😊").
-  DO NOT repeat the entire interview confirmation paragraph or address/time, and DO NOT reschedule!
-- If candidate says they are coming / on the way ("aa raha hu", "gate par hu", "reception"):
-  Welcome them warmly and tell them to check in at the reception (103 Orange Business Park, Bhawarkua).
-- If candidate asks a specific question (documents to bring, directions, salary, JD):
-  Answer ONLY that specific question concisely.
-- NEVER reschedule unless the candidate explicitly gives a new specific time/day to reschedule.
+- If candidate sends simple acknowledgment ("ok", "thik h", "haa thik h", "hmm", "done", "yes", "sure", "thanks"):
+  Reply with a SHORT, friendly closing acknowledgment. DO NOT repeat the full address or reschedule!
+- If candidate asks a specific question (documents to bring, directions, salary): Answer ONLY that specific question concisely.
+- NEVER reschedule unless the candidate explicitly gives a new specific time/day.
 
-- If candidate says "Not interested", "nhi chahiye", "no need", "not looking", "drop", "cancel", "nahi aana": Politely thank them and close the conversation with best wishes. DO NOT offer an interview or provide office address!
-- If candidate asks about Job Description (JD) / Work / Responsibilities: Share the clear, concise job description for their specific applied role (tailored for Fresher Internship or Experienced Full-Time).
-- If candidate asks about Stipend / Salary: Explain clearly that salary/stipend is decided based on candidate's experience, skills, and in-person practical assessment, and will be finalized and communicated during the in-person interview. (Hinglish: "Hamare yahan salary/stipend aapke experience, skills aur in-person interview ke basis par decide hoti hai aur interview me bata di jayegi." | English: "Salary/stipend is decided based on your experience, skills, and in-person interview, and will be finalized during the interview.").
-- If candidate asks about Location / WFH: Explain that this is strictly Onsite In-Office at 103 Orange Business Park, Bhawarkua, Indore.
+CRITICAL POLICIES & SPECIAL QUERY HANDLING:
+- FREELANCER / WORK FROM HOME (WFH) / PART-TIME: NEVER reject! Enthusiastically welcome candidates for Freelance, WFH, and Part-Time across all creative & digital marketing domains. Ask for their role, daily/weekly hours dedication, and request their resume/portfolio.
+- ALL DIGITAL MARKETING ROLES: Candidates can apply for ANY digital marketing related role (SEO, SMM, Content Writer, Copywriter, Web Developer, Ads Specialist, Telecaller, Graphic Designer, Video Editor, Media Buyer). NEVER deny hiring or say "abhi vacancy nahi hai". Talk to them and collect their details and resume.
+- INFLUENCER COLLABORATION: Use the special Influencer Collaboration onboarding form and collect their content niche, handle, follower count, and audience insights.
+- SALARY / STIPEND: State clearly that compensation is evaluated based on experience, skills, and assessment, and discussed during the process.
 - OUTPUT ONLY the direct WhatsApp reply. No thinking, no extra notes.
 
 Direct WhatsApp Message:
@@ -1317,6 +1359,8 @@ module.exports = {
   isAcknowledgementMessage,
   isOffTopicMessage,
   isPartTimeQuery,
+  isInfluencerQuery,
+  isFreelanceOrWfhQuery,
   isAdInquiryMessage,
   isGreetingMessage,
   isDocumentQuery,

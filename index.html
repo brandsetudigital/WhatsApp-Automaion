@@ -563,25 +563,18 @@
       <!-- TAB: Hiring & Interviews Pipeline -->
       <div id="tab-hiring" class="tab-pane">
         <div class="card glass-card mb-4">
-          <div class="card-header flex-between flex-wrap gap-3">
+          <div class="card-header flex-between">
             <div>
               <h3><i class="fa-solid fa-user-tie"></i> Candidates & Interview Pipeline</h3>
               <p class="subtitle">Real-time candidate tracking, 4-hr resume reminders, 1-hr interview alerts & Excel export</p>
             </div>
-            <div class="header-actions flex gap-2">
+            <div class="header-actions">
               <button id="openMobilePreviewBtn" class="btn btn-outline-success">
                 <i class="fa-solid fa-mobile-screen-button"></i> WhatsApp Mobile View
               </button>
               <a href="/api/hiring/export-excel" id="exportExcelBtn" class="btn btn-success" download>
                 <i class="fa-solid fa-file-excel"></i> Download Excel (.xlsx)
               </a>
-              <a href="/api/hiring/backup/export" id="backupDownloadBtn" class="btn btn-outline-primary" download title="Download full candidates & chats backup JSON">
-                <i class="fa-solid fa-cloud-arrow-down"></i> Backup JSON
-              </a>
-              <button id="restoreBackupBtn" class="btn btn-outline-warning" title="Restore or merge candidates from backup JSON">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Restore JSON
-              </button>
-              <input type="file" id="backupFileInput" accept=".json" style="display: none;">
               <button id="addCandidateBtn" class="btn btn-primary">
                 <i class="fa-solid fa-user-plus"></i> Add Candidate
               </button>
@@ -731,6 +724,10 @@
               <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
               <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
               <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
+              <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
+              <option value="Web Developer">💻 Web Developer</option>
+              <option value="Other Digital Marketing Roles">💼 Other Digital Marketing Roles</option>
+              <option value="Influencer Collaboration">✨ Influencer Collaboration</option>
               <option value="General Applicant">General Applicant</option>
             </select>
           </div>
@@ -786,6 +783,10 @@
               <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
               <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
               <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
+              <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
+              <option value="Web Developer">💻 Web Developer</option>
+              <option value="Other Digital Marketing Roles">💼 Other Digital Marketing Roles</option>
+              <option value="Influencer Collaboration">✨ Influencer Collaboration</option>
             </select>
           </div>
           <div class="form-group mb-3">

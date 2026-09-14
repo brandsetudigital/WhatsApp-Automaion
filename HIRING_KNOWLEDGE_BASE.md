@@ -30,7 +30,7 @@
 
 - **Company Name:** Brand Setu Digital
 - **Domain / Industry:** Digital Marketing, AI Media Production, SEO/AEO, Creative Design & Performance Advertising.
-- **Work Mode:** **100% Onsite / In-Office (Indore)**. Remote / Work From Home is NOT available.
+- **Work Mode:** **Flexible Options Available**: Full-Time (In-Office Indore), Work From Home (WFH), Freelancer, and Part-Time.
 - **Office Address:** 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore, Madhya Pradesh 452014.
 - **Working Hours:** Monday to Saturday | 10:00 AM – 7:00 PM (Sundays Off).
 - **Interview Hours:** Monday to Saturday | 10:00 AM – 6:00 PM.
@@ -38,9 +38,9 @@
 
 ---
 
-## 2. Active Job Openings & Requirements (6 Roles)
+## 2. Active Job Openings & Collaborations
 
-| # | Position | Core Responsibilities & Scope | Required Tools / Skills | Portfolio Requirement |
+| # | Position / Track | Core Responsibilities & Scope | Required Tools / Skills | Portfolio / Info Requirement |
 |---|---|---|---|---|
 | **1** | **🎬 Video Editor** | High-retention Instagram Reels, YouTube long-form videos, brand ads, motion graphics, audio syncing, subtitle dynamic animations. | Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro | Video samples / Google Drive link + PDF Resume |
 | **2** | **🤖 AI Video Expert** | AI video generation, prompt engineering, realistic avatars, Kling/Runway/Midjourney workflows for brand commercials. | Midjourney, Runway (Gen-2/3), Kling AI, Luma Dream Machine, Pika, HeyGen, ElevenLabs | AI Video creations / Drive link + PDF Resume |
@@ -48,6 +48,9 @@
 | **4** | **🔎 SEO & AEO Expert** | On-Page & Technical SEO, Answer Engine Optimization (AI search visibility for Perplexity, ChatGPT, Gemini), Google Search Console, Rank tracking. | Ahrefs, SEMrush, Google Search Console, Screaming Frog | Live case studies / Ranking screenshots + PDF Resume |
 | **5** | **📱 Social Media Manager** | Organic profile growth, viral reels strategy, content calendar planning, caption writing, audience engagement across IG/LinkedIn/YouTube. | Meta Business Suite, Canva, Notion, Analytics tools | Past managed handles / Growth case studies + PDF Resume |
 | **6** | **📢 Digital Marketing Manager** | High-ROI Meta Ads & Google Ads campaigns, performance funnel optimization, lead generation, ROAS tracking & client strategy. | Meta Ads Manager, Google Ads, GA4, Funnel Analytics | Ad campaigns track record / ROAS case studies + PDF Resume |
+| **7** | **✨ Influencer Collaboration!** | Content creators on Instagram/YouTube for brand promotions, paid reels, barter deals, and ambassador campaigns. | Instagram, YouTube, Short-form / Long-form video | Content niche, profile link, follower count & audience insights |
+
+> **💼 Note on Other Digital Marketing Roles (In Description):** Candidates applying for other digital marketing profiles (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller / Inside Sales, Media Buyer, etc.) are always welcome. The system never denies hiring and warmly gathers their experience and resume.
 
 ---
 
@@ -56,28 +59,30 @@
 ### Q1. Salary / Stipend / Package
 **Candidate asks:** *"Salary kitni milegi?", "What is the package?", "Is this paid internship?", "Stipend kitna hoga?"*
 
-* **Official Policy:** Salary or stipend is strictly evaluated on the basis of candidate's past experience, practical test, and in-person interview performance. It is finalized during the face-to-face interview.
+* **Official Policy:** Salary or stipend is evaluated on the basis of candidate's past experience, practical assessment, and discussion.
 * **Hinglish Reply:**
   > 💰 *Salary / Stipend Details:*  
-  > Hamare yahan salary / stipend aapke **Experience, Skills aur In-Person Practical Interview** ke basis par decide hoti hai aur interview ke dauraan finalize kar di jayegi. 🤝  
-  > Kripya apna updated **Resume (PDF)** aur portfolio link share karein taaki hum aapka interview schedule kar sakein. 📄
+  > Hamare yahan salary / stipend aapke **Experience, Skills aur Practical Assessment / Interview** ke basis par decide hoti hai aur discussion ke dauraan finalize kar di jayegi. 🤝  
+  > Kripya apna updated **Resume (PDF)** aur portfolio link share karein taaki hum aage ka process start kar sakein. 📄
 * **English Reply:**
   > 💰 *Salary / Compensation Details:*  
-  > Salary and stipend are decided based on your **Experience, Skills, and In-Person Practical Interview performance**, and will be discussed and finalized during the interview. 🤝  
-  > Please share your updated **Resume (PDF)** or portfolio link so we can proceed with scheduling your interview. 📄
+  > Salary and stipend are decided based on your **Experience, Skills, and Practical Assessment / Interview performance**, and will be discussed and finalized during the process. 🤝  
+  > Please share your updated **Resume (PDF)** or portfolio link so we can proceed. 📄
 
 ---
 
-### Q2. Work From Home (WFH) / Remote Work
-**Candidate asks:** *"Kya WFH available hai?", "Can I work remotely / part time?", "Ghar se kaam kar sakte hain?"*
+### Q2. Work From Home (WFH) / Freelancer / Part-Time Work
+**Candidate asks:** *"Kya WFH available hai?", "Can I work remotely / part time / freelance?", "Ghar se kaam kar sakte hain?"*
 
-* **Official Policy:** Strictly in-office onsite at Indore. No permanent remote/WFH option.
+* **Official Policy:** Candidates are welcome to apply for **Full-Time**, **Work From Home (WFH)**, **Freelancer**, or **Part-Time** modes. NEVER reject or deny hiring.
 * **Hinglish Reply:**
-  > 🏢 Yeh position strictly **Onsite In-Office** role hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) ke liye. Remote ya Work-From-Home option available nahi hai.  
-  > Agar aap Indore office me full-time kaam karne ke liye comfortable hain, toh kripya apna **Resume (PDF)** yahan share karein. 👍
+  > 💻 *Work From Home & Freelancer:*  
+  > Haan bilkul! Hamare yahan **Work From Home (WFH) / Remote**, **Freelancer**, aur **Part-Time** roles ke liye bhi candidates onboard kiye jaate hain. ✨  
+  > Kripya batayein aap kis role me interested hain, daily/weekly kitna time de sakte hain, aur apna updated **Resume (PDF)** aur portfolio / Google Drive link share karein! 👍
 * **English Reply:**
-  > 🏢 This is strictly an **Onsite In-Office** position at our Indore office (*103 Orange Business Park, Bhawarkua*). We currently do not offer remote or work-from-home options.  
-  > If you are available to work from our Indore office, please share your updated **Resume (PDF)** to proceed. 👍
+  > 💻 *Work From Home & Freelancer:*  
+  > Yes, absolutely! We onboard candidates for **Work From Home (WFH) / Remote**, **Freelancer**, and **Part-Time** opportunities as well. ✨  
+  > Please let us know which position you are interested in, how many hours you can dedicate, and share your updated **Resume (PDF)** and portfolio / Google Drive link to proceed! 👍
 
 ---
 
