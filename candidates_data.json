@@ -1263,5 +1263,77 @@
     "workType": "Full-Time",
     "socialHandle": "",
     "followers": ""
+  },
+  {
+    "id": "cand_1789376406826_rbx90",
+    "phone": "919876543211",
+    "whatsappChatId": null,
+    "name": "Candidate",
+    "role": "Influencer Collaboration",
+    "workType": "Influencer Collaboration",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Preferred: Influencer Collaboration",
+    "portfolio": "",
+    "socialHandle": "@tech_creator",
+    "followers": "45k",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-14T09:00:06.822Z",
+    "updatedAt": "2026-09-14T09:00:06.822Z",
+    "lastMessage": "Hello, I want to connect for Influencer Collaboration. My instagram is @tech_creator with 45k followers",
+    "justSelectedRole": false,
+    "justAnsweredExperience": true,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello, I want to connect for Influencer Collaboration. My instagram is @tech_creator with 45k followers",
+        "timestamp": "2026-09-14T09:00:06.826Z"
+      }
+    ],
+    "unreadCount": 1
+  },
+  {
+    "id": "cand_1789376406803_4aejc",
+    "phone": "919876543210",
+    "whatsappChatId": null,
+    "name": "Candidate",
+    "role": "Video Editor",
+    "workType": "Freelancer",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Preferred: Freelancer",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Applied",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-14T09:00:06.800Z",
+    "updatedAt": "2026-09-14T09:00:06.800Z",
+    "lastMessage": "Hi I am Rahul, I want to apply for video editor freelance work from home",
+    "justSelectedRole": false,
+    "justAnsweredExperience": true,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hi I am Rahul, I want to apply for video editor freelance work from home",
+        "timestamp": "2026-09-14T09:00:06.803Z"
+      }
+    ],
+    "unreadCount": 1
   }
 ]
