@@ -875,7 +875,7 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   const isHinglish = (lang === 'hinglish' || lang === 'hindi');
 
   // ── 0. NOT INTERESTED / CANCEL / DROP HANDLING ──
-  if (isNotInterestedMessage(text) || candidate.status === 'Not Interested') {
+  if (isNotInterestedMessage(text)) {
     if (isHinglish) {
       return `Humein batane ke liye dhanyawad! Humne aapka status update kar diya hai. Aapke future ke liye best wishes! ✨`;
     } else {

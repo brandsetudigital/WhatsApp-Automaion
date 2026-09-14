@@ -1362,7 +1362,7 @@ function runHiringAutomationCheck() {
 
   candidates.forEach(candidate => {
     // 1. Missing Resume Reminder (After 4 Hours if not received)
-    if (!candidate.resumeReceived && !candidate.resumeReminderSent && candidate.createdAt) {
+    if (!candidate.resumeReceived && !candidate.resumeReminderSent && candidate.status !== 'Not Interested' && candidate.status !== 'Closed' && candidate.createdAt) {
       const createdTime = new Date(candidate.createdAt).getTime();
       const elapsed = now - createdTime;
       if (elapsed >= FOUR_HOURS_MS) {

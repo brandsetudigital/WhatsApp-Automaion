@@ -224,6 +224,7 @@ async function processIncomingWhatsAppMessage(messageData) {
   if (candidate && aiService.isNotInterestedMessage(messageText)) {
     console.log(`🛑 Candidate ${candidate.name} (+${candidate.phone}) marked NOT INTERESTED`);
     candidate.status = 'Not Interested';
+    candidate.closedAt = new Date().toISOString(); // Record time when chat was closed
     candidate.interviewDateTime = null; // Clear any scheduled interview
     candidate.resumeReminderSent = true; // Block future resume reminders
     candidate.interviewReminderSent = true; // Block future interview reminders
@@ -251,13 +252,57 @@ async function processIncomingWhatsAppMessage(messageData) {
     return; // Stop immediately!
   }
 
-  // 1.6 If Candidate is ALREADY Not Interested and sends casual text, ignore
+  // 1.6 If Candidate was previously marked "Not Interested" and reaches back out:
   if (candidate && candidate.status === 'Not Interested') {
-    const isReapply = /(?:apply|restart|start|job|hiring|reopen)/i.test(messageText);
-    if (!isReapply) {
-      console.log(`ℹ️ Ignored casual message from Not Interested candidate: +${customerPhone}`);
+    // A) If it is just a pure closing acknowledgment right after closing (like "🙏🙏", "ok", "thanks"), ignore politely
+    const isPureClosingAck = /^(?:[\u{1F64F}\u{1F64C}\u{1F44D}\u{1F60A}\u{1F642}]+|ok|okay|thank\s*you|thanks|dhanyawad|thik\s*h)$/iu.test(String(messageText).trim());
+    if (isPureClosingAck) {
+      console.log(`ℹ️ Ignored closing acknowledgment from Not Interested candidate: +${customerPhone}`);
       return;
     }
+
+    // B) 24-Hour Cooldown & Re-engagement Check
+    const closedTime = candidate.closedAt ? new Date(candidate.closedAt).getTime() : 0;
+    const hoursSinceClosed = closedTime > 0 ? (Date.now() - closedTime) / (1000 * 60 * 60) : 999;
+    const isExplicitReapply = /(?:job|apply|role|opening|vacancy|hiring|work|start|restart|chahiye|karna\s*hai|reopen)/i.test(messageText);
+    const isGreeting = aiService.isGreetingMessage(messageText);
+
+    // If within 24 hours AND NOT explicitly asking for job or greeting, keep chat closed
+    if (hoursSinceClosed < 24 && !isExplicitReapply && !isGreeting) {
+      console.log(`⏳ Candidate closed recently (${hoursSinceClosed.toFixed(1)}h ago). Keeping chat closed for casual text: "${messageText}"`);
+      return;
+    }
+
+    // C) 24 hours have passed OR candidate proactively greeted / asked to apply! Reactivate profile!
+    console.log(`🔄 Candidate ${candidate.name} (+${candidate.phone}) is RE-ENGAGING after being closed (${hoursSinceClosed.toFixed(1)}h). Reactivating profile...`);
+    candidate.status = candidate.resumeReceived ? 'Resume Received' : (candidate.role && candidate.role !== 'General Applicant' ? 'Resume Pending' : 'Applied');
+    candidate.closedAt = null;
+    candidate.resumeReminderSent = false;
+    candidate.interviewReminderSent = false;
+    candidate.updatedAt = new Date().toISOString();
+
+    const isHi = (candidate.lang === 'hinglish' || candidate.lang === 'hindi' || aiService.detectLanguage(messageText) !== 'english');
+    const candName = (candidate.name && candidate.name !== 'Candidate') ? candidate.name.split(' ')[0] : '';
+    const namePrefix = candName ? `${candName}! ` : '';
+
+    const reactivateMsg = isHi
+      ? `Welcome back ${namePrefix}😊\n\nKya aap Brand Setu Digital me open positions ya collaborations ke liye dobara connect karna chahte hain?\n\nKripya batayein aap kis role ke liye apply karna chahte hain ya hum aapki kya madad kar sakte hain! 👍`
+      : `Welcome back ${namePrefix}😊\n\nAre you looking to explore open positions or collaborations with Brand Setu Digital again?\n\nPlease let us know which position you'd like to apply for or how we can assist you! 👍`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, reactivateMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', reactivateMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (sendErr) {
+      console.error('Error sending reactivate welcome message:', sendErr.message);
+    }
+    return;
   }
 
   // 1.7 If candidate already has an interview scheduled and sends simple acknowledgment ("ok", "thik h", "ok sir")
