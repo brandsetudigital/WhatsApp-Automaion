@@ -1,15 +1,14 @@
 [
-  
   {
     "id": "faq_location",
-    "trigger": "office address, office location, where is office, indore address, company location",
+    "trigger": "office address, office location, where is office, indore address, company location, directions, kahan se aana hai, location bhejo, rasta batao",
     "matchType": "contains",
-    "replyText": "📍 *BrandSetu Digital Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Monday – Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025"
+    "replyText": "📍 *BrandSetu Digital Office Location & Directions:*\nOffice No. 103, 1st Floor, Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n🚶‍♂️ *Directions:* Bhawarkua Main Road par Apple Hospital ke paas Orange Business Park building me 1st Floor (Office No. 103) par aayein.\n\n⏰ *Office Timings:* Monday – Saturday (10:00 AM – 7:00 PM)\n📞 *Help / Calling Numbers:*\n👉 +91 9329232025\n👉 +91 9669765911"
   },
   {
     "id": "faq_contact",
-    "trigger": "contact number, hr phone, hr contact, helpline, call number",
+    "trigger": "contact number, hr phone, hr contact, helpline, call number, calling no, calling number, phone number, call no",
     "matchType": "contains",
-    "replyText": "📞 *BrandSetu Digital HR Contact:*\nPhone / WhatsApp: +91 9329232025 | +91 7389824231\nEmail: contact@brandsetudigital.com\n\nFeel free to connect during office hours (Mon-Sat, 10:00 AM - 7:00 PM)."
+    "replyText": "📞 *BrandSetu Digital HR Calling & Contact Numbers:*\n👉 +91 9329232025\n👉 +91 9669765911\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.)\n📧 *Email:* contact@brandsetudigital.com\n\nOffice aane me ya directions ke liye aap in numbers par directly call ya WhatsApp kar sakte hain (Mon-Sat, 10:00 AM - 7:00 PM)."
   }
 ]

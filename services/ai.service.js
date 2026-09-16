@@ -281,12 +281,168 @@ function isNotInterestedMessage(rawText) {
 }
 
 /**
+ * Detect candidate stating they will call before coming / arriving
+ */
+function isPreArrivalCallNotice(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return (
+    /(?:(?:will|shall|i'll)\s*call(?:\s*you)?\s*(?:before|prior)|call\s*(?:krke|karke|kr k|kar k)?\s*(?:aaunga|aunga|aaungi|aungi|aana|aate|pahuch)|aane\s*se\s*pehle\s*call|pahunchne\s*se\s*pehle\s*call|reach\s*karne\s*se\s*pehle\s*call|call\s*before\s*coming|call\s*before\s*reaching|call\s*before\s*i\s*come)/i.test(text)
+  );
+}
+
+/**
+ * Human pre-arrival call response
+ */
+function getPreArrivalCallResponse(lang = 'hinglish') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `Ji bilkul, sounds good! 👍 Aap aane se pehle hamare helpline numbers par call kar sakte hain:\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nLooking forward to meeting you! All the best! 😊`;
+  }
+  return `Sure, sounds good! 👍 You can call us before leaving or when you are on the way:\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nLooking forward to meeting you! Best of luck! 😊`;
+}
+
+/**
+ * Short, human navigation cue when office address has already been provided
+ */
+function getShortNavigationResponse(lang = 'hinglish') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `Ji, hamara office Orange Business Park (Near Apple Hospital) ke 1st Floor par Office No. 103 hai. Building me pahunch kar reception par Brand Setu Digital ke baare me puchein ya turant call karein:\n👉 *+91 9329232025* / *+91 9669765911* 👍`;
+  }
+  return `Yes, our office is on the 1st Floor (Office No. 103) of Orange Business Park, near Apple Hospital. Check in at the reception or call us directly at:\n👉 *+91 9329232025* / *+91 9669765911* 👍`;
+}
+
+/**
  * Detect candidate arrival or on-the-way status
  */
 function isArrivalStatusMessage(rawText) {
   if (!rawText) return false;
   const text = String(rawText).toLowerCase().trim();
-  return /(?:aa\s*raha|a\s*rha|aa\s*rahi|a\s*rhi|aa\s*rahe|a\s*rhe|pahuch|on\s*the\s*way|coming|i\s*am\s*coming|reception|office\s*ke\s*bahar|office\s*me\s*hu|gate\s*par|pahunch)/i.test(text);
+
+  // Exclude pre-arrival call notice, cancellations, or future scheduled days
+  if (isPreArrivalCallNotice(text)) return false;
+  if (/(?:before\s*coming|not\s*coming|can'?t\s*come|cannot\s*come|kal\b|tomorrow|parso|monday|tuesday|wednesday|thursday|friday|saturday)/i.test(text)) {
+    return false;
+  }
+
+  return /(?:aa\s*raha|a\s*rha|aa\s*rahi|a\s*rhi|aa\s*rahe|a\s*rhe|on\s*the\s*way|i\s*am\s*coming\s*(?:now)?|reception|office\s*ke\s*bahar|office\s*me\s*hu|gate\s*par|pahunch\s*gaya|pahunch\s*gayi|pahuch\s*gaya|pahuch\s*gayi|be\s*there\s*in|there\s*in\s*\d+|reaching\s*in|arriving\s*in|wait\s*\d+\s*min|traffic\s*(?:me|jam)|\b\d{1,2}\s*(?:min|mins|minutes)\b.*(?:aa|pahuch|reach|there)|building\s*ke\s*pass|lift\s*me\s*hu|parking\s*me\s*hu)/i.test(text);
+}
+
+/**
+ * Detect queries about office directions, navigation, address, entry, or requesting HR calling/contact numbers
+ */
+function isOfficeDirectionsOrContactQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+
+  return (
+    // Asking for directions, navigation, entrance, where to come
+    /(?:where\s*(?:i\s*can|can\s*i)\s*come|from\s*where\s*(?:i\s*can|can\s*i)\s*come|how\s*to\s*reach|how\s*can\s*i\s*reach|where\s*is\s*(?:the\s*)?office|guide\s*me\s*(?:from|where|how|to)|directions?|rasta\s*bata|kaise\s*aana\s*hai|kaise\s*aaye|kaise\s*pahuche|kahan\s*se\s*aana\s*hai|entry\s*kahan|gate\s*kahan|gate\s*kaha|kahan\s*par\s*hai|kaha\s*par\s*hai|entrance|which\s*floor|building\s*kahan|apple\s*hospital\s*ke\s*pass\s*kahan)/i.test(text) ||
+    // Can't find office or lost
+    /(?:office\s*n[ahi]+[i]?\s*mil|n[ahi]+[i]?\s*mil\s*raha|cannot\s*find|can'?t\s*find|unable\s*to\s*find|lost|building\s*n[ahi]+[i]?|kahan\s*hai\s*office|kaha\s*hai\s*office|office\s*dhoondh)/i.test(text) ||
+    // Requesting location / map
+    /(?:send\s*location|share\s*location|location\s*(?:bhejo|bhej\s*do|send|share|share\s*karo|de\s*do)|google\s*map|map\s*location|office\s*location|office\s*address|kahan\s*aana\s*hai)/i.test(text) ||
+    // Requesting calling/contact phone number
+    /(?:calling\s*no|calling\s*number|call\s*no|contact\s*no|contact\s*number|phone\s*no|phone\s*number|kisko\s*call|kis\s*no\s*par\s*call|kisse\s*baat|kise\s*call|call\s*karna\s*hai|number\s*de\s*do|no\s*de\s*do|number\s*bhejo|no\s*bhejo|give\s*me\s*calling|need\s*(?:your\s*)?contact|contact\s*details)/i.test(text)
+  );
+}
+
+/**
+ * Standard Office Location, Directions & Calling Numbers response
+ */
+function getOfficeLocationDirectionsResponse(lang = 'hinglish') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `📍 *Brand Setu Digital - Office Location & Help:* 🏢\n\n📌 *Address:*\nOffice No. 103, 1st Floor, Orange Business Park, Bhawarkua Main Road, Near Apple Hospital (Transport Nagar), Indore (M.P.) - 452014\n\n🚶‍♂️ *Office Tak Kaise Pahunchein (Directions):*\n• Bhawarkua Main Road par *Apple Hospital* ke paas *Orange Business Park* building hai.\n• Building me enter karke *Lift / Stairs se 1st Floor (Office No. 103)* par aayein.\n• Reception par Brand Setu Digital ke baare me puchein.\n\n📞 *Agar office dhoondhne ya directions me koi dikkat ho, toh turant in numbers par call karein:*\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nHamari team aapko guide kar degi! See you shortly! 😊👍`;
+  }
+  return `📍 *Brand Setu Digital - Office Location & Contact:* 🏢\n\n📌 *Address:*\nOffice No. 103, 1st Floor, Orange Business Park, Bhawarkua Main Road, Near Apple Hospital (Transport Nagar), Indore (M.P.) - 452014\n\n🚶‍♂️ *How to Reach (Directions):*\n• The office is located in *Orange Business Park* on Bhawarkua Main Road (Near Apple Hospital).\n• Please take the lift/stairs to the *1st Floor (Office No. 103)*.\n• Check in at the reception for Brand Setu Digital.\n\n📞 *If you need any help finding the office or directions, please call us directly:*\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nOur team will assist you! See you shortly! 😊👍`;
+}
+
+/**
+ * Deduplication & Anti-Robotic Engine:
+ * Prevents repeating identical or robotic templates back-to-back.
+ */
+function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
+  if (!candidate || !candidate.chatHistory || candidate.chatHistory.length === 0) {
+    return proposedText;
+  }
+
+  const isEnglish = (candidate.lang === 'english');
+  const recentAssistantMsgs = candidate.chatHistory
+    .filter(m => m.role === 'assistant')
+    .slice(-3)
+    .map(m => (m.text || '').trim());
+
+  if (recentAssistantMsgs.length === 0) {
+    return proposedText;
+  }
+
+  const lastAssistantMsg = recentAssistantMsgs[recentAssistantMsgs.length - 1];
+
+  // 1. Candidate sends simple acknowledgment ("ok", "thik h", "thank you", "ji", "👍")
+  if (isAcknowledgementMessage(userMessage)) {
+    const last2Assistant = recentAssistantMsgs.slice(-2);
+    const hasRecentAck = last2Assistant.some(msg => 
+      msg.includes('Interview me milte hain') ||
+      msg.includes('seeing you at the interview') ||
+      msg.includes('milte hain') ||
+      msg.includes('All the best') ||
+      msg.includes('See you') ||
+      msg.includes('Welcome') ||
+      msg.includes('👍')
+    );
+
+    if (hasRecentAck) {
+      const ackCount = recentAssistantMsgs.filter(msg => 
+        msg.includes('milte hain') || msg.includes('seeing you') || msg.includes('See you') || msg.includes('Welcome') || msg === '👍'
+      ).length;
+
+      if (ackCount >= 2) {
+        return '👍';
+      }
+      return isEnglish ? `You're welcome! See you at the interview. 👍` : `Bilkul! Interview me milte hain. 👍`;
+    }
+  }
+
+  // 2. Candidate asks for directions / office location / entrance
+  if (isOfficeDirectionsOrContactQuery(userMessage)) {
+    const hasSentAddressRecently = recentAssistantMsgs.some(msg =>
+      msg.includes('Orange Business Park') || msg.includes('Apple Hospital') || msg.includes('103 Orange')
+    );
+    if (hasSentAddressRecently) {
+      return getShortNavigationResponse(candidate.lang);
+    }
+  }
+
+  // 3. Exact Duplicate Suppression
+  const normalize = (t) => (t || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+  if (normalize(proposedText) && normalize(proposedText) === normalize(lastAssistantMsg)) {
+    if (isAcknowledgementMessage(userMessage)) {
+      return isEnglish ? `See you then! 👍` : `Bilkul, see you! 👍`;
+    }
+    if (candidate.status === 'Resume Received' || candidate.resumeReceived) {
+      return isEnglish
+        ? `We have your details and our team is reviewing them. We will update you shortly! 👍`
+        : `Aapki details hamare paas hain aur team review kar rahi hai. Hum jald update karenge! 👍`;
+    }
+    if (!candidate.role || candidate.role === 'General Applicant') {
+      return isEnglish
+        ? `Please let us know which role you are interested in so we can proceed. 👍`
+        : `Aap kis role me interested hain kripya batayein taaki hum aage badhein! 👍`;
+    }
+  }
+
+  return proposedText;
+}
+
+/**
+ * Detect requests for Virtual / Online / Remote Interview
+ */
+function isVirtualOrRemoteInterviewQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:virtual(?:\s*mode|\s*interview|\s*call|\s*round)?|online(?:\s*mode|\s*interview|\s*meet|\s*round)?|google\s*meet|zoom|video\s*call|remote(?:ly|\s*only|\s*interview)?|wfh|work\s*from\s*home|indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|ghar\s*se\s*interview)/i.test(text);
 }
 
 /**
@@ -386,6 +542,64 @@ function isAdInquiryMessage(rawText) {
 }
 
 /**
+ * Detect affirmative interest responses (e.g. to bulk outreach campaigns, job broadcasts, or ads)
+ */
+function isHiringInterestMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // Affirmative single words / short replies to outreach
+  const singleAffirmatives = [
+    'yes', 'haan', 'haanji', 'hanji', 'ha', 'ji', 'sure', 'interested', 'intrested',
+    'ok', 'okay', 'ready', 'willing', 'yep', 'yeah', 'yes sir', 'yes maam', 'yes mam',
+    'haan sir', 'haanji sir', 'ji sir', 'ha sir', 'ha ji', 'yes please', 'interested sir'
+  ];
+
+  if (singleAffirmatives.includes(clean)) {
+    return true;
+  }
+
+  const interestPhrases = [
+    'interested',
+    'intrested',
+    'i am interested',
+    'im interested',
+    'me interested',
+    'mai interested',
+    'main interested',
+    'hum interested',
+    'interested hu',
+    'interested hoon',
+    'yes interested',
+    'haan interested',
+    'want to apply',
+    'apply karna hai',
+    'apply krna h',
+    'apply karna chahta',
+    'apply karna chahti',
+    'job chahiye',
+    'job chahie',
+    'job ki jarurat',
+    'job opening',
+    'job vacancy',
+    'hiring ke liye',
+    'kaunsi job',
+    'kya job hai',
+    'kya work hai',
+    'kaam kya hai',
+    'work details',
+    'tell me more',
+    'more details',
+    'share details',
+    'info on this',
+    'can i get more info'
+  ];
+
+  return interestPhrases.some(p => text.includes(p));
+}
+
+/**
  * Detect completely off-topic / non-hiring messages (e.g. casual chit-chat, jokes, weather, loans, abusive, random nonsense)
  */
 function isOffTopicMessage(rawText, candidate = null) {
@@ -398,9 +612,12 @@ function isOffTopicMessage(rawText, candidate = null) {
   if (
     isGreetingMessage(text) ||
     isAdInquiryMessage(text) ||
+    isHiringInterestMessage(text) ||
     isAcknowledgementMessage(text) ||
     isNotInterestedMessage(text) ||
     isArrivalStatusMessage(text) ||
+    isOfficeDirectionsOrContactQuery(text) ||
+    isVirtualOrRemoteInterviewQuery(text) ||
     isDocumentQuery(text) ||
     isPartTimeQuery(text) ||
     isInfluencerQuery(text) ||
@@ -485,7 +702,11 @@ function isOffTopicMessage(rawText, candidate = null) {
     'influencer', 'collab', 'collaboration', 'creator', 'followers', 'follower', 'sponsorship', 'pr',
     'freelance', 'freelancer', 'freelancing', 'parttime', 'part-time',
     'naukri', 'recruitment', 'opening', 'opportunity', 'post', 'posts', 'kya', 'kaise', 'batao',
-    'bataye', 'bataiye', 'chahiye', 'interested', 'know', 'tell', 'help'
+    'bataye', 'bataiye', 'chahiye', 'interested', 'know', 'tell', 'help',
+    'jan', 'january', 'feb', 'february', 'mar', 'march', 'apr', 'april', 'may', 'jun', 'june',
+    'jul', 'july', 'aug', 'august', 'sep', 'sept', 'september', 'oct', 'october', 'nov', 'november', 'dec', 'december',
+    'minute', 'minutes', 'min', 'mins', 'late', 'traffic', 'reach', 'reaching', 'arrive', 'arriving',
+    'there', 'come', 'coming', 'visit', 'between', 'dates', 'shift', 'postpone', 'wait'
   ];
 
   const words = clean.split(' ');
@@ -496,17 +717,7 @@ function isOffTopicMessage(rawText, candidate = null) {
     return false;
   }
 
-  // A brand new candidate or someone in initial stages (chatHistory <= 2) should NEVER get an off-topic warning unless explicit offTopicPattern matched above!
-  const chatCount = (candidate && candidate.chatHistory) ? candidate.chatHistory.length : 0;
-  if (!candidate || candidate.role === 'General Applicant' || chatCount <= 2) {
-    return false;
-  }
-
-  // In ongoing chats, only flag if long message with zero hiring keywords
-  if (words.length >= 4 && !hasHiringKeyword) {
-    return true;
-  }
-
+  // Registered candidate talking to HR should NEVER get an off-topic warning unless explicit offTopicPattern matched above!
   return false;
 }
 
@@ -604,9 +815,26 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     }
   }
 
-  // 4. Check for Affirmative Confirmation (Only when interview slot is pending/not scheduled yet)
+  // 4. Check for Affirmative Confirmation (Only when interview slot was explicitly proposed by HR)
+  const cleanTrimmed = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  const hasConditionalOrRemote = /(?:but|par\b|lekin|agar|if\b|remote|wfh|work\s*from\s*home|online|virtual|is\s*it\s*fine|chalega\s*kya|possible\s*hai|ghar\s*se)/i.test(text);
+  if (hasConditionalOrRemote) {
+    return null; // Let the remote/virtual query handler manage it!
+  }
+
+  const isSlotProposed = candidate && candidate.interviewSlotProposed;
+  const isPureAckWord = /^(?:ok|okay|sure|done|theek|thik|thik\s*h|thik\s*hai|thanks|thank\s*you)$/i.test(cleanTrimmed);
+  if (isPureAckWord && !isSlotProposed) {
+    return null; // A pure "ok/okay" when no interview slot was proposed is just an acknowledgement, NEVER an interview schedule!
+  }
+
   const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
-  const isAffirmative = (!candidate || !candidate.interviewDateTime) && affirmativePattern.test(text);
+  const isAffirmative = (!candidate || !candidate.interviewDateTime) && isSlotProposed && !hasConditionalOrRemote && affirmativePattern.test(text);
+
+  // If message contains a date range (e.g. "between 18-20 sep", "18-20 sep"), let date range handler prompt for specific time
+  if (/(?:between\s*\d{1,2}|-\s*\d{1,2}\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec)?)/i.test(schedulingText) && !/(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b)/i.test(schedulingText)) {
+    return null;
+  }
 
   // 5. Must have day indicator OR explicit time keyword OR affirmative response when interview slot is pending
   const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
@@ -951,15 +1179,21 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // 0.5 OFFICE DIRECTIONS, NAVIGATION & CALLING CONTACT NUMBERS CHECK
+  if (isOfficeDirectionsOrContactQuery(text)) {
+    return getOfficeLocationDirectionsResponse(isHinglish ? 'hinglish' : 'english');
+  }
+
   // 1. DIGITAL MARKETING & OTHER ROLES CHECK (Content Writer, Web Dev, Telecaller, Media Buyer, etc.)
-  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|telecaller|caller|calling|sales|bpo|receptionist|accountant|data\s*entry|marketing|media\s*buyer|funnel)/i;
-  const isExcludedRole = otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media');
+  const isContactOrPhoneQuery = isOfficeDirectionsOrContactQuery(text) || /(?:calling|contact|phone)\s*(?:no|number|num)/i.test(text);
+  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|telecaller|telecalling|inside\s*sales|\b(?:calling|caller)\s+(?:job|role|post|vacancy|work)\b|sales|bpo|receptionist|accountant|data\s*entry|marketing|media\s*buyer|funnel)/i;
+  const isExcludedRole = !isContactOrPhoneQuery && otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media');
 
   if (isExcludedRole) {
     let mentionedRole = 'Digital Marketing Role';
     if (text.includes('web') || text.includes('developer')) mentionedRole = 'Web / Website Developer';
     else if (text.includes('content') || text.includes('writer') || text.includes('copywriter')) mentionedRole = 'Content Writer / Copywriter';
-    else if (text.includes('telecaller') || text.includes('caller') || text.includes('calling')) mentionedRole = 'Telecaller / Inside Sales';
+    else if (text.includes('telecaller') || text.includes('telecalling') || text.includes('inside sales') || /\b(?:calling|caller)\s+(?:job|role|post)\b/i.test(text)) mentionedRole = 'Telecaller / Inside Sales';
     else if (text.includes('accountant')) mentionedRole = 'Accounts / Finance';
 
     if (isHinglish) {
@@ -970,18 +1204,28 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   }
 
   // 1.5 INFLUENCER COLLABORATION INQUIRY
-  if (isInfluencerQuery(text) || (candidate && candidate.role === 'Influencer Collaboration')) {
+  if (isInfluencerQuery(text)) {
+    if (candidate && (candidate.portfolio || candidate.resumeReceived || (candidate.experience && candidate.experience !== 'Influencer Profile'))) {
+      return isHinglish
+        ? `${prefixHi}Aapki details aur work samples note kar li gayi hain, dhanyawad! ✨ Hamari collaboration team aapke content ko review kar rahi hai aur jald hi aapse connect karegi. 🤝`
+        : `${prefixEn}Thank you for sharing your details and content samples! ✨ Our collaboration team is reviewing your profile and will connect with you shortly. 🤝`;
+    }
     return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
   }
+  if (candidate && candidate.role === 'Influencer Collaboration') {
+    return isHinglish
+      ? `${prefixHi}Aapki details aur work samples note kar li gayi hain, dhanyawad! ✨ Hamari collaboration team aapke content ko review kar rahi hai aur jald hi aapse connect karegi. 🤝`
+      : `${prefixEn}Thank you for sharing your details and content samples! ✨ Our collaboration team is reviewing your profile and will connect with you shortly. 🤝`;
+  }
 
-  // 2. OUT OF INDORE / ONLINE GOOGLE MEET INTERVIEW CHECK
+  // 2. REMOTE / VIRTUAL / ONLINE GOOGLE MEET INTERVIEW CHECK (User Rule: Inform that HR will connect directly)
   const outOfIndorePattern = /(?:indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|bahar\s*hu|bahar\s*rehta|bhopal|delhi|ujjain|dewas|gwaliar|gwalior|jabalpur|raipur|jaipur|pune|mumbai|other\s*city|dusre\s*shehar|online\s*interview|google\s*meet|virtual\s*interview|video\s*call\s*interview|online\s*meet|online\s*kar\s*lo|online\s*ho\s*skta|online\s*ho\s*sakta|online\s*de\s*sakta|online\s*le\s*lo)/i;
-  if (outOfIndorePattern.test(text)) {
+  if (isVirtualOrRemoteInterviewQuery(text) || outOfIndorePattern.test(text)) {
     candidate.interviewMode = 'online';
     if (isHinglish) {
-      return `${prefixHi}Koi baat nahi! Agar aap filhal Indore se bahar hain, toh hum aapka *Online Google Meet Interview* conduct kar sakte hain. 💻✨\n\n👉 Kripya batayein aap kis din aur time par online interview ke liye available hain? (Monday to Saturday, 10:00 AM se 6:00 PM ke beech) 📅\n\n📌 *(Interview shuru hone se 15 minute pehle aapko WhatsApp par Google Meet joining link mil jayegi).* 👍`;
+      return `${prefixHi}Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`;
     } else {
-      return `${prefixEn}No problem at all! If you are currently outside Indore, we can conduct your interview online via *Google Meet*. 💻✨\n\n👉 Please share your preferred Date and Time when you are available for the online interview (Monday to Saturday, 10:00 AM – 6:00 PM). 📅\n\n📌 *(You will receive the Google Meet joining link on WhatsApp 15 minutes prior to the interview).* 👍`;
+      return `${prefixEn}Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`;
     }
   }
 
@@ -999,6 +1243,16 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // 3.5. DATE RANGE / RESCHEDULE DATE PROPOSAL (e.g. "May come on between 18-20 sep?", "between 18-20 sep")
+  const dateRangePattern = /(?:between\s*\d{1,2}(?:\s*-\s*|\s*to\s*|\s*se\s*)\d{1,2}|\b\d{1,2}(?:st|nd|rd|th)?\s*(?:-|to|se)\s*\d{1,2}(?:st|nd|rd|th)?\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec)?|\b(?:come\s*on|available\s*on)\s*\d{1,2}(?:st|nd|rd|th)?\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec)?)/i;
+  if (dateRangePattern.test(text)) {
+    if (isHinglish) {
+      return `${prefixHi}Haan bilkul! Aap in dates ke beech interview ke liye aa sakte hain. 📅\n\n👉 Kripya apna exact preferred date aur time slot (*Monday to Saturday, 10:00 AM se 6:00 PM ke beech*) confirm karein taaki hum aapka interview slot lock kar sakein. 👍`;
+    } else {
+      return `${prefixEn}Certainly! You can visit for your interview during those dates. 📅\n\n👉 Please confirm your exact preferred date and time slot (*Monday to Saturday, between 10:00 AM and 6:00 PM*) so we can lock in your interview schedule. 👍`;
+    }
+  }
+
   // 4. FAQ: SALARY / STIPEND / PAID INTERNSHIP QUESTIONS
   if (text.includes('salary') || text.includes('package') || text.includes('kitna milega') || text.includes('ctc') || text.includes('stipend') || text.includes('paise') || text.includes('per month') || text.includes('pay') || text.includes('internship') || text.includes('certificate')) {
     if (isHinglish) {
@@ -1009,12 +1263,8 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   }
 
   // 5. FAQ: OFFICE ADDRESS / LOCATION
-  if (text.includes('location') || text.includes('address') || text.includes('kahan') || text.includes('kaha') || text.includes('where') || text.includes('office') || text.includes('bhawarkua') || text.includes('apple hospital')) {
-    if (isHinglish) {
-      return `${prefixHi}📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Office Timings:* Mon–Sat (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
-    } else {
-      return `${prefixEn}📍 *Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025`;
-    }
+  if (isOfficeDirectionsOrContactQuery(text) || text.includes('location') || text.includes('address') || text.includes('kahan') || text.includes('kaha') || text.includes('where') || text.includes('office') || text.includes('bhawarkua') || text.includes('apple hospital')) {
+    return getOfficeLocationDirectionsResponse(isHinglish ? 'hinglish' : 'english');
   }
 
   // 6. FAQ: WORK FROM HOME / REMOTE
@@ -1162,7 +1412,22 @@ You are the professional, friendly HR & Recruitment Coordinator for Brand Setu D
     (userMessage && /(?:https?:\/\/|\.pdf\b)/i.test(userMessage));
 
   if (!isDocOrLink && !candidate.interviewDateTime) {
+    if (isVirtualOrRemoteInterviewQuery(userMessage)) {
+      console.log(`💻 Direct Virtual/Remote Interview Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
+      candidate.interviewMode = 'online';
+      const isHi = (lang === 'hinglish' || lang === 'hindi');
+      return isHi
+        ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`
+        : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`;
+    }
+
     if (isInfluencerQuery(userMessage)) {
+      if (candidate && (candidate.portfolio || candidate.resumeReceived || (candidate.experience && candidate.experience !== 'Influencer Profile'))) {
+        const isHi = (lang === 'hinglish' || lang === 'hindi');
+        return isHi
+          ? `Aapki details aur work samples note kar li gayi hain, dhanyawad! ✨ Hamari collaboration team aapke content ko review kar rahi hai aur jald hi aapse connect karegi. 🤝`
+          : `Thank you for sharing your details and content samples! ✨ Our collaboration team is reviewing your profile and will connect with you shortly. 🤝`;
+      }
       console.log(`✨ Direct Influencer Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
       return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
     }
@@ -1220,6 +1485,12 @@ CRITICAL CONVERSATIONAL & GREETING RULES (MANDATORY):
      --> NEVER ask them if they want Full-Time, WFH, Freelancer, or Part-Time!
      --> NEVER send any variation of "Please let me know if you are looking for Full-Time (In-Office), Work From Home, Freelancer, or Part-Time position"!
    - If Resume / Portfolio is already received (Step 4): NEVER ask for work mode or role again! Simply acknowledge that HR is reviewing their profile, answer their specific query, or proceed to interview scheduling.
+8. HUMAN-LIKE TONE & ZERO REPETITION (CRITICAL):
+   - Talk like a real, warm, considerate human HR recruiter on WhatsApp. Do NOT sound like an automated IVR, chatbot, or rigid script.
+   - ALWAYS read RECENT CONVERSATION HISTORY. NEVER repeat questions, templates, or sentences that were already said in previous turns.
+   - If candidate acknowledges ("ok", "theek hai", "sure", "done", "thank you"): reply with a warm, natural human note (e.g. "Welcome! Looking forward to seeing you 😊" or "Bilkul, kal milte hain! 👍").
+   - If candidate mentions coming or calling before arriving: acknowledge warmly and provide both helpline numbers (+91 9329232025 / +91 9669765911).
+   - Keep WhatsApp messages short, clear, and natural (1 to 3 sentences). Avoid long rigid walls of text.
 
 STRICT STEP-BY-STEP RECRUITMENT & COLLABORATION FUNNEL INSTRUCTIONS:
 Follow these sequential qualification steps strictly:
@@ -1373,9 +1644,18 @@ module.exports = {
   isInfluencerQuery,
   isFreelanceOrWfhQuery,
   isAdInquiryMessage,
+  isHiringInterestMessage,
   isGreetingMessage,
   isDocumentQuery,
   isArrivalStatusMessage,
+  isPreArrivalCallNotice,
+  getPreArrivalCallResponse,
+  getShortNavigationResponse,
+  getDeduplicatedOrHumanResponse,
+  isOfficeDirectionsOrContactQuery,
+  getOfficeLocationDirectionsResponse,
+  isVirtualOrRemoteInterviewQuery,
+  generateContextualFallbackResponse,
   getOffTopicBoundaryResponse,
   getOffTopicWarningResponse,
   detectLanguage

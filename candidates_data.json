@@ -1,5 +1,373 @@
 [
   {
+    "id": "cand_1789540471215_u0xoc",
+    "phone": "919713100248",
+    "whatsappChatId": null,
+    "name": "Garima Namdev",
+    "role": "Social Media Manager",
+    "workType": "Freelancer",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Experienced [Freelancer]",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": true,
+    "resumeFileName": "Portfolio Link",
+    "status": "Resume Received",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-16T06:34:31.210Z",
+    "updatedAt": "2026-09-16T06:34:32.135Z",
+    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+    "justSelectedRole": false,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-16T06:34:31.215Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm a professional social media manager, qith 4+ years experience. I'm available for full time / work from home / freelance opportunities",
+        "timestamp": "2026-09-16T06:34:31.831Z"
+      },
+      {
+        "role": "user",
+        "text": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+        "timestamp": "2026-09-16T06:34:32.141Z"
+      }
+    ],
+    "unreadCount": 3,
+    "interviewMode": "online",
+    "resumeReceivedAt": "2026-09-16T06:34:32.135Z",
+    "interviewSlotProposed": false
+  },
+  {
+    "id": "cand_1789537989101_er1mc",
+    "phone": "918959264686",
+    "whatsappChatId": null,
+    "name": "Karishma Jaiswani",
+    "role": "Social Media Manager & Content Writer",
+    "workType": "Work From Home",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Preferred: Work From Home",
+    "portfolio": "https://drive.google.com/file/d/1SGpoKwfEDMCdq2VH6pAPQgF7u1Xf_nmh/view?usp=drivesdk",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": true,
+    "resumeFileName": "Resume_karishma_jaiswani-1.pdf",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-16T05:53:09.091Z",
+    "updatedAt": "2026-09-16T06:34:30.525Z",
+    "lastMessage": "Social media manager and content writer and creator- work from home",
+    "justSelectedRole": false,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T12:41:28.017Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T12:41:28.981Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-15T12:42:39.859Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you! ✨ Your details have been noted. Please share your Instagram profile link or insights screenshot here, and our collaboration team will connect with you shortly! 🤝",
+        "timestamp": "2026-09-15T12:42:40.780Z"
+      },
+      {
+        "role": "user",
+        "text": "I haven't posted anything there..but created few for brands..",
+        "timestamp": "2026-09-15T12:43:22.140Z"
+      },
+      {
+        "role": "assistant",
+        "text": "That's totally fine! 📑✨ \n\nCould you please share a Google Drive link to the content or samples you created for those brands, along with your updated Resume (PDF)? \n\nOur team will review your work and get back to you shortly! 🤝",
+        "timestamp": "2026-09-15T12:43:45.728Z"
+      },
+      {
+        "role": "user",
+        "text": "Resume_karishma jaiswani-1.pdf",
+        "timestamp": "2026-09-15T12:43:55.585Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝",
+        "timestamp": "2026-09-15T12:44:16.838Z"
+      },
+      {
+        "role": "user",
+        "text": "https://drive.google.com/file/d/1SGpoKwfEDMCdq2VH6pAPQgF7u1Xf_nmh/view?usp=drivesdk",
+        "timestamp": "2026-09-15T12:45:20.857Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝",
+        "timestamp": "2026-09-15T12:45:34.979Z"
+      },
+      {
+        "role": "user",
+        "text": "Can create any..few created for digital marketing agency \nAs i am fresher in this\nPaid reel",
+        "timestamp": "2026-09-15T12:46:48.745Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝",
+        "timestamp": "2026-09-15T12:46:50.816Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Karishma Jaiswani! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T12:54:05.470Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes but as i am looking for remote only..so is it fine?",
+        "timestamp": "2026-09-15T12:54:58.288Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Karishma Jaiswani! 🎉\n\nYour in-person interview for the *Other Digital Marketing Roles* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T12:54:59.118Z"
+      },
+      {
+        "role": "user",
+        "text": "Sure..thanks",
+        "timestamp": "2026-09-15T12:55:24.626Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T12:55:25.410Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Karishma Jaiswani! 🔔 *Interview Reminder*\n\nYour in-person interview for *Other Digital Marketing Roles* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:21.068Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes I will be there",
+        "timestamp": "2026-09-16T04:24:52.629Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Your in-person interview is confirmed for *Wed, 16 Sept, 11:00 am* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍",
+        "timestamp": "2026-09-16T04:24:56.695Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T05:53:09.102Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T05:54:03.102Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T05:56:47.207Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T06:07:15.121Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T06:16:43.321Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T06:24:28.576Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager and content writer and creator- work from home",
+        "timestamp": "2026-09-16T06:34:30.531Z"
+      }
+    ],
+    "unreadCount": 7,
+    "interviewMode": "online",
+    "interviewSlotProposed": true
+  },
+  {
+    "id": "cand_1789539868655_sinwn",
+    "phone": "919713474209",
+    "whatsappChatId": null,
+    "name": "Garima Namdev",
+    "role": "Social Media Manager",
+    "workType": "Freelancer",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "Experienced [Freelancer]",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": true,
+    "resumeFileName": "Portfolio Link",
+    "status": "Resume Received",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-16T06:24:28.649Z",
+    "updatedAt": "2026-09-16T06:24:28.718Z",
+    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+    "justSelectedRole": false,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-16T06:24:28.655Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm a professional social media manager, qith 4+ years experience. I'm available for full time / work from home / freelance opportunities",
+        "timestamp": "2026-09-16T06:24:28.689Z"
+      },
+      {
+        "role": "user",
+        "text": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+        "timestamp": "2026-09-16T06:24:28.723Z"
+      }
+    ],
+    "unreadCount": 3,
+    "interviewMode": "online",
+    "resumeReceivedAt": "2026-09-16T06:24:28.718Z",
+    "interviewSlotProposed": false
+  },
+  {
+    "id": "cand_1789539002884_7033e",
+    "phone": "919876500002",
+    "whatsappChatId": null,
+    "name": "Old",
+    "role": "General Applicant",
+    "workType": "Full-Time",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Not Interested",
+    "interviewDateTime": null,
+    "notes": "",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-16T06:10:02.884Z",
+    "updatedAt": "2026-09-16T06:10:50.653Z",
+    "lastMessage": "Yes I want to apply now",
+    "justSelectedRole": false,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Not interested right now",
+        "timestamp": "2026-09-16T06:10:02.884Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Brand Setu Digital is hiring! 1) Video Editor 2) AI Video 3) Graphic Designer. Reply with your role!",
+        "timestamp": "2026-09-16T06:10:02.916Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes I want to apply now",
+        "timestamp": "2026-09-16T06:10:02.938Z"
+      }
+    ],
+    "unreadCount": 4,
+    "closedAt": null,
+    "offTopicCount": 0
+  },
+  {
+    "id": "cand_1789539002672_n5rnh",
+    "phone": "919876500001",
+    "whatsappChatId": null,
+    "name": "Rohit Sharma",
+    "role": "Video Editor",
+    "workType": "Work From Home",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "1 years",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": false,
+    "resumeFileName": "",
+    "status": "Campaign Sent",
+    "interviewDateTime": null,
+    "notes": "Outreach campaign broadcast sent",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-09-16T06:10:02.672Z",
+    "updatedAt": "2026-09-16T06:10:50.553Z",
+    "lastMessage": "1.5 years experience in reels, looking for work from home",
+    "justSelectedRole": false,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "assistant",
+        "text": "Brand Setu Digital is hiring! 1) Video Editor 2) AI Video 3) Graphic Designer. Reply with your role!",
+        "timestamp": "2026-09-16T06:10:02.674Z"
+      },
+      {
+        "role": "user",
+        "text": "I am interested sir",
+        "timestamp": "2026-09-16T06:10:02.724Z"
+      },
+      {
+        "role": "user",
+        "text": "1",
+        "timestamp": "2026-09-16T06:10:02.786Z"
+      },
+      {
+        "role": "user",
+        "text": "1.5 years experience in reels, looking for work from home",
+        "timestamp": "2026-09-16T06:10:02.830Z"
+      }
+    ],
+    "unreadCount": 6,
+    "interviewMode": "online",
+    "closedAt": null,
+    "offTopicCount": 0
+  },
+  {
     "phone": "918357977322",
     "chatHistory": [
       {
@@ -131,40 +499,306 @@
         "role": "assistant",
         "text": "Great! See you at the interview. 👍 All the best! 😊",
         "timestamp": "2026-09-08T17:00:02.254Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-14T09:40:45.700Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hi Arjun! 😊 Since we have already received your Resume and Portfolio for the SEO & AEO Expert role, please let me know if you are looking for a Full-Time (In-Office), Work From Home, Freelancer, or Part-Time position so we can proceed further with your interview scheduling. 👍✨",
+        "timestamp": "2026-09-14T09:40:48.983Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-14T09:51:55.416Z"
+      },
+      {
+        "role": "assistant",
+        "text": "It looks like you might have missed my previous message, Arjun! 😊 \n\nCould you please let me know which work mode you prefer for the SEO & AEO Expert role? \n\nWe have these options available:\n1. Full-Time (In-Office at Indore)\n2. Work From Home (WFH)\n3. Freelancer\n4. Part-Time\n\nOnce you share your preference, we can quickly schedule your interview! 👍✨",
+        "timestamp": "2026-09-14T09:51:57.812Z"
+      },
+      {
+        "role": "user",
+        "text": "Full Time in (office at Indore )",
+        "timestamp": "2026-09-14T09:52:36.484Z"
+      },
+      {
+        "role": "assistant",
+        "text": "That's great to hear, Arjun! 🏢✨ Since you prefer a Full-Time In-Office role in Indore, let's get your interview scheduled. \n\nAre you available to visit our office for a face-to-face discussion tomorrow or the day after between 10:00 AM and 6:00 PM? Please let me know your preferred day and time! 👍😊",
+        "timestamp": "2026-09-14T09:52:39.033Z"
+      },
+      {
+        "role": "user",
+        "text": "I need h part time 12 se 4",
+        "timestamp": "2026-09-14T09:53:17.797Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Haan bilkul! Hamare yahan *Part-Time / Flexible hours* ke liye bhi opportunities available hain. 🤝✨\n\nKripya batayein:\n1️⃣ Aap kis position (Video Editor, Graphic Designer, Social Media, Content Writer, Telecaller, etc.) me part-time kaam karna chahte hain?\n2️⃣ Aap daily kitne hours dedicate kar sakte hain (e.g. 2-4 hours)?\n\nKripya apna updated *Resume (PDF)* aur portfolio / work sample link share karein! 📄👍",
+        "timestamp": "2026-09-14T09:53:19.725Z"
+      },
+      {
+        "role": "user",
+        "text": "Video editor",
+        "timestamp": "2026-09-14T09:53:44.693Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Video Editor*. 🎬👍\n\nPlease let us know:\n1️⃣ Which software do you use? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ What type of videos do you edit? (Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ How much experience do you have (Fresher / Experienced)? 💼",
+        "timestamp": "2026-09-14T09:53:45.976Z"
+      },
+      {
+        "role": "user",
+        "text": "Hi I am Rahul, I want to apply for video editor freelance work from home",
+        "timestamp": "2026-09-14T09:56:21.161Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! We welcome candidates for *Freelancer* and *Work From Home (WFH)* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking to work freelance / WFH in?\n2️⃣ How much experience do you have and how many hours can you dedicate?\n\nPlease share your updated *Resume (PDF)* and portfolio / work samples link here! 📄🎥",
+        "timestamp": "2026-09-14T09:56:23.336Z"
+      },
+      {
+        "role": "user",
+        "text": "Video editor",
+        "timestamp": "2026-09-14T09:56:57.939Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Since you are applying for the **Video Editor (Freelancer / WFH)** role, please share:\n\n1️⃣ Your updated **Resume (PDF format)** 📄\n2️⃣ Your **Video Portfolio** (Google Drive or YouTube link of your best edited videos) 🎥 \n\nOnce received, our team will review your work and get back to you! 👍✨",
+        "timestamp": "2026-09-14T09:57:00.337Z"
+      },
+      {
+        "role": "user",
+        "text": "Not interested",
+        "timestamp": "2026-09-14T10:08:35.876Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for letting us know! We have updated your status and will not disturb you further. We wish you all the best for your future endeavors! ✨",
+        "timestamp": "2026-09-14T10:08:36.900Z"
+      },
+      {
+        "role": "user",
+        "text": "Thanks",
+        "timestamp": "2026-09-14T10:08:47.903Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-14T10:09:46.769Z"
+      },
+      {
+        "role": "user",
+        "text": "Apply",
+        "timestamp": "2026-09-14T10:17:00.822Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome back! Glad to see you’",
+        "timestamp": "2026-09-14T10:17:08.259Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-14T10:17:26.659Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! Glad to connect with you again. 😊✨\n\nWe have received your details! Our team is currently reviewing your profile and work samples. 📄🔍\n\nWe will reach out to you shortly with the next steps! 👍",
+        "timestamp": "2026-09-14T10:17:29.929Z"
+      },
+      {
+        "role": "user",
+        "text": "Hiii",
+        "timestamp": "2026-09-14T17:01:40.973Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\nThank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-14T17:01:58.849Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-15T09:47:43.630Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! 😊\n\nWe have received your details, and our HR team is currently reviewing your profile and work samples for the Freelance SEO & AEO Expert role. 📄✨\n\nWe will connect with you very soon regarding the next steps! 👍",
+        "timestamp": "2026-09-15T09:47:49.516Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello",
+        "timestamp": "2026-09-15T09:50:04.719Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hi Arjun! Yes, we are here. 😊\n\nAs shared earlier, our team is currently reviewing your profile for the Freelance SEO & AEO Expert role. We will reach out to you with the next steps very soon! 👍",
+        "timestamp": "2026-09-15T09:50:25.073Z"
+      },
+      {
+        "role": "user",
+        "text": "Hmm",
+        "timestamp": "2026-09-15T09:58:28.489Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Is there anything specific you would like to ask regarding your application or the review process? We are here to help! 😊👍",
+        "timestamp": "2026-09-15T09:58:48.065Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-15T10:39:50.571Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Yes Arjun! We are right here. 😊\n\nSince your resume and portfolio for the Freelance SEO & AEO Expert role are already with our review team, is there any specific question you have about your application? \n\nFeel free to ask, I'm here to help! 👍",
+        "timestamp": "2026-09-15T10:40:22.426Z"
+      },
+      {
+        "role": "user",
+        "text": "Ok sir",
+        "timestamp": "2026-09-15T10:51:53.164Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Arjun Meena! 🎉\n\nBrandSetu Digital me *SEO & AEO Expert* position ke liye aapka in-person interview schedule ho gaya hai.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T10:51:54.118Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-15T10:57:55.190Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hi Arjun! Yes, we are here. 😊\n\nYour in-person interview is already scheduled for **Wednesday, 16th Sept, at 11:00 AM** at our Indore office. \n\nAre you all set for the interview, or do you need any help with the office location? 👍",
+        "timestamp": "2026-09-15T10:57:59.542Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello",
+        "timestamp": "2026-09-15T11:07:59.534Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun! I'm right here. 😊 \n\nJust a quick reminder that your in-person interview is confirmed for **Wednesday, 16th Sept, at 11:00 AM** at our Indore office. \n\nPlease let me know if you need the Google Maps location or have any questions before you arrive! 👍",
+        "timestamp": "2026-09-15T11:08:05.937Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-15T11:59:56.991Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hi Arjun! How can I assist you today? \n\nIf you have any questions regarding your upcoming interview on Wednesday, 16th Sept, please let me know! 😊👍",
+        "timestamp": "2026-09-15T12:00:11.110Z"
+      },
+      {
+        "role": "user",
+        "text": "Hmm",
+        "timestamp": "2026-09-15T12:05:48.452Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T12:05:49.514Z"
+      },
+      {
+        "role": "user",
+        "text": "Hii",
+        "timestamp": "2026-09-15T12:14:39.267Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hi Arjun! Is there anything specific you need help with regarding your interview scheduled for tomorrow at 11:00 AM? \n\nPlease let me know if you need the Google Maps location or directions to our Indore office. 😊👍",
+        "timestamp": "2026-09-15T12:14:57.334Z"
+      },
+      {
+        "role": "user",
+        "text": "Hmm",
+        "timestamp": "2026-09-15T12:16:40.800Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T12:16:42.112Z"
+      },
+      {
+        "role": "user",
+        "text": "hm",
+        "timestamp": "2026-09-15T12:24:36.031Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T12:24:37.075Z"
+      },
+      {
+        "role": "user",
+        "text": "Hmm",
+        "timestamp": "2026-09-15T12:30:57.078Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T12:30:58.083Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello! I am interested in learning more about your business.",
+        "timestamp": "2026-09-15T12:31:50.162Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Brand Setu Digital is a premier Digital Marketing, AI Media, and Creative Agency based in Indore. 🚀 \n\nWe help brands grow through high-impact strategies, including SEO/AEO, performance marketing, social media growth, high-retention video editing, and influencer collaborations. \n\nSince your interview is already scheduled for tomorrow, we can discuss how your SEO & AEO expertise can help scale our client projects during your discussion! 😊👍",
+        "timestamp": "2026-09-15T12:31:58.087Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Arjun Meena! 🔔 *Interview Reminder*\n\nYour in-person interview for *SEO & AEO Expert* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:21.046Z"
       }
     ],
     "city": "Indore",
     "createdAt": "2026-09-07T07:56:44.263Z",
     "experience": "Experienced (Full-Time)",
     "id": "cand_1788767804268_3kok5",
-    "interviewDateTime": "2026-09-08T05:30:00.000Z",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
     "interviewMode": "in_person",
-    "interviewReminderSent": false,
-    "interviewReminderSentAt": null,
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-09-16T04:24:19.909Z",
     "interviewSlotProposed": true,
     "interviewSlotProposedAt": "2026-09-07T08:10:11.934Z",
     "lang": "english",
-    "lastMessage": "Great! See you at the interview. 👍 All the best! 😊",
+    "lastMessage": "Hello Arjun Meena! 🔔 *Interview Reminder*\n\nYour in-person interview for *SEO & AEO Expert* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
     "name": "Arjun Meena",
-    "notes": "Auto-scheduled via WhatsApp AI: \"Yes\" (In-Person)",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Ok sir\" (In-Person)",
     "portfolio": "",
     "resumeFileName": "manisha_meena.pdf",
     "resumePath": "C:\\Users\\ADMIN\\Desktop\\Arjun\\WhatsApp Automaion\\uploads\\resumes\\918357977322_1788767981883_manisha_meena.pdf",
     "resumeReceived": true,
     "resumeReceivedAt": "2026-09-07T07:59:41.883Z",
-    "resumeReminderSent": false,
+    "resumeReminderSent": true,
     "resumeReminderSentAt": null,
     "resumeUrl": "/uploads/resumes/918357977322_1788767981883_manisha_meena.pdf",
     "role": "SEO & AEO Expert",
     "status": "Interview Scheduled",
     "unreadCount": 0,
-    "updatedAt": "2026-09-09T05:11:36.686Z",
+    "updatedAt": "2026-09-15T12:33:39.510Z",
     "whatsappChatId": null,
     "justAnsweredExperience": false,
     "justSelectedRole": false,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Freelancer",
+    "offTopicCount": 0
   },
   {
     "phone": "919993297342",
@@ -193,6 +827,16 @@
         "role": "assistant",
         "text": "Hello Tanmay Jain! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
         "timestamp": "2026-09-07T06:29:00.037Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T11:57:08.150Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Sure, Tanmay! This is a practical, in-person interview for the **Digital Marketing Manager** role at our Indore office. \n\nDuring this round, you will have a brief discussion with our team, followed by a quick practical assessment to evaluate your campaign strategies and performance marketing skills. It will help us understand your hands-on experience with running ads and optimizing ROI. \n\nPlease let me know if tomorrow morning between *10:00 AM and 12:00 PM* works for you, or if you would like to suggest an alternative time! 👍🏢",
+        "timestamp": "2026-09-15T11:57:18.700Z"
       }
     ],
     "city": "Indore",
@@ -205,7 +849,7 @@
     "interviewSlotProposed": true,
     "interviewSlotProposedAt": "2026-09-07T06:28:59.005Z",
     "lang": "english",
-    "lastMessage": "Hello Tanmay Jain! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+    "lastMessage": "Sure, Tanmay! This is a practical, in-person interview for the **Digital Marketing Manager** role at our Indore office. \n\nDuring this round, you will have a brief discussion with our team, followed by a quick practical assessment to evaluate your campaign strategies and performance marketing skills. It will help us understand your hands-on experience with running ads and optimizing ROI. \n\nPlease let me know if tomorrow morning between *10:00 AM and 12:00 PM* works for you, or if you would like to suggest an alternative time! 👍🏢",
     "name": "Tanmay Jain",
     "notes": "",
     "portfolio": "",
@@ -219,11 +863,14 @@
     "role": "Digital Marketing Manager",
     "status": "Resume Received",
     "unreadCount": 0,
-    "updatedAt": "2026-09-07T07:41:10.586Z",
+    "updatedAt": "2026-09-15T12:00:09.513Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time",
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "offTopicCount": 0
   },
   {
     "phone": "917693884339",
@@ -1073,9 +1720,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-11T17:24:47.328Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "919770477701",
@@ -1234,106 +1881,2523 @@
         "role": "user",
         "text": "Hi",
         "timestamp": "2026-09-13T05:30:36.347Z"
+      },
+      {
+        "role": "user",
+        "text": "Helloooo",
+        "timestamp": "2026-09-14T10:00:11.442Z"
+      },
+      {
+        "role": "user",
+        "text": "Restart job",
+        "timestamp": "2026-09-14T10:22:31.082Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome back सौमित्र! 😊\n\nAre you looking to explore open positions or collaborations with Brand Setu Digital again?\n\nPlease let us know which position you'd like to apply for or how we can assist you! 👍",
+        "timestamp": "2026-09-14T10:22:32.142Z"
+      },
+      {
+        "role": "user",
+        "text": "Influencer",
+        "timestamp": "2026-09-14T10:23:02.268Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you! ✨ Your details have been noted. Please share your Instagram profile link or insights screenshot here, and our collaboration team will connect with you shortly! 🤝",
+        "timestamp": "2026-09-14T10:23:03.293Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello सौमित्र! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-14T10:23:27.805Z"
+      },
+      {
+        "role": "user",
+        "text": "But I have very less followers",
+        "timestamp": "2026-09-14T10:23:56.493Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝",
+        "timestamp": "2026-09-14T10:23:57.206Z"
+      },
+      {
+        "role": "user",
+        "text": "Hi",
+        "timestamp": "2026-09-15T07:12:21.235Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello सौमित्र! 👋\n\nSince we are discussing your influencer collaboration, please help us with the quick details we requested above (your content niche, profile link, follower count, and preferred collaboration type). \n\nEven with fewer followers, we have amazing barter and campaign opportunities, and we would love to review your profile! ✨",
+        "timestamp": "2026-09-15T07:12:25.009Z"
+      },
+      {
+        "role": "user",
+        "text": "I need job for video editor",
+        "timestamp": "2026-09-15T07:12:50.726Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Video Editor*. 🎬👍\n\nPlease let us know:\n1️⃣ Which software do you use? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ What type of videos do you edit? (Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ How much experience do you have (Fresher / Experienced)? 💼",
+        "timestamp": "2026-09-15T07:12:51.497Z"
+      },
+      {
+        "role": "user",
+        "text": "I am fresher",
+        "timestamp": "2026-09-15T07:13:19.929Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can evaluate your best work samples. 📄🎥",
+        "timestamp": "2026-09-15T07:13:20.577Z"
       }
     ],
     "city": "Indore",
     "createdAt": "2026-09-12T09:19:43.433Z",
-    "experience": "",
+    "experience": "Fresher (Paid Internship)",
     "id": "cand_1789204783435_hcwsd",
     "interviewDateTime": null,
-    "interviewReminderSent": true,
+    "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "justAnsweredExperience": false,
     "justSelectedRole": false,
     "lang": "english",
-    "lastMessage": "Hi",
+    "lastMessage": "Great! 🎬 Please share your updated *Resume (PDF)* and your Video Portfolio / Google Drive link here so we can evaluate your best work samples. 📄🎥",
     "name": "सौमित्र",
     "notes": "",
     "portfolio": "",
     "resumeFileName": "",
     "resumeReceived": false,
     "resumeReminderSent": true,
-    "resumeReminderSentAt": "2026-09-12T13:20:29.881Z",
-    "role": "AI Video Expert",
-    "status": "Not Interested",
+    "resumeReminderSentAt": "2026-09-14T10:23:27.134Z",
+    "role": "Video Editor",
+    "status": "Resume Pending",
     "unreadCount": 0,
-    "updatedAt": "2026-09-14T08:45:40.919Z",
+    "updatedAt": "2026-09-15T07:17:37.357Z",
     "whatsappChatId": null,
     "offTopicCount": 1,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Influencer Collaboration",
+    "closedAt": null
   },
   {
-    "id": "cand_1789376406826_rbx90",
     "phone": "919876543211",
-    "whatsappChatId": null,
-    "name": "Candidate",
-    "role": "Influencer Collaboration",
-    "workType": "Influencer Collaboration",
-    "city": "Indore",
-    "lang": "english",
-    "experience": "Preferred: Influencer Collaboration",
-    "portfolio": "",
-    "socialHandle": "@tech_creator",
-    "followers": "45k",
-    "resumeReceived": false,
-    "resumeFileName": "",
-    "status": "Applied",
-    "interviewDateTime": null,
-    "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
-    "interviewReminderSent": false,
-    "interviewReminderSentAt": null,
-    "createdAt": "2026-09-14T09:00:06.822Z",
-    "updatedAt": "2026-09-14T09:00:06.822Z",
-    "lastMessage": "Hello, I want to connect for Influencer Collaboration. My instagram is @tech_creator with 45k followers",
-    "justSelectedRole": false,
-    "justAnsweredExperience": true,
     "chatHistory": [
       {
         "role": "user",
         "text": "Hello, I want to connect for Influencer Collaboration. My instagram is @tech_creator with 45k followers",
         "timestamp": "2026-09-14T09:00:06.826Z"
+      },
+      {
+        "role": "assistant",
+        "text": "ok",
+        "timestamp": "2026-09-14T09:54:03.950Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-14T13:00:28.487Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-16T06:13:05.070Z"
       }
     ],
-    "unreadCount": 1
-  },
-  {
-    "id": "cand_1789376406803_4aejc",
-    "phone": "919876543210",
-    "whatsappChatId": null,
-    "name": "Candidate",
-    "role": "Video Editor",
-    "workType": "Freelancer",
     "city": "Indore",
-    "lang": "english",
-    "experience": "Preferred: Freelancer",
-    "portfolio": "",
-    "socialHandle": "",
-    "followers": "",
-    "resumeReceived": false,
-    "resumeFileName": "",
-    "status": "Applied",
+    "createdAt": "2026-09-14T09:00:06.822Z",
+    "experience": "Preferred: Influencer Collaboration",
+    "followers": "45k",
+    "id": "cand_1789376406826_rbx90",
     "interviewDateTime": null,
-    "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
-    "createdAt": "2026-09-14T09:00:06.800Z",
-    "updatedAt": "2026-09-14T09:00:06.800Z",
-    "lastMessage": "Hi I am Rahul, I want to apply for video editor freelance work from home",
-    "justSelectedRole": false,
     "justAnsweredExperience": true,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Candidate",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-14T13:00:27.195Z",
+    "role": "Influencer Collaboration",
+    "socialHandle": "@tech_creator",
+    "status": "Resume Pending",
+    "unreadCount": 1,
+    "updatedAt": "2026-09-14T10:21:54.401Z",
+    "whatsappChatId": null,
+    "workType": "Influencer Collaboration"
+  },
+  {
+    "phone": "919876543210",
     "chatHistory": [
       {
         "role": "user",
         "text": "Hi I am Rahul, I want to apply for video editor freelance work from home",
         "timestamp": "2026-09-14T09:00:06.803Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Video Editor* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-14T13:00:29.042Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Video Editor* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-16T06:13:05.377Z"
       }
     ],
-    "unreadCount": 1
+    "city": "Indore",
+    "createdAt": "2026-09-14T09:00:06.800Z",
+    "experience": "Preferred: Freelancer",
+    "followers": "",
+    "id": "cand_1789376406803_4aejc",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": true,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Video Editor* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Candidate",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-14T13:00:27.214Z",
+    "role": "Video Editor",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 1,
+    "updatedAt": "2026-09-14T10:21:56.328Z",
+    "whatsappChatId": null,
+    "workType": "Freelancer"
+  },
+  {
+    "phone": "919098773689",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T08:19:29.895Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T08:19:30.851Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Pooja Kimtee! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T12:20:05.796Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T08:19:29.894Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789460369895_5d47a",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Pooja Kimtee! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Pooja Kimtee",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T12:20:04.440Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T08:31:11.738Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "916267343142",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T10:11:49.045Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T10:11:50.023Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Dileep Yadav! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T14:12:05.592Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T10:11:49.045Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789467109045_t9xql",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Dileep Yadav! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Dileep Yadav",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T14:12:04.497Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T10:17:34.194Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "917879128725",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T10:28:54.840Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T10:28:55.746Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Salonipatel! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T14:29:05.385Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T10:28:54.840Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789468134840_pb820",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Salonipatel! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Salonipatel",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T14:29:04.505Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T10:38:33.872Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "917067603800",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T10:32:44.137Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T10:32:44.983Z"
+      },
+      {
+        "role": "user",
+        "text": "5",
+        "timestamp": "2026-09-15T10:33:44.791Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T10:33:45.787Z"
+      },
+      {
+        "role": "user",
+        "text": "RASHI AGRAWAL RESUME SM-2.pdf",
+        "timestamp": "2026-09-15T10:34:53.324Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume, Rashi! 📄✨ \n\nOur team is reviewing your profile and your 5 years of experience as a Social Media Manager. We will get back to you shortly with the next steps! 👍",
+        "timestamp": "2026-09-15T10:35:02.031Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Rashi Agrawal Sm! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T10:45:05.476Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello, sure. I'll be there",
+        "timestamp": "2026-09-15T10:49:50.831Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏",
+        "timestamp": "2026-09-15T10:49:52.027Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! 😊 We’ll be happy to have you. Please make sure to be available at the scheduled time. If you have any questions before the interview, feel free to message us.  See you soon! All the best. 🙌",
+        "timestamp": "2026-09-15T11:04:11.183Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T10:32:44.137Z",
+    "experience": "5 years",
+    "followers": "",
+    "id": "cand_1789468364137_ccxit",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Great! 😊 We’ll be happy to have you. Please make sure to be available at the scheduled time. If you have any questions before the interview, feel free to message us.  See you soon! All the best. 🙌",
+    "name": "Rashi Agrawal Sm",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "RASHI_AGRAWAL_RESUME_SM-2.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T11:04:11.183Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/917067603800_1789468493336_RASHI_AGRAWAL_RESUME_SM-2.pdf",
+    "resumeReceivedAt": "2026-09-15T10:34:53.336Z",
+    "resumeUrl": "/uploads/resumes/917067603800_1789468493336_RASHI_AGRAWAL_RESUME_SM-2.pdf",
+    "interviewSlotProposedAt": "2026-09-15T10:45:04.403Z",
+    "offTopicCount": 1
+  },
+  {
+    "phone": "919424011708",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T12:24:57.129Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T12:24:58.012Z"
+      },
+      {
+        "role": "user",
+        "text": "5",
+        "timestamp": "2026-09-15T13:02:06.405Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T13:02:07.286Z"
+      },
+      {
+        "role": "user",
+        "text": "Himanshu Agnihotri Resume.docx (1).pdf\nMovers express \nInsta account",
+        "timestamp": "2026-09-15T13:04:02.869Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume and Instagram handle, Himanshu! 📄✨ \n\nOur core team is currently reviewing your profile and work samples. We will evaluate your 5 years of experience and get back to you shortly for the next steps! 👍🚀",
+        "timestamp": "2026-09-15T13:04:22.030Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Himanshu Agnihotri! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T16:25:05.598Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T12:24:57.129Z",
+    "experience": "5 years",
+    "followers": "",
+    "id": "cand_1789475097129_0pfdx",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Himanshu Agnihotri! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Himanshu Agnihotri",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T16:25:04.553Z",
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T13:35:34.001Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "919993829137",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T12:47:52.684Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T12:47:53.960Z"
+      },
+      {
+        "role": "user",
+        "text": "5 and 7",
+        "timestamp": "2026-09-15T12:51:38.893Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T12:51:39.582Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Saniya! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T16:48:05.696Z"
+      },
+      {
+        "role": "user",
+        "text": "Photo.pdf",
+        "timestamp": "2026-09-15T17:00:22.153Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T17:00:28.859Z"
+      },
+      {
+        "role": "user",
+        "text": "Okay",
+        "timestamp": "2026-09-15T17:00:45.526Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Photo! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T17:00:46.389Z"
+      },
+      {
+        "role": "user",
+        "text": "Okay",
+        "timestamp": "2026-09-15T17:01:59.091Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T17:01:59.841Z"
+      },
+      {
+        "role": "user",
+        "text": "I will call you before coming for the interview",
+        "timestamp": "2026-09-15T17:02:36.643Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! 🏢 Our office is at 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital). Please check in at the reception upon arrival. 👍",
+        "timestamp": "2026-09-15T17:02:39.941Z"
+      },
+      {
+        "role": "user",
+        "text": "Okay",
+        "timestamp": "2026-09-15T17:03:13.689Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-15T17:03:14.464Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Photo! 🔔 *Interview Reminder*\n\nYour in-person interview for *Social Media Manager* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:21.013Z"
+      },
+      {
+        "role": "user",
+        "text": "[reaction message received]",
+        "timestamp": "2026-09-16T04:47:17.243Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! At Brand Setu Digital, we welcome applications for *Digital Marketing Role* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *Digital Marketing Role* (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our team can evaluate your profile. 📄👍",
+        "timestamp": "2026-09-16T04:47:20.243Z"
+      },
+      {
+        "role": "user",
+        "text": "Saniya Soni .PNG",
+        "timestamp": "2026-09-16T05:13:37.686Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-16T05:13:38.584Z"
+      },
+      {
+        "role": "user",
+        "text": "I’ll be there in 15 minutes",
+        "timestamp": "2026-09-16T05:28:45.330Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏",
+        "timestamp": "2026-09-16T05:28:46.101Z"
+      },
+      {
+        "role": "assistant",
+        "text": "ok",
+        "timestamp": "2026-09-16T05:29:07.698Z"
+      },
+      {
+        "role": "user",
+        "text": "Please give me calling no",
+        "timestamp": "2026-09-16T06:14:04.326Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Telecaller / Inside Sales*. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in this field (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ What are your core skills and tools? 📝",
+        "timestamp": "2026-09-16T06:14:05.105Z"
+      },
+      {
+        "role": "user",
+        "text": "I have reached the location",
+        "timestamp": "2026-09-16T06:14:36.626Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome! Please come up to **Office No. 103, 1st Floor, Orange Business Park** (Bhawarkua Main Road, Near Apple Hospital). 🏢\n\nYou can ask for the HR team at the reception, or call us at **+91 9329232025** if you need any assistance finding the office. See you shortly! 😊👍",
+        "timestamp": "2026-09-16T06:14:43.434Z"
+      },
+      {
+        "role": "user",
+        "text": "Can you please guide me from where I can come?",
+        "timestamp": "2026-09-16T06:14:45.951Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (2/3):* This helpline is strictly for Brand Setu Digital recruitment. Please message regarding job positions only, otherwise this conversation will be closed. 🙏",
+        "timestamp": "2026-09-16T06:14:46.814Z"
+      },
+      {
+        "role": "user",
+        "text": "So that’s why I need your contact number",
+        "timestamp": "2026-09-16T06:14:56.464Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📞 *BrandSetu Digital HR Contact:*\nPhone / WhatsApp: +91 9329232025 | +91 7389824231\nEmail: contact@brandsetudigital.com\n\nFeel free to connect during office hours (Mon-Sat, 10:00 AM - 7:00 PM).",
+        "timestamp": "2026-09-16T06:14:57.275Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📍 *BrandSetu Digital Office Address:*103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014Google Maps: https://maps.google.com/?q=Orange+Business+Park+Indore",
+        "timestamp": "2026-09-16T06:15:57.331Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T12:47:52.684Z",
+    "experience": "I have reached the location",
+    "followers": "",
+    "id": "cand_1789476472684_ry6gk",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-09-16T04:24:19.818Z",
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "📍 *BrandSetu Digital Office Address:*103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014Google Maps: https://maps.google.com/?q=Orange+Business+Park+Indore",
+    "name": "Saniya Soni",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Okay\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Photo.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T16:48:04.568Z",
+    "role": "Telecaller / Inside Sales",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T06:15:57.331Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": false,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/919993829137_1789491622170_Photo.pdf",
+    "resumeReceivedAt": "2026-09-15T17:00:22.170Z",
+    "resumeUrl": "/uploads/resumes/919993829137_1789491622170_Photo.pdf",
+    "interviewMode": "in_person",
+    "offTopicCount": 2
+  },
+  {
+    "phone": "918965042108",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T13:15:37.321Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T13:15:38.766Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-15T16:09:06.404Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T16:09:07.142Z"
+      },
+      {
+        "role": "user",
+        "text": "Experienced , part time",
+        "timestamp": "2026-09-15T16:09:41.559Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T16:09:42.199Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Deepa Vishwakarma! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T17:24:51.969Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T13:15:37.321Z",
+    "experience": "Experienced [Part-Time]",
+    "followers": "",
+    "id": "cand_1789478137321_9zhyk",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Deepa Vishwakarma! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Deepa Vishwakarma",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T17:24:51.133Z",
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:13:58.991Z",
+    "whatsappChatId": null,
+    "workType": "Part-Time"
+  },
+  {
+    "phone": "918817289144",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T13:49:58.731Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T13:49:59.597Z"
+      },
+      {
+        "role": "user",
+        "text": "5",
+        "timestamp": "2026-09-15T13:50:42.993Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T13:50:43.795Z"
+      },
+      {
+        "role": "user",
+        "text": "Marketingwithpriyanshi.com",
+        "timestamp": "2026-09-15T13:51:04.685Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Other Digital Marketing Roles*. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in this field (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ What are your core skills and tools? 📝",
+        "timestamp": "2026-09-15T13:51:05.349Z"
+      },
+      {
+        "role": "user",
+        "text": "Check on this please",
+        "timestamp": "2026-09-15T13:51:09.642Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏",
+        "timestamp": "2026-09-15T13:51:10.378Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Digitalwithpriyanshi! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Other Digital Marketing Roles* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T17:50:52.175Z"
+      },
+      {
+        "role": "user",
+        "text": "Marketingwithpriyanshi.com",
+        "timestamp": "2026-09-15T17:51:34.586Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! At Brand Setu Digital, we welcome applications for *Digital Marketing Role* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *Digital Marketing Role* (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our team can evaluate your profile. 📄👍",
+        "timestamp": "2026-09-15T17:51:37.298Z"
+      },
+      {
+        "role": "user",
+        "text": "See this",
+        "timestamp": "2026-09-15T17:51:41.831Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! 💼 Please share your updated *Resume (PDF)* and your past work samples / portfolio / live links here so our team can review your profile. 📄✨",
+        "timestamp": "2026-09-15T17:51:43.815Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📍 *BrandSetu Digital Office Address:*103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014Google Maps: https://maps.google.com/?q=Orange+Business+Park+Indore",
+        "timestamp": "2026-09-16T06:09:25.550Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Digitalwithpriyanshi! 🎉 Your in-person interview for the *Other Digital Marketing Roles* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍",
+        "timestamp": "2026-09-16T06:09:30.745Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T13:49:58.730Z",
+    "experience": "Check on this please",
+    "followers": "",
+    "id": "cand_1789480198731_tlxqd",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Digitalwithpriyanshi! 🎉 Your in-person interview for the *Other Digital Marketing Roles* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍",
+    "name": "Digitalwithpriyanshi",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T17:50:51.145Z",
+    "role": "Other Digital Marketing Roles",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T06:09:30.745Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "offTopicCount": 1
+  },
+  {
+    "phone": "919893433392",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T13:58:11.837Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T13:58:12.804Z"
+      },
+      {
+        "role": "user",
+        "text": "Dear HR\nI'm Amit Verma from Indore and I'm looking for content creation job in Indore and want to join your team. I'm learn filmmaking nowadays I'm a content writer too and I'm use to Canva for Instagram post, know some basics of editing and Camera. So I'm be grateful if I have any opportunity to work with your team.",
+        "timestamp": "2026-09-15T13:59:37.373Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Graphic Designer*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T13:59:38.447Z"
+      },
+      {
+        "role": "user",
+        "text": "Amit CV 2026.pdf",
+        "timestamp": "2026-09-15T13:59:44.776Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T14:00:07.288Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Amit! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T14:10:05.366Z"
+      },
+      {
+        "role": "user",
+        "text": "May come on between 18-20 sep?",
+        "timestamp": "2026-09-15T14:30:02.301Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏",
+        "timestamp": "2026-09-15T14:30:03.228Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-09-15T14:31:15.184Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Amit! 🎉\n\nYour in-person interview for the *Graphic Designer* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T14:31:16.180Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Amit! 🔔 *Interview Reminder*\n\nYour in-person interview for *Graphic Designer* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:20.999Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T13:58:11.837Z",
+    "experience": "Amit CV 2026.pdf",
+    "followers": "",
+    "id": "cand_1789480691837_56sn6",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-09-16T04:24:19.874Z",
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Amit! 🔔 *Interview Reminder*\n\nYour in-person interview for *Graphic Designer* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+    "name": "Amit",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Yes\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Amit_CV_2026.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Graphic Designer",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:20:20.520Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/919893433392_1789480784784_Amit_CV_2026.pdf",
+    "resumeReceivedAt": "2026-09-15T13:59:44.784Z",
+    "resumeUrl": "/uploads/resumes/919893433392_1789480784784_Amit_CV_2026.pdf",
+    "interviewSlotProposedAt": "2026-09-15T14:10:04.496Z",
+    "offTopicCount": 1,
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "918085393861",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T14:11:17.631Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T14:11:18.864Z"
+      },
+      {
+        "role": "user",
+        "text": "5",
+        "timestamp": "2026-09-15T14:12:03.260Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T14:12:04.008Z"
+      },
+      {
+        "role": "user",
+        "text": "MAHEK HABLANI- Resume.pdf",
+        "timestamp": "2026-09-15T14:12:39.215Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T14:12:57.939Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mahek Hablani! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T14:23:05.559Z"
+      },
+      {
+        "role": "user",
+        "text": "Day after tomorrow",
+        "timestamp": "2026-09-15T14:26:41.501Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Mahek Hablani! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T14:26:42.285Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T14:11:17.631Z",
+    "experience": "5 years",
+    "followers": "",
+    "id": "cand_1789481477631_vuq7t",
+    "interviewDateTime": "2026-09-17T05:30:00.000Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Mahek Hablani! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+    "name": "Mahek Hablani",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Day after tomorrow\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "MAHEK_HABLANI-_Resume.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-15T14:31:19.691Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/918085393861_1789481559229_MAHEK_HABLANI-_Resume.pdf",
+    "resumeReceivedAt": "2026-09-15T14:12:39.229Z",
+    "resumeUrl": "/uploads/resumes/918085393861_1789481559229_MAHEK_HABLANI-_Resume.pdf",
+    "interviewSlotProposedAt": "2026-09-15T14:23:04.500Z",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "918770615526",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T15:00:57.315Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T15:00:58.776Z"
+      },
+      {
+        "role": "user",
+        "text": "Social Media Manager – Full-Time",
+        "timestamp": "2026-09-15T15:08:00.656Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T15:08:01.607Z"
+      },
+      {
+        "role": "user",
+        "text": "ram tanwar 01.pdf",
+        "timestamp": "2026-09-15T15:10:10.431Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T15:10:21.957Z"
+      },
+      {
+        "role": "user",
+        "text": "Ok",
+        "timestamp": "2026-09-15T15:10:45.200Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Ram Tanwar! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T15:21:05.594Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-09-15T15:26:39.645Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Ram Tanwar! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T15:26:40.441Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Ram Tanwar! 🔔 *Interview Reminder*\n\nYour in-person interview for *Social Media Manager* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:21.030Z"
+      },
+      {
+        "role": "user",
+        "text": "👍 okay",
+        "timestamp": "2026-09-16T04:25:15.992Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+        "timestamp": "2026-09-16T04:25:17.136Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T15:00:57.315Z",
+    "experience": "Preferred: Full-Time",
+    "followers": "",
+    "id": "cand_1789484457315_3kufp",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-09-16T04:24:19.838Z",
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Great! Looking forward to seeing you at the interview. 👍 All the best! 😊",
+    "name": "Ram Tanwar",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Yes\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "ram_tanwar_01.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:21:52.518Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/918770615526_1789485010445_ram_tanwar_01.pdf",
+    "resumeReceivedAt": "2026-09-15T15:10:10.445Z",
+    "resumeUrl": "/uploads/resumes/918770615526_1789485010445_ram_tanwar_01.pdf",
+    "interviewSlotProposedAt": "2026-09-15T15:21:04.525Z",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "918269011542",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T15:14:03.262Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T15:14:04.385Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager!!",
+        "timestamp": "2026-09-15T15:14:52.688Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T15:14:53.501Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm fresher\nWork from home",
+        "timestamp": "2026-09-15T15:15:19.758Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T15:15:20.628Z"
+      },
+      {
+        "role": "user",
+        "text": "plk.cv.pdf",
+        "timestamp": "2026-09-15T15:15:54.956Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T15:16:01.056Z"
+      },
+      {
+        "role": "user",
+        "text": "[Image received]",
+        "timestamp": "2026-09-15T15:16:43.058Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-15T15:16:43.875Z"
+      },
+      {
+        "role": "user",
+        "text": "Managed this account!!",
+        "timestamp": "2026-09-15T15:16:57.390Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Got it, thank you for sharing your work sample! 📱✨\n\nOur HR team is reviewing your profile, resume, and managed account. We will get back to you shortly with the next steps for the selection process! 👍🚀",
+        "timestamp": "2026-09-15T15:17:06.085Z"
+      },
+      {
+        "role": "user",
+        "text": "Okay",
+        "timestamp": "2026-09-15T15:17:56.867Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Image! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Wed, 16 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T15:17:58.028Z"
+      },
+      {
+        "role": "user",
+        "text": "Can we do the interview in virtual mode",
+        "timestamp": "2026-09-15T15:18:58.889Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Your in-person interview is confirmed for *Wed, 16 Sept, 11:00 am* at 103 Orange Business Park, Bhawarkua, Indore. Please arrive on time with your updated Resume. All the best! 😊📍",
+        "timestamp": "2026-09-15T15:19:08.009Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Image! 🔔 *Interview Reminder*\n\nYour in-person interview for *Social Media Manager* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+        "timestamp": "2026-09-16T04:24:21.001Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T15:14:03.262Z",
+    "experience": "Fresher (Work From Home)",
+    "followers": "",
+    "id": "cand_1789485243262_hmjqn",
+    "interviewDateTime": "2026-09-16T05:30:00.000Z",
+    "interviewReminderSent": true,
+    "interviewReminderSentAt": "2026-09-16T04:24:19.857Z",
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Image! 🔔 *Interview Reminder*\n\nYour in-person interview for *Social Media Manager* at *Brand Setu Digital* is scheduled today at *Wed, 16 Sept, 11:00 am*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025\n- HR Team, Brand Setu Digital",
+    "name": "Image",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Okay\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "plk.cv.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:20:58.090Z",
+    "whatsappChatId": null,
+    "workType": "Work From Home",
+    "interviewSlotProposed": false,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/918269011542_1789485354967_plk.cv.pdf",
+    "resumeReceivedAt": "2026-09-15T15:15:54.967Z",
+    "resumeUrl": "/uploads/resumes/918269011542_1789485354967_plk.cv.pdf",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "919203383540",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T15:18:01.544Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T15:18:02.270Z"
+      },
+      {
+        "role": "user",
+        "text": "I would like to apply for social media manager |work from home or freelancer module",
+        "timestamp": "2026-09-15T15:32:24.343Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T15:32:25.123Z"
+      },
+      {
+        "role": "user",
+        "text": "Sure! I’m currently building my experience in Social Media Management, so I don’t have previous client-managed profiles or formal growth case studies yet. I do have experience with content creation, ideation, scripting and managing my own content. I’d be happy to share my resume and personal work/portfolio for consideration.",
+        "timestamp": "2026-09-15T15:40:00.378Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T15:40:05.282Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Sneha Patel! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T19:18:52.234Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T15:18:01.544Z",
+    "experience": "Preferred: Freelancer",
+    "followers": "",
+    "id": "cand_1789485481544_s7nyy",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Sneha Patel! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Sneha Patel",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T19:18:51.174Z",
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:15:23.887Z",
+    "whatsappChatId": null,
+    "workType": "Freelancer"
+  },
+  {
+    "phone": "919770627922",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T15:26:05.200Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T15:26:06.352Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Team Yamraj! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T19:26:52.032Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T15:26:05.199Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789485965200_h5rjd",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Team Yamraj! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Team Yamraj",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T19:26:51.175Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:16:02.993Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "919713358457",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T15:33:38.302Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T15:33:39.175Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-15T16:02:54.924Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T16:02:55.851Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm a professional social media manager, qith 4+ years experience. \nI'm available for full time / work from home / freelance opportunities",
+        "timestamp": "2026-09-15T16:04:29.811Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T16:04:31.120Z"
+      },
+      {
+        "role": "user",
+        "text": "https://garimanamdevportfolio.my.canva.site/creative-portfolio\nGarima_Namdev_Resume.pdf",
+        "timestamp": "2026-09-15T16:05:10.565Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Graphic Designer*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T16:05:13.042Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T16:16:05.547Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T15:33:38.302Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789486418302_9o2ad",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+    "name": "Garima Namdev",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "Garima_Namdev_Resume.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Graphic Designer",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:10:54.842Z",
+    "whatsappChatId": null,
+    "workType": "Freelancer",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/919713358457_1789488310580_Garima_Namdev_Resume.pdf",
+    "resumeReceivedAt": "2026-09-15T16:05:10.581Z",
+    "resumeUrl": "/uploads/resumes/919713358457_1789488310580_Garima_Namdev_Resume.pdf",
+    "interviewSlotProposedAt": "2026-09-15T16:16:04.551Z"
+  },
+  {
+    "phone": "919340297879",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T16:02:37.467Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T16:02:38.643Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Candidate! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T20:02:52.365Z"
+      },
+      {
+        "role": "user",
+        "text": "Rishi-SM-CV.pdf",
+        "timestamp": "2026-09-16T05:06:59.087Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-16T05:07:04.428Z"
+      },
+      {
+        "role": "user",
+        "text": "5 or 6",
+        "timestamp": "2026-09-16T05:08:00.264Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-16T05:08:01.143Z"
+      },
+      {
+        "role": "user",
+        "text": "Fresher [ I did freelance work too ]\nFull time in office",
+        "timestamp": "2026-09-16T05:09:15.798Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! We welcome candidates for *Freelancer* and *Work From Home (WFH)* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking to work freelance / WFH in?\n2️⃣ How much experience do you have and how many hours can you dedicate?\n\nPlease share your updated *Resume (PDF)* and portfolio / work samples link here! 📄🎥",
+        "timestamp": "2026-09-16T05:09:16.662Z"
+      },
+      {
+        "role": "user",
+        "text": "Sorry I mean I'm fresher and applying for Full-Time In-Office",
+        "timestamp": "2026-09-16T05:10:35.630Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📍 *Office Location:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n⏰ *Timings:* Monday to Saturday (10:00 AM – 7:00 PM)\n📞 *Contact:* +91 9329232025",
+        "timestamp": "2026-09-16T05:10:38.424Z"
+      },
+      {
+        "role": "user",
+        "text": "Rishi-SM-CV.pdf",
+        "timestamp": "2026-09-16T05:12:03.458Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-16T05:12:09.831Z"
+      },
+      {
+        "role": "user",
+        "text": "[reaction message received]",
+        "timestamp": "2026-09-16T05:12:23.309Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! At Brand Setu Digital, we welcome applications for *Digital Marketing Role* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *Digital Marketing Role* (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our team can evaluate your profile. 📄👍",
+        "timestamp": "2026-09-16T05:12:25.421Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Rishi Sm! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T05:22:20.855Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes",
+        "timestamp": "2026-09-16T05:23:26.355Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Rishi Sm! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-16T05:23:27.183Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T16:02:37.467Z",
+    "experience": "Fresher (Freelancer)",
+    "followers": "",
+    "id": "cand_1789488157467_apeq1",
+    "interviewDateTime": "2026-09-17T05:30:00.000Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Rishi Sm! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+    "name": "Rishi Sm",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Yes\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Rishi-SM-CV.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T20:02:51.183Z",
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:28:14.929Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/919340297879_1789535523473_Rishi-SM-CV.pdf",
+    "resumeReceivedAt": "2026-09-16T05:12:03.473Z",
+    "resumeUrl": "/uploads/resumes/919340297879_1789535523473_Rishi-SM-CV.pdf",
+    "interviewSlotProposedAt": "2026-09-16T05:22:19.834Z",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "916393680196",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T16:20:13.159Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T16:20:14.112Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-15T18:11:41.001Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T18:11:42.260Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Pooja Tripathi! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T20:20:52.621Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T16:20:13.159Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789489213159_1kbbb",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Pooja Tripathi! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Social Media Manager* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Pooja Tripathi",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T20:20:51.192Z",
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:17:01.837Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "919179555776",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T16:49:38.853Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T16:49:39.666Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media manager",
+        "timestamp": "2026-09-15T16:50:24.751Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T16:50:25.346Z"
+      },
+      {
+        "role": "user",
+        "text": "My Exeperience 6 months in internship and 6 months in job\n\nApplying for full time in Office",
+        "timestamp": "2026-09-15T16:51:55.141Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-15T16:51:55.702Z"
+      },
+      {
+        "role": "user",
+        "text": "Ekta Talreja Resume.docx",
+        "timestamp": "2026-09-15T16:53:09.782Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-15T16:53:10.444Z"
+      },
+      {
+        "role": "user",
+        "text": "https://docs.google.com/presentation/d/1i3b6HZMsPrEPYOjLO6-hyDBFZXplEPpMY5AfxGeo8Dk/edit?usp=sharing",
+        "timestamp": "2026-09-15T16:54:51.994Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T16:55:09.723Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Ekta Talreja! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T17:04:05.395Z"
+      },
+      {
+        "role": "user",
+        "text": "No , can come around 2-2:30",
+        "timestamp": "2026-09-15T17:06:36.433Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T17:06:40.404Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T16:49:38.853Z",
+    "experience": "Fresher (Full-Time)",
+    "followers": "",
+    "id": "cand_1789490978853_flib7",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+    "name": "Ekta Talreja",
+    "notes": "",
+    "portfolio": "https://docs.google.com/presentation/d/1i3b6HZMsPrEPYOjLO6-hyDBFZXplEPpMY5AfxGeo8Dk/edit?usp=sharing",
+    "resumeFileName": "Ekta Talreja Resume.docx",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:11:49.459Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumeReceivedAt": "2026-09-15T16:53:09.782Z",
+    "interviewSlotProposedAt": "2026-09-15T17:04:04.580Z"
+  },
+  {
+    "phone": "918770389606",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T17:23:53.192Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T17:23:54.135Z"
+      },
+      {
+        "role": "user",
+        "text": "Khushi Malani's Resume.pdf",
+        "timestamp": "2026-09-15T17:25:04.835Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T17:25:09.686Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Khushi Malani! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T17:35:52.348Z"
+      },
+      {
+        "role": "user",
+        "text": "Can interview be done at 2pm?",
+        "timestamp": "2026-09-16T04:53:15.364Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Khushi Malani! 🎉\n\nYour in-person interview for the *General Applicant* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 02:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-16T04:53:16.128Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T17:23:53.190Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789493033192_5igvt",
+    "interviewDateTime": "2026-09-17T08:30:00.000Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Khushi Malani! 🎉\n\nYour in-person interview for the *General Applicant* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 02:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+    "name": "Khushi Malani",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Can interview be done at 2pm?\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Khushi_Malani_s_Resume.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:23:16.287Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/918770389606_1789493104850_Khushi_Malani_s_Resume.pdf",
+    "resumeReceivedAt": "2026-09-15T17:25:04.850Z",
+    "resumeUrl": "/uploads/resumes/918770389606_1789493104850_Khushi_Malani_s_Resume.pdf",
+    "interviewSlotProposedAt": "2026-09-15T17:35:51.140Z",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "918989051473",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T17:53:50.420Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T17:53:51.430Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Nexora Labs! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T21:54:20.855Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T17:53:50.420Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789494830420_slc1z",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Nexora Labs! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Nexora Labs",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T21:54:19.705Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:17:14.109Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "918602859616",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T18:17:04.741Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T18:17:05.433Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Mradul! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T22:17:20.652Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T18:17:04.740Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789496224741_84w4a",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Mradul! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Mradul",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T22:17:19.711Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:17:26.722Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "917770836080",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T18:53:44.567Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T18:53:45.491Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Karmang Darpan! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-15T22:54:20.784Z"
+      },
+      {
+        "role": "user",
+        "text": "Lavvanya joshi resume july 2026.pdf",
+        "timestamp": "2026-09-16T04:15:56.169Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume! 📄✨ \n\nOur recruitment team is currently reviewing your profile. We will get back to you shortly with the next steps regarding your application. 👍\n\nHave a great day ahead! 🚀",
+        "timestamp": "2026-09-16T04:16:06.045Z"
+      },
+      {
+        "role": "user",
+        "text": "PORTFOLIO LAVVANYA JOSHI 2025.pdf",
+        "timestamp": "2026-09-16T04:16:07.266Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you so much for sharing your portfolio! 🎨✨ \n\nWe have received both your Resume and Portfolio. Our team is currently reviewing your work samples and profile, and we will get back to you shortly with the next steps. 👍\n\nHave a wonderful day ahead! 🚀",
+        "timestamp": "2026-09-16T04:16:14.677Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Lavvanya Joshi! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T04:26:20.571Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T18:53:44.566Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789498424566_42w0a",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Lavvanya Joshi! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+    "name": "Lavvanya Joshi",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "PORTFOLIO_LAVVANYA_JOSHI_2025.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-15T22:54:19.715Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:22:50.958Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/917770836080_1789532167285_PORTFOLIO_LAVVANYA_JOSHI_2025.pdf",
+    "resumeReceivedAt": "2026-09-16T04:16:07.285Z",
+    "resumeUrl": "/uploads/resumes/917770836080_1789532167285_PORTFOLIO_LAVVANYA_JOSHI_2025.pdf",
+    "interviewSlotProposedAt": "2026-09-16T04:26:19.819Z"
+  },
+  {
+    "phone": "918319029608",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T19:18:30.348Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T19:18:31.129Z"
+      },
+      {
+        "role": "user",
+        "text": "2 & Full time WFO",
+        "timestamp": "2026-09-15T19:19:52.134Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Awesome! 🤖 Please share your updated *Resume (PDF)* and your AI video work samples / Google Drive link here. 📄🎥",
+        "timestamp": "2026-09-15T19:19:52.857Z"
+      },
+      {
+        "role": "user",
+        "text": "Rahul_Khatri_Resume_Premium.docx",
+        "timestamp": "2026-09-15T19:20:15.969Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-15T19:20:16.614Z"
+      },
+      {
+        "role": "user",
+        "text": "Here is my CV and the links are also there in the CV, lmk if you want anything else.",
+        "timestamp": "2026-09-15T19:20:43.886Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your details! 📄✨ \n\nOur team is currently reviewing your profile",
+        "timestamp": "2026-09-15T19:20:55.054Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Rahul! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T19:30:51.877Z"
+      },
+      {
+        "role": "user",
+        "text": "Can I come at around 3 pm?",
+        "timestamp": "2026-09-16T00:16:09.970Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Rahul! 🎉\n\nYour in-person interview for the *AI Video Expert* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 03:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-16T00:16:10.913Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T19:18:30.348Z",
+    "experience": "Preferred: Full-Time",
+    "followers": "",
+    "id": "cand_1789499910348_wxcn8",
+    "interviewDateTime": "2026-09-17T09:30:00.000Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Rahul! 🎉\n\nYour in-person interview for the *AI Video Expert* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 03:00 pm\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+    "name": "Rahul",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Can I come at around 3 pm?\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Rahul_Khatri_Resume_Premium.docx",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "AI Video Expert",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:17:39.657Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumeReceivedAt": "2026-09-15T19:20:15.969Z",
+    "interviewSlotProposedAt": "2026-09-15T19:30:51.175Z",
+    "interviewMode": "in_person"
+  },
+  {
+    "phone": "917828332884",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T19:24:35.805Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T19:24:36.694Z"
+      },
+      {
+        "role": "user",
+        "text": "Social Media Manager",
+        "timestamp": "2026-09-15T19:25:35.125Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-15T19:25:35.980Z"
+      },
+      {
+        "role": "user",
+        "text": "Pradhyumn_Kuril_Resume_(1)[1].docx",
+        "timestamp": "2026-09-15T19:25:55.249Z"
+      },
+      {
+        "role": "assistant",
+        "text": "📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍",
+        "timestamp": "2026-09-15T19:25:55.883Z"
+      },
+      {
+        "role": "user",
+        "text": "I'm interested in Work from home or office either",
+        "timestamp": "2026-09-15T19:26:27.472Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! We welcome candidates for *Freelancer* and *Work From Home (WFH)* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking to work freelance / WFH in?\n2️⃣ How much experience do you have and how many hours can you dedicate?\n\nPlease share your updated *Resume (PDF)* and portfolio / work samples link here! 📄🎥",
+        "timestamp": "2026-09-15T19:26:28.256Z"
+      },
+      {
+        "role": "user",
+        "text": "Social media",
+        "timestamp": "2026-09-15T19:27:02.042Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your resume/portfolio! 📄✨\n\nOur HR team is currently reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-15T19:27:06.894Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Pradhyumn Kuril! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-15T19:36:52.523Z"
+      },
+      {
+        "role": "user",
+        "text": "Yes sure",
+        "timestamp": "2026-09-15T19:37:49.844Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Pradhyumn Kuril! 🎉\n\nYour in-person interview for the *Social Media Manager* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* Thu, 17 Sept, 2026, 11:00 am\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital",
+        "timestamp": "2026-09-15T19:37:50.655Z"
+      },
+      {
+        "role": "user",
+        "text": "I'll come till 12",
+        "timestamp": "2026-09-16T05:45:37.273Z"
+      },
+      {
+        "role": "assistant",
+        "text": "⚠️ *Warning (1/3):* This helpline is strictly reserved for Brand Setu Digital recruitment & active job roles (*Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager*). 😊\n\nPlease message only regarding our hiring. Thank you! 🙏",
+        "timestamp": "2026-09-16T05:45:38.565Z"
+      },
+      {
+        "role": "assistant",
+        "text": "ok",
+        "timestamp": "2026-09-16T05:46:33.959Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T19:24:35.805Z",
+    "experience": "Pradhyumn_Kuril_Resume_(1)[1].docx",
+    "followers": "",
+    "id": "cand_1789500275805_c4xp0",
+    "interviewDateTime": "2026-09-17T05:30:00.000Z",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "ok",
+    "name": "Pradhyumn Kuril",
+    "notes": "Auto-scheduled via WhatsApp AI: \"Yes sure\" (In-Person)",
+    "portfolio": "",
+    "resumeFileName": "Pradhyumn_Kuril_Resume_(1)[1].docx",
+    "resumeReceived": true,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Interview Scheduled",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:46:33.959Z",
+    "whatsappChatId": null,
+    "workType": "Work From Home",
+    "interviewSlotProposed": true,
+    "resumeReceivedAt": "2026-09-15T19:25:55.249Z",
+    "interviewSlotProposedAt": "2026-09-15T19:36:51.176Z",
+    "interviewMode": "in_person",
+    "offTopicCount": 1
+  },
+  {
+    "phone": "916263807580",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T20:28:18.098Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T20:28:18.906Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Zainab Ansari! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-16T00:28:21.168Z"
+      },
+      {
+        "role": "user",
+        "text": "zainab's resume _3.pdf\nzainab's Ansari graphic portfolio 2026_3.pdf",
+        "timestamp": "2026-09-16T04:01:56.732Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Graphic Designer*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-16T04:02:00.487Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Zainab Ansari! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T04:12:20.566Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T20:28:18.098Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789504098098_c27ra",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Zainab Ansari! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+    "name": "Zainab Ansari",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "zainab_s_Ansari_graphic_portfolio_2026_3.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-16T00:28:19.743Z",
+    "role": "Graphic Designer",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:18:15.783Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/916263807580_1789531316754_zainab_s_Ansari_graphic_portfolio_2026_3.pdf",
+    "resumeReceivedAt": "2026-09-16T04:01:56.754Z",
+    "resumeUrl": "/uploads/resumes/916263807580_1789531316754_zainab_s_Ansari_graphic_portfolio_2026_3.pdf",
+    "interviewSlotProposedAt": "2026-09-16T04:12:19.812Z"
+  },
+  {
+    "phone": "919131002563",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T20:57:21.781Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T20:57:22.982Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Somya Jain! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-16T00:58:21.777Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T20:57:21.779Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789505841781_rmp6k",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Somya Jain! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+    "name": "Somya Jain",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-16T00:58:19.749Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Pending",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:18:07.877Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "918982493940",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-15T22:28:50.086Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-15T22:28:50.836Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Khushi Dixit! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *General Applicant* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025)",
+        "timestamp": "2026-09-16T02:29:20.891Z"
+      },
+      {
+        "role": "user",
+        "text": "Khushi Dixit Resume.pdf",
+        "timestamp": "2026-09-16T05:07:22.909Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-16T05:07:27.002Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Khushi Dixit! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T05:18:20.550Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Khushi Dixit! 🎉 Your in-person interview for the *General Applicant* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍",
+        "timestamp": "2026-09-16T05:28:00.972Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-15T22:28:50.084Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789511330086_u94lo",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Dear Khushi Dixit! 🎉 Your in-person interview for the *General Applicant* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍",
+    "name": "Khushi Dixit",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "Khushi_Dixit_Resume.pdf",
+    "resumeReceived": true,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-16T02:29:19.788Z",
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:28:00.972Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "interviewSlotProposed": true,
+    "resumePath": "/home/u504868178/domains/azure-donkey-934655.hostingersite.com/hbuilds/versions/01a09f6e-72cd-7083-ae4a-96dc386d0fec/nodejs/uploads/resumes/918982493940_1789535242925_Khushi_Dixit_Resume.pdf",
+    "resumeReceivedAt": "2026-09-16T05:07:22.925Z",
+    "resumeUrl": "/uploads/resumes/918982493940_1789535242925_Khushi_Dixit_Resume.pdf",
+    "interviewSlotProposedAt": "2026-09-16T05:18:19.833Z"
+  },
+  {
+    "phone": "919752628864",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello!",
+        "timestamp": "2026-09-16T04:04:19.394Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-16T04:04:20.342Z"
+      },
+      {
+        "role": "user",
+        "text": "I am looking for a job in the digital marketing field. I have experience in social media management, Google SEO, Meta Ads, content creation influencer collaboration, and basic digital marketing services. Please let me know if you have any open vacancy so we can discuss it further.",
+        "timestamp": "2026-09-16T04:13:29.993Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you! ✨ Your details have been noted. Please share your Instagram profile link or insights screenshot here, and our collaboration team will connect with you shortly! 🤝",
+        "timestamp": "2026-09-16T04:13:30.754Z"
+      },
+      {
+        "role": "user",
+        "text": "fdb1fea8-a17e-45b1-b1fb-186c48900deb.pdf\nHere's my CV",
+        "timestamp": "2026-09-16T04:13:47.291Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Thank you for sharing your CV! 📄✨ \n\nOur team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+        "timestamp": "2026-09-16T04:13:50.219Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-16T04:04:19.394Z",
+    "experience": "Preferred: Influencer Collaboration",
+    "followers": "",
+    "id": "cand_1789531459394_3hpur",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Thank you for sharing your CV! 📄✨ \n\nOur team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+    "name": "Anjali",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Influencer Collaboration",
+    "socialHandle": "",
+    "status": "Applied",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:19:59.936Z",
+    "whatsappChatId": null,
+    "workType": "Influencer Collaboration"
+  },
+  {
+    "phone": "919753928315",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hello! Can I get more info on this?",
+        "timestamp": "2026-09-16T05:10:19.205Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+        "timestamp": "2026-09-16T05:10:20.383Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-16T05:10:19.205Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789535419205_1kkt1",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝",
+    "name": "Rahul",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Applied",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:23:34.834Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time"
+  },
+  {
+    "phone": "918982980773",
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "Hey I am Poorva, I would like to apply for job Social media manager, please find my resume attached. Thank you\nHello! Can I get more info on this?",
+        "timestamp": "2026-09-16T05:47:23.637Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Great! You have selected *Social Media Manager*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼",
+        "timestamp": "2026-09-16T05:47:24.572Z"
+      },
+      {
+        "role": "user",
+        "text": "1 year of experience and Work from home if is it possible?",
+        "timestamp": "2026-09-16T05:48:17.431Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+        "timestamp": "2026-09-16T05:48:18.372Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-16T05:47:23.637Z",
+    "experience": "Full-Time (1 year of experience) [Work From Home]",
+    "followers": "",
+    "id": "cand_1789537643637_9n4fv",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Super! 📱 Please share your updated *Resume (PDF)* and your past managed social media profiles / growth proof here. 📄🚀",
+    "name": "Poorva",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Applied",
+    "unreadCount": 0,
+    "updatedAt": "2026-09-16T05:53:23.191Z",
+    "whatsappChatId": null,
+    "workType": "Work From Home"
   }
 ]

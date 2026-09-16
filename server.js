@@ -186,6 +186,31 @@ async function processIncomingWhatsAppMessage(messageData) {
         hiringService.saveCandidatesAndSyncExcel();
       } else {
         // Candidate sent an IMAGE, photo, screenshot, audio, or non-PDF file
+        const isEnglish = (candidate.lang === 'english');
+
+        // Check if candidate ALREADY submitted a PDF resume or portfolio
+        if (candidate.resumeReceived || candidate.portfolio) {
+          console.log(`📱 Candidate ${candidate.name} (+${candidate.phone}) sent media/screenshot after resume: Acknowledging as work sample`);
+          const sampleAckMsg = isEnglish
+            ? `Got it! Thank you for sharing your work sample / screenshot. 📱✨ Our HR team has added this to your application file and is reviewing it along with your resume. 👍`
+            : `Mil gaya! Apna work sample / screenshot share karne ke liye dhanyawad. 📱✨ Hamari HR team ise aapke application aur resume ke saath review kar rahi hai. 👍`;
+
+          try {
+            const isMetaSource = messageData.source === 'meta';
+            await whatsappCloudService.sendWhatsAppText(replyRecipient, sampleAckMsg, isMetaSource);
+            hiringService.appendChatHistory(candidate, 'assistant', sampleAckMsg);
+            hiringService.saveCandidatesAndSyncExcel();
+            io.emit('hiring-updated', {
+              candidates: hiringService.getCandidates(),
+              stats: hiringService.getHiringStats(),
+              candidateId: candidate.id
+            });
+          } catch (sendErr) {
+            console.error('Error sending media sample ack:', sendErr.message);
+          }
+          return;
+        }
+
         console.log(`⚠️ Candidate ${candidate.name} (+${candidate.phone}) sent non-PDF media (${messageData.messageType}): Requesting proper PDF resume`);
 
         // Check if image filename contains candidate's name (e.g. "Bhoomika Sankhla Resume.PNG")
@@ -195,7 +220,6 @@ async function processIncomingWhatsAppMessage(messageData) {
           candidate.name = nameFromMedia;
         }
 
-        const isEnglish = (candidate.lang === 'english');
         const invalidMediaMsg = isEnglish
           ? `📌 *Resume Format Notice:*\n\nPlease share your updated resume in **PDF format (.pdf)** only (Photos/images are not accepted). 📄\n\nIf you have a portfolio or work samples, please share the **Google Drive, Behance, or Figma link**. 👍`
           : `📌 *Resume Format Notice:*\n\nKripya apna updated resume **PDF format (.pdf)** me hi share karein (Photos/images accept nahi hote). 📄\n\nAgar aapke paas portfolio ya work samples hain, to uska **Google Drive, Behance, ya Figma link** yahan share karein. 👍`;
@@ -309,9 +333,10 @@ async function processIncomingWhatsAppMessage(messageData) {
   if (candidate && candidate.interviewDateTime && aiService.isAcknowledgementMessage(messageText)) {
     console.log(`👍 Candidate ${candidate.name} (+${candidate.phone}) sent acknowledgment for scheduled interview`);
     const isEnglish = (candidate.lang === 'english');
-    const ackMsg = isEnglish
+    const defaultAckMsg = isEnglish
       ? `Great! Looking forward to seeing you at the interview. 👍 All the best! 😊`
       : `Bahut badiya! Interview me milte hain. 👍 All the best! 😊`;
+    const ackMsg = aiService.getDeduplicatedOrHumanResponse(candidate, defaultAckMsg, messageText);
 
     try {
       const isMetaSource = messageData.source === 'meta';
@@ -322,6 +347,111 @@ async function processIncomingWhatsAppMessage(messageData) {
       console.error('Error sending ack reply:', e.message);
     }
     return; // Don't reschedule or send repetitive messages!
+  }
+
+  // 1.74 If candidate states they will call before coming / arriving ("will call before coming", "aane se pehle call karunga")
+  if (candidate && messageText && aiService.isPreArrivalCallNotice(messageText)) {
+    console.log(`📞 Candidate ${candidate.name} (+${candidate.phone}) sent pre-arrival call notice: "${messageText}"`);
+    const preCallMsg = aiService.getPreArrivalCallResponse(candidate.lang);
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, preCallMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', preCallMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending pre-arrival call reply:', e.message);
+    }
+    return;
+  }
+
+  // 1.75 If candidate sends arrival / on-the-way status ("I'll be there in 15 minutes", "gate par hu", "traffic me hu", etc.)
+  if (candidate && messageText && aiService.isArrivalStatusMessage(messageText)) {
+    console.log(`📍 Candidate ${candidate.name} (+${candidate.phone}) sent arrival status: "${messageText}"`);
+    const isEnglish = (candidate.lang === 'english');
+    const defaultArrivalMsg = isEnglish
+      ? `Got it! 👍 Our office is located at 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital). Please come up to the 1st floor and check in at the reception upon arrival. Our team is waiting for you! All the best! 😊📍`
+      : `Bahut badiya! 🏢 Hamara office 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital) 1st floor par hai. Office pahunch kar reception par contact karein, hamari team aapka wait kar rahi hai. All the best! 😊📍`;
+    const arrivalMsg = aiService.getDeduplicatedOrHumanResponse(candidate, defaultArrivalMsg, messageText);
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, arrivalMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', arrivalMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending arrival status reply:', e.message);
+    }
+    return;
+  }
+
+  // 1.76 Check for Remote / Virtual / Online Interview Request (User Rule: HR will connect directly)
+  if (candidate && messageText && aiService.isVirtualOrRemoteInterviewQuery(messageText)) {
+    console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) requested Remote/Virtual/Online interview: "${messageText}"`);
+    candidate.interviewMode = 'online';
+    candidate.workType = candidate.workType || 'Work From Home';
+    candidate.updatedAt = new Date().toISOString();
+
+    const isEnglish = (candidate.lang === 'english');
+    const remoteMsg = isEnglish
+      ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨ Meanwhile, please ensure your updated Resume (PDF) and portfolio links are shared here. 👍`
+      : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨ Tab tak kripya apna updated Resume (PDF) aur work portfolio link yahan share kar dein. 👍`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, remoteMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', remoteMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+
+      // Alert HR phone
+      const hrPhones = (process.env.HR_PHONE_NUMBER || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
+      for (const hrPhone of hrPhones) {
+        if (hrPhone && hrPhone !== candidate.phone) {
+          const hrMsg = `📢 *HR ALERT: Candidate Requested Remote / Online Interview* 💻\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🌐 *Preference:* Remote / Online (Virtual)\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n\n👉 Kripya candidate se WhatsApp / Call par connect karein. 👍`;
+          whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg).catch(err => console.error('HR alert error:', err.message));
+        }
+      }
+    } catch (sendErr) {
+      console.error('Error sending remote/virtual reply:', sendErr.message);
+    }
+    return;
+  }
+
+  // 1.77 Check for Office Location, Directions, or Contact / Calling Number Queries
+  if (candidate && messageText && aiService.isOfficeDirectionsOrContactQuery(messageText)) {
+    console.log(`📍 Candidate ${candidate.name} (+${candidate.phone}) asked for office directions / contact: "${messageText}"`);
+    const defaultDirectionsMsg = aiService.getOfficeLocationDirectionsResponse(candidate.lang);
+    const directionsMsg = aiService.getDeduplicatedOrHumanResponse(candidate, defaultDirectionsMsg, messageText);
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, directionsMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', directionsMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending directions response:', e.message);
+    }
+    return;
   }
 
   // 1.8 Check for Off-Topic / Irrelevant Messages: 3-Warning Rule & Auto-Close
@@ -383,11 +513,19 @@ async function processIncomingWhatsAppMessage(messageData) {
     return; // STOP! Never auto-schedule an interview from a third-party forward!
   }
 
-  // 1.94 Candidate clicks Ad or sends Initial Greeting / Inquiry (Step 0 -> Step 1: Welcome & 6 Roles)
-  const isAdInquiry = aiService.isAdInquiryMessage(messageText);
+  // 1.94 Candidate clicks Ad, responds to Bulk Campaign, or sends Initial Greeting / Inquiry (Step 0 -> Step 1: Welcome & 6 Roles)
+  const isHiringInterest = aiService.isHiringInterestMessage ? aiService.isHiringInterestMessage(messageText) : false;
+  const isAdInquiry = aiService.isAdInquiryMessage(messageText) || isHiringInterest;
   const isGreeting = aiService.isGreetingMessage(messageText);
   const cleanIncomingLower = (messageText || '').toLowerCase().trim();
-  const isFreshIntent = (cleanIncomingLower === 'apply' || cleanIncomingLower === 'job' || cleanIncomingLower === 'hiring' || isAdInquiry || isGreeting);
+  const isFreshIntent = (
+    cleanIncomingLower === 'apply' ||
+    cleanIncomingLower === 'job' ||
+    cleanIncomingLower === 'hiring' ||
+    isHiringInterest ||
+    isAdInquiry ||
+    isGreeting
+  );
   const isSpecificFaq = (
     aiService.isPartTimeQuery(messageText) ||
     aiService.isDocumentQuery(messageText) ||
@@ -396,9 +534,13 @@ async function processIncomingWhatsAppMessage(messageData) {
 
   const isGeneralCandidate = candidate && (!candidate.role || candidate.role === 'General Applicant');
   const hasNoResumeOrExp = candidate && !candidate.resumeReceived && (!candidate.experience || candidate.experience === '');
+  const isReplyingToCampaign = candidate && (candidate.status === 'Campaign Sent' || (candidate.notes && candidate.notes.includes('campaign'))) && candidate.chatHistory && candidate.chatHistory.length <= 2;
 
-  if (isGeneralCandidate && hasNoResumeOrExp && !isSpecificFaq && !candidate.justSelectedRole && (isFreshIntent || (candidate.chatHistory && candidate.chatHistory.length <= 1))) {
-    console.log(`👋 New/Ad Inquiry from +${customerPhone} ("${messageText}") -> Sending Welcome & 6 Roles`);
+  if (isGeneralCandidate && hasNoResumeOrExp && !isSpecificFaq && !candidate.justSelectedRole && (isFreshIntent || isReplyingToCampaign || (candidate.chatHistory && candidate.chatHistory.length <= 1))) {
+    console.log(`👋 New/Ad/Campaign Inquiry from +${customerPhone} ("${messageText}") -> Sending Welcome & 6 Roles`);
+    if (candidate && candidate.status === 'Campaign Sent') {
+      candidate.status = 'Applied';
+    }
     const welcomeMsg = hiringService.getWelcomeRolesReply(candidate.lang);
     try {
       const isMetaSource = messageData.source === 'meta';
@@ -587,9 +729,14 @@ async function processIncomingWhatsAppMessage(messageData) {
       });
 
       // Pass full candidate profile and history to AI
-      const aiResponseText = candidate
+      let aiResponseText = candidate
         ? await aiService.generateHiringAIResponse(candidate, messageText, messageData)
         : await aiService.generateAIResponse(messageText);
+
+      // Filter repetitive or robotic responses
+      aiResponseText = candidate
+        ? aiService.getDeduplicatedOrHumanResponse(candidate, aiResponseText, messageText)
+        : aiResponseText;
 
       // Send AI response
       const isMetaSource = messageData.source === 'meta';
@@ -915,6 +1062,14 @@ app.post('/api/send-bulk', upload.single('media'), async (req, res) => {
         }
 
         activeCampaign.sent++;
+
+        // Track outgoing campaign message in Hiring CRM & candidate chat history
+        try {
+          hiringService.trackOutgoingCampaignMessage(phone, messageContent);
+        } catch (trkErr) {
+          console.error(`Error tracking campaign message for +${phone}:`, trkErr.message);
+        }
+
         const logMsg = `[${i + 1}/${recipients.length}] Sent message to +${phone}`;
         activeCampaign.logs.push({ time: new Date().toLocaleTimeString(), type: 'success', text: logMsg });
         io.emit('campaign-progress', activeCampaign);
