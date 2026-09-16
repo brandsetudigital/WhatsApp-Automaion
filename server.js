@@ -863,6 +863,65 @@ app.post('/api/logout', async (req, res) => {
   }
 });
 
+/**
+ * Helper to intelligently extract and normalize phone numbers from any CSV/Excel row object or string
+ */
+function extractPhoneNumberFromItem(item) {
+  if (!item) return '';
+  if (typeof item === 'string' || typeof item === 'number') {
+    let digits = String(item).replace(/[^0-9]/g, '');
+    if (digits.length === 10) digits = '91' + digits;
+    else if (digits.length === 11 && digits.startsWith('0')) digits = '91' + digits.slice(1);
+    return digits;
+  }
+
+  if (typeof item === 'object') {
+    const keys = Object.keys(item);
+
+    // 1. Check known keys case-insensitively, trimmed, without punctuation
+    for (const key of keys) {
+      const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (
+        cleanKey.includes('phone') ||
+        cleanKey.includes('mobile') ||
+        cleanKey.includes('contact') ||
+        cleanKey.includes('whatsapp') ||
+        cleanKey.includes('number') ||
+        cleanKey.includes('tele') ||
+        cleanKey === 'num' ||
+        cleanKey === 'ph' ||
+        cleanKey === 'wa'
+      ) {
+        let val = String(item[key] || '').replace(/[^0-9]/g, '');
+        if (val.length >= 10 && val.length <= 13) {
+          if (val.length === 10) val = '91' + val;
+          else if (val.length === 11 && val.startsWith('0')) val = '91' + val.slice(1);
+          return val;
+        } else if (val.length >= 8) {
+          return val;
+        }
+      }
+    }
+
+    // 2. Scan every field in the row to find a 10 to 13 digit phone number
+    for (const key of keys) {
+      let val = String(item[key] || '').replace(/[^0-9]/g, '');
+      if (val.length === 10) return '91' + val;
+      if (val.length === 11 && val.startsWith('0')) return '91' + val.slice(1);
+      if (val.length === 12 && val.startsWith('91')) return val;
+      if (val.length >= 10 && val.length <= 13) return val;
+    }
+
+    // 3. Fallback: Any field with 8+ digits
+    for (const key of keys) {
+      let val = String(item[key] || '').replace(/[^0-9]/g, '');
+      if (val.length >= 8) return val;
+    }
+  }
+
+  return '';
+}
+
 // Upload CSV / Excel File and parse contacts
 app.post('/api/upload-csv', upload.single('file'), (req, res) => {
   if (!req.file) {
@@ -882,9 +941,12 @@ app.post('/api/upload-csv', upload.single('file'), (req, res) => {
           columns = headers.map(h => h.trim());
         })
         .on('data', (row) => {
+          const ph = extractPhoneNumberFromItem(row);
+          if (ph) row.phone = ph;
           contacts.push(row);
         })
         .on('end', () => {
+          if (!columns.includes('phone')) columns.unshift('phone');
           fs.unlinkSync(filePath);
           res.json({ success: true, count: contacts.length, columns, contacts });
         })
@@ -896,10 +958,15 @@ app.post('/api/upload-csv', upload.single('file'), (req, res) => {
       const workbook = xlsx.readFile(filePath);
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-      const data = xlsx.utils.sheet_to_json(sheet, { defval: '' });
+      const data = xlsx.utils.sheet_to_json(sheet, { defval: '', raw: false });
 
       if (data.length > 0) {
+        data.forEach(row => {
+          const ph = extractPhoneNumberFromItem(row);
+          if (ph) row.phone = ph;
+        });
         columns = Object.keys(data[0]);
+        if (!columns.includes('phone')) columns.unshift('phone');
       }
       fs.unlinkSync(filePath);
       res.json({ success: true, count: data.length, columns, contacts: data });
@@ -1019,10 +1086,8 @@ app.post('/api/send-bulk', upload.single('media'), async (req, res) => {
       }
 
       const item = recipients[i];
-      let phone = item.phone || item.Phone || item.mobile || item.Mobile || item.number || item.Number || item.contact || item.Contact || item;
-      phone = String(phone).replace(/[^0-9]/g, '');
+      let phone = extractPhoneNumberFromItem(item);
 
-      
       if (!phone || phone.length < 8) {
         activeCampaign.failed++;
         const failMsg = `[Row ${i + 1}] Invalid Phone Number: "${phone}"`;
@@ -1034,6 +1099,8 @@ app.post('/api/send-bulk', upload.single('media'), async (req, res) => {
 
       if (phone.length === 10) {
         phone = '91' + phone;
+      } else if (phone.length === 11 && phone.startsWith('0')) {
+        phone = '91' + phone.slice(1);
       }
 
       // Variable replacement for text

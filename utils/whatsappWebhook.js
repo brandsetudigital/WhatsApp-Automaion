@@ -143,8 +143,25 @@ function parseWebhookPayload(body) {
   }
 }
 
+/**
+ * Parse Meta Webhook status updates (sent, delivered, read, failed)
+ */
+function parseWebhookStatuses(body) {
+  if (!body || body.object !== 'whatsapp_business_account') return null;
+  try {
+    const entry = body.entry?.[0];
+    const changes = entry?.changes?.[0];
+    const value = changes?.value;
+    if (value && value.statuses && Array.isArray(value.statuses) && value.statuses.length > 0) {
+      return value.statuses;
+    }
+  } catch (e) {}
+  return null;
+}
+
 module.exports = {
   isDuplicateMessage,
   verifyWebhookSignature,
-  parseWebhookPayload
+  parseWebhookPayload,
+  parseWebhookStatuses
 };

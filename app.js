@@ -251,7 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
         detectedColumns = data.columns;
         updateRecipientCounter();
         renderTagPills();
-        appendLog('success', `Successfully loaded ${data.count} contacts from ${file.name}`);
+        const validPhones = loadedContacts.filter(c => c.phone && String(c.phone).replace(/[^0-9]/g, '').length >= 10).length;
+        appendLog('success', `Successfully loaded ${data.count} contacts from ${file.name} (${validPhones} phone numbers recognized)`);
       } else {
         alert('Error: ' + data.error);
         appendLog('error', `Failed to parse file: ${data.error}`);

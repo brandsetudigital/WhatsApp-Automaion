@@ -1,31 +1,6 @@
 [
   {
-    "id": "cand_1789540471215_u0xoc",
     "phone": "919713100248",
-    "whatsappChatId": null,
-    "name": "Garima Namdev",
-    "role": "Social Media Manager",
-    "workType": "Freelancer",
-    "city": "Indore",
-    "lang": "english",
-    "experience": "Experienced [Freelancer]",
-    "portfolio": "",
-    "socialHandle": "",
-    "followers": "",
-    "resumeReceived": true,
-    "resumeFileName": "Portfolio Link",
-    "status": "Resume Received",
-    "interviewDateTime": null,
-    "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
-    "interviewReminderSent": false,
-    "interviewReminderSentAt": null,
-    "createdAt": "2026-09-16T06:34:31.210Z",
-    "updatedAt": "2026-09-16T06:34:32.135Z",
-    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
-    "justSelectedRole": false,
-    "justAnsweredExperience": false,
     "chatHistory": [
       {
         "role": "user",
@@ -41,12 +16,43 @@
         "role": "user",
         "text": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
         "timestamp": "2026-09-16T06:34:32.141Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T06:44:54.859Z"
       }
     ],
-    "unreadCount": 3,
+    "city": "Indore",
+    "createdAt": "2026-09-16T06:34:31.210Z",
+    "experience": "Experienced [Freelancer]",
+    "followers": "",
+    "id": "cand_1789540471215_u0xoc",
+    "interviewDateTime": null,
     "interviewMode": "online",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "interviewSlotProposed": true,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+    "name": "Garima Namdev",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "Portfolio Link",
+    "resumeReceived": true,
     "resumeReceivedAt": "2026-09-16T06:34:32.135Z",
-    "interviewSlotProposed": false
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 3,
+    "updatedAt": "2026-09-16T06:39:57.156Z",
+    "whatsappChatId": null,
+    "workType": "Freelancer",
+    "interviewSlotProposedAt": "2026-09-16T06:44:54.015Z"
   },
   {
     "id": "cand_1789537989101_er1mc",
@@ -217,32 +223,7 @@
     "interviewSlotProposed": true
   },
   {
-    "id": "cand_1789539868655_sinwn",
     "phone": "919713474209",
-    "whatsappChatId": null,
-    "name": "Garima Namdev",
-    "role": "Social Media Manager",
-    "workType": "Freelancer",
-    "city": "Indore",
-    "lang": "english",
-    "experience": "Experienced [Freelancer]",
-    "portfolio": "",
-    "socialHandle": "",
-    "followers": "",
-    "resumeReceived": true,
-    "resumeFileName": "Portfolio Link",
-    "status": "Resume Received",
-    "interviewDateTime": null,
-    "notes": "",
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
-    "interviewReminderSent": false,
-    "interviewReminderSentAt": null,
-    "createdAt": "2026-09-16T06:24:28.649Z",
-    "updatedAt": "2026-09-16T06:24:28.718Z",
-    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
-    "justSelectedRole": false,
-    "justAnsweredExperience": false,
     "chatHistory": [
       {
         "role": "user",
@@ -258,12 +239,43 @@
         "role": "user",
         "text": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
         "timestamp": "2026-09-16T06:24:28.723Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
+        "timestamp": "2026-09-16T07:06:15.710Z"
       }
     ],
-    "unreadCount": 3,
+    "city": "Indore",
+    "createdAt": "2026-09-16T06:24:28.649Z",
+    "experience": "Experienced [Freelancer]",
+    "followers": "",
+    "id": "cand_1789539868655_sinwn",
+    "interviewDateTime": null,
     "interviewMode": "online",
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "interviewSlotProposed": true,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "english",
+    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+    "name": "Garima Namdev",
+    "notes": "",
+    "portfolio": "",
+    "resumeFileName": "Portfolio Link",
+    "resumeReceived": true,
     "resumeReceivedAt": "2026-09-16T06:24:28.718Z",
-    "interviewSlotProposed": false
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "Social Media Manager",
+    "socialHandle": "",
+    "status": "Resume Received",
+    "unreadCount": 3,
+    "updatedAt": "2026-09-16T06:24:28.718Z",
+    "whatsappChatId": null,
+    "workType": "Freelancer",
+    "interviewSlotProposedAt": "2026-09-16T07:06:14.161Z"
   },
   {
     "id": "cand_1789539002884_7033e",
@@ -979,9 +991,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T09:07:13.029Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "919669765911",
@@ -1022,9 +1034,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T09:03:28.825Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "917470584339",
@@ -1146,9 +1158,9 @@
     "status": "Resume Received",
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:57:08.627Z",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "917828966773",
@@ -1194,9 +1206,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:58:19.377Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "917869724727",
@@ -1280,9 +1292,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:53:09.196Z",
     "whatsappChatId": null,
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "38899686625461",
@@ -1323,9 +1335,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T12:40:31.999Z",
     "whatsappChatId": "38899686625461@lid",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "278880866857060",
@@ -1426,9 +1438,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T10:43:16.320Z",
     "whatsappChatId": "278880866857060@lid",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "919329232025",
@@ -1499,9 +1511,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T10:12:05.377Z",
     "whatsappChatId": "919329232025@c.us",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "114405211672638",
@@ -1627,9 +1639,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T12:40:27.298Z",
     "whatsappChatId": "114405211672638@lid",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "917879010084",
@@ -1669,9 +1681,9 @@
     "status": "Resume Pending",
     "unreadCount": 0,
     "updatedAt": "2026-09-03T08:15:10.071Z",
-    "workType": "Full-Time",
+    "followers": "",
     "socialHandle": "",
-    "followers": ""
+    "workType": "Full-Time"
   },
   {
     "phone": "919039193109",
@@ -4399,5 +4411,41 @@
     "updatedAt": "2026-09-16T05:53:23.191Z",
     "whatsappChatId": null,
     "workType": "Work From Home"
+  },
+  {
+    "phone": "918085513390",
+    "chatHistory": [
+      {
+        "role": "assistant",
+        "text": "Hello! 👋\r\n\r\nBrand Setu Digital is expanding its Creative & Marketing Team! 🚀\r\n\r\nWe are currently hiring for multiple positions:\r\n\r\n1️⃣ Video Editor – Reels / YouTube 🎬\r\n2️⃣ AI Video Expert – AI Tools / Prompting 🤖\r\n3️⃣ Graphic Designer – Photoshop / Figma 🎨\r\n4️⃣ SEO & AEO Expert 🔎\r\n5️⃣ Social Media Manager 📱\r\n6️⃣ Digital Marketing Manager 📢\r\n7️⃣ Influencer Collaboration ✨\r\n\r\n💼 Full-Time | Work From Home | Freelance opportunities are available.\r\n\r\nIf you’re interested, please share your updated Resume (PDF) and mention which position you are applying for.\r\n\r\n👉 Example: “I’m applying for Position 1 – Video Editor.”\r\n\r\nIf you’re interested in multiple positions, you can mention all the positions you’d like to apply for.\r\n\r\nOur HR team will review your profile and get back to you with the next steps. 😊",
+        "timestamp": "2026-09-16T06:47:34.767Z"
+      }
+    ],
+    "city": "Indore",
+    "createdAt": "2026-09-16T06:47:34.767Z",
+    "experience": "",
+    "followers": "",
+    "id": "cand_1789541254767_xn1j2",
+    "interviewDateTime": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "lang": "hinglish",
+    "lastMessage": "Hello! 👋\r\n\r\nBrand Setu Digital is expanding its Creative & Marketing Team! 🚀\r\n\r\nWe are currently hiring for multiple positions:\r\n\r\n1️⃣ Video Editor – Reels / YouTube 🎬\r\n2️⃣ AI Video Expert – AI Tools / Prompting 🤖\r\n3️⃣ Graphic Designer – Photoshop / Figma 🎨\r\n4️⃣ SEO & AEO Expert 🔎\r\n5️⃣ Social Media Manager 📱\r\n6️⃣ Digital Marketing Manager 📢\r\n7️⃣ Influencer Collaboration ✨\r\n\r\n💼 Full-Time | Work From Home | Freelance opportunities are available.\r\n\r\nIf you’re interested, please share your updated Resume (PDF) and mention which position you are applying for.\r\n\r\n👉 Example: “I’m applying for Position 1 – Video Editor.”\r\n\r\nIf you’re interested in multiple positions, you can mention all the positions you’d like to apply for.\r\n\r\nOur HR team will review your profile and get back to you with the next steps. 😊",
+    "name": "Candidate",
+    "notes": "Outreach campaign broadcast sent",
+    "portfolio": "",
+    "resumeFileName": "",
+    "resumeReceived": false,
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "role": "General Applicant",
+    "socialHandle": "",
+    "status": "Campaign Sent",
+    "updatedAt": "2026-09-16T06:47:34.767Z",
+    "whatsappChatId": null,
+    "workType": "Full-Time",
+    "unreadCount": 0
   }
 ]

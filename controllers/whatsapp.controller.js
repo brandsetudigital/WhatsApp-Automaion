@@ -1,4 +1,4 @@
-const { verifyWebhookSignature, parseWebhookPayload, isDuplicateMessage } = require('../utils/whatsappWebhook');
+const { verifyWebhookSignature, parseWebhookPayload, parseWebhookStatuses, isDuplicateMessage } = require('../utils/whatsappWebhook');
 const whatsappCloudService = require('../services/whatsappCloud.service');
 const whatsappWebService = require('../services/whatsappWeb.service');
 
@@ -78,10 +78,41 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
     return;
   }
 
-  // 3. Parse Webhook payload
+  // 3. Check for status updates (sent, delivered, read, failed)
+  const statuses = parseWebhookStatuses(req.body);
+  if (statuses && statuses.length > 0) {
+    for (const st of statuses) {
+      const recipient = st.recipient_id;
+      if (st.status === 'failed') {
+        const err = (st.errors && st.errors[0]) || {};
+        const code = err.code || 'N/A';
+        const title = err.title || err.message || 'Message delivery failed';
+        console.error(`❌ Meta WhatsApp delivery FAILED for recipient +${recipient} (Code: ${code}): ${title}`);
+        if (io) {
+          let reason = title;
+          if (code === 131047) {
+            reason = 'User has not replied within 24 hours. Meta Cloud API strictly requires an approved WhatsApp Template for cold outreach messages, or the recipient must message your number first.';
+          } else if (code === 131026) {
+            reason = 'Message undeliverable (phone number may not be active on WhatsApp).';
+          }
+          io.emit('log', {
+            type: 'error',
+            text: `❌ WhatsApp Delivery FAILED for +${recipient} [Code ${code}]: ${reason}`
+          });
+        }
+      } else if (st.status === 'delivered') {
+        console.log(`✅ Meta WhatsApp message delivered to +${recipient}`);
+      } else if (st.status === 'read') {
+        console.log(`👁️ Meta WhatsApp message read by +${recipient}`);
+      }
+    }
+    return;
+  }
+
+  // 4. Parse incoming user message
   const messageData = parseWebhookPayload(req.body);
   if (!messageData) {
-    return; // Event was not an incoming message (e.g. status update)
+    return;
   }
 
   console.log(`📩 Incoming Webhook message from +${messageData.customerPhone} (${messageData.customerName}): "${messageData.messageText}"`);
