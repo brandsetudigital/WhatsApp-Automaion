@@ -78,7 +78,16 @@ async function initMongoDb() {
     } else if (candidates.length > 0) {
       console.log(`🍃 [MongoDB Atlas] Cloud collection clean. Seeding ${candidates.length} local candidates into cloud collection...`);
       for (const c of candidates) {
-        await candidatesCollection.updateOne({ phone: c.phone }, { $set: { ...c, _id: c.id } }, { upsert: true });
+        if (!c || !c.phone) continue;
+        const { _id, ...updateDoc } = c;
+        await candidatesCollection.updateOne(
+          { phone: c.phone },
+          {
+            $set: updateDoc,
+            $setOnInsert: { _id: c.id || String(Date.now() + Math.random()) }
+          },
+          { upsert: true }
+        );
       }
       console.log('🍃 [MongoDB Atlas] Cloud collection seeded successfully!');
     }
@@ -323,11 +332,20 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
       Promise.resolve().then(async () => {
         try {
           for (const c of candidates) {
-            await candidatesCollection.updateOne(
-              { phone: c.phone },
-              { $set: { ...c, _id: c.id } },
-              { upsert: true }
-            );
+            if (!c || !c.phone) continue;
+            try {
+              const { _id, ...updateDoc } = c;
+              await candidatesCollection.updateOne(
+                { phone: c.phone },
+                {
+                  $set: updateDoc,
+                  $setOnInsert: { _id: c.id || String(Date.now() + Math.random()) }
+                },
+                { upsert: true }
+              );
+            } catch (singleErr) {
+              console.warn(`⚠️ [MongoDB] Single candidate sync notice (${c.phone}):`, singleErr.message);
+            }
           }
         } catch (mErr) {
           console.warn('⚠️ [MongoDB] Background sync notice:', mErr.message);

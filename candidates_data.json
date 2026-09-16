@@ -259,7 +259,7 @@
     "justAnsweredExperience": false,
     "justSelectedRole": false,
     "lang": "english",
-    "lastMessage": "https://garimanamdevportfolio.my.canva.site/creative-portfolio GarimaNamdevResume.pdf",
+    "lastMessage": "Hello Garima Namdev! 😊\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍",
     "name": "Garima Namdev",
     "notes": "",
     "portfolio": "",
@@ -991,9 +991,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T09:07:13.029Z",
     "whatsappChatId": null,
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "919669765911",
@@ -1034,9 +1034,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T09:03:28.825Z",
     "whatsappChatId": null,
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "917470584339",
@@ -1158,9 +1158,9 @@
     "status": "Resume Received",
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:57:08.627Z",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "917828966773",
@@ -1206,9 +1206,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:58:19.377Z",
     "whatsappChatId": null,
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "917869724727",
@@ -1292,9 +1292,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-04T08:53:09.196Z",
     "whatsappChatId": null,
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "38899686625461",
@@ -1335,9 +1335,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T12:40:31.999Z",
     "whatsappChatId": "38899686625461@lid",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "278880866857060",
@@ -1438,9 +1438,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T10:43:16.320Z",
     "whatsappChatId": "278880866857060@lid",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "919329232025",
@@ -1511,9 +1511,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T10:12:05.377Z",
     "whatsappChatId": "919329232025@c.us",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "114405211672638",
@@ -1639,9 +1639,9 @@
     "unreadCount": 0,
     "updatedAt": "2026-09-03T12:40:27.298Z",
     "whatsappChatId": "114405211672638@lid",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "917879010084",
@@ -1681,9 +1681,9 @@
     "status": "Resume Pending",
     "unreadCount": 0,
     "updatedAt": "2026-09-03T08:15:10.071Z",
-    "followers": "",
+    "workType": "Full-Time",
     "socialHandle": "",
-    "workType": "Full-Time"
+    "followers": ""
   },
   {
     "phone": "919039193109",
@@ -4291,6 +4291,11 @@
         "role": "assistant",
         "text": "Thank you for sharing your CV! 📄✨ \n\nOur team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
         "timestamp": "2026-09-16T04:13:50.219Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Dear Anjali! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025 / +91 9669765911)",
+        "timestamp": "2026-09-16T08:05:16.355Z"
       }
     ],
     "city": "Indore",
@@ -4304,17 +4309,17 @@
     "justAnsweredExperience": false,
     "justSelectedRole": false,
     "lang": "english",
-    "lastMessage": "Thank you for sharing your CV! 📄✨ \n\nOur team is reviewing your profile and work samples. We will connect with you shortly for the next steps! 👍",
+    "lastMessage": "Dear Anjali! 👋\n\nThank you for your interest in joining *BrandSetu Digital* for the *Influencer Collaboration* position. We noticed we haven't received your updated *Resume / Portfolio* yet. 📄\n\n👉 Please share your Resume (PDF) or Portfolio link here so we can proceed with scheduling your interview. 🚀\n\n- HR Team, BrandSetu Digital (+91 9329232025 / +91 9669765911)",
     "name": "Anjali",
     "notes": "",
     "portfolio": "",
     "resumeFileName": "",
     "resumeReceived": false,
-    "resumeReminderSent": false,
-    "resumeReminderSentAt": null,
+    "resumeReminderSent": true,
+    "resumeReminderSentAt": "2026-09-16T08:05:14.752Z",
     "role": "Influencer Collaboration",
     "socialHandle": "",
-    "status": "Applied",
+    "status": "Resume Pending",
     "unreadCount": 0,
     "updatedAt": "2026-09-16T05:19:59.936Z",
     "whatsappChatId": null,
