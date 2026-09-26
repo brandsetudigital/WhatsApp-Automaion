@@ -115,6 +115,17 @@ async function processIncomingWhatsAppMessage(messageData) {
   const { customerPhone, customerName, messageText, messageId } = messageData;
   const replyRecipient = messageData.chatId || customerPhone;
 
+  // Ignore emoji reactions completely - do NOT send any bot message or questionnaire on reactions!
+  if (
+    messageData.messageType === 'reaction' ||
+    !messageText ||
+    messageText.toLowerCase().includes('reaction message received') ||
+    messageText.toLowerCase().includes('[reaction')
+  ) {
+    console.log(`ℹ️ WhatsApp reaction received from +${customerPhone} - skipping automated reply.`);
+    return;
+  }
+
   console.log(`📩 Webhook message received from +${customerPhone} (${customerName}): "${messageText}"`);
 
   io.emit('log', {

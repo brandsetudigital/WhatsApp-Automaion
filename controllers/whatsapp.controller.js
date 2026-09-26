@@ -115,6 +115,12 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
     return;
   }
 
+  // Strictly ignore reactions so they never trigger bot replies or questionnaires
+  if (messageData.messageType === 'reaction' || (messageData.messageText && messageData.messageText.toLowerCase().includes('reaction'))) {
+    console.log(`ℹ️ Ignoring reaction message from +${messageData.customerPhone}`);
+    return;
+  }
+
   console.log(`📩 Incoming Webhook message from +${messageData.customerPhone} (${messageData.customerName}): "${messageData.messageText}"`);
 
   // 4. Duplicate prevention

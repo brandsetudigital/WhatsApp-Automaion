@@ -105,6 +105,7 @@ class WhatsAppWebService extends EventEmitter {
     this.client.on('message', async message => {
       if (message.fromMe || message.from === 'status@broadcast') return;
       if (message.from.endsWith('@g.us') || message.from.includes('@g.us') || message.from.endsWith('@newsletter') || message.from.includes('@broadcast')) return;
+      if (message.type === 'reaction') return; // Ignore reactions
 
       // Ignore old sync messages older than 2 hours to prevent dummy records
       const msgAgeMs = Date.now() - (message.timestamp * 1000);

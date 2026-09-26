@@ -105,8 +105,17 @@ function parseWebhookPayload(body) {
       messageText = message.button?.text || '';
     } else if (messageType === 'interactive') {
       messageText = message.interactive?.button_reply?.title || message.interactive?.list_reply?.title || '';
+    } else if (messageType === 'reaction') {
+      // EMOJI REACTION (e.g. candidate reacted with 👍 or ❤️ on a message)
+      // Strictly ignore reactions so they never trigger automated bot replies or questionnaires!
+      return null;
+    } else if (messageType === 'location') {
+      messageText = '[Location received]';
+    } else if (messageType === 'sticker') {
+      messageText = '[Sticker received]';
     } else {
-      messageText = `[${messageType} message received]`;
+      // Ignore unsupported or system message types
+      return null;
     }
 
     // Extract Instagram / Facebook Ad Referral data if user came from Ad click

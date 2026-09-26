@@ -1117,6 +1117,11 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   const text = (userMessage || '').toLowerCase().trim();
   const clean = text.replace(/[^\w\s]/g, '').trim();
 
+  // Ignore reactions completely - never generate automated response for reactions
+  if (!text || text.includes('[reaction') || text.includes('reaction message received')) {
+    return null;
+  }
+
   let candName = (candidate.name || '').trim();
   if (!candName || candName.toLowerCase() === 'candidate' || candName.toLowerCase() === 'customer') {
     candName = '';
@@ -1208,8 +1213,8 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
 
   // 1. DIGITAL MARKETING & OTHER ROLES CHECK (Content Writer, Web Dev, Telecaller, Sales, Media Buyer, etc.)
   const isContactOrPhoneQuery = isOfficeDirectionsOrContactQuery(text) || /(?:calling|contact|phone)\s*(?:no|number|num)/i.test(text);
-  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales|\b(?:calling|caller)\s+(?:job|role|post|vacancy|work)\b|\bsales\b|bpo|receptionist|accountant|accounts|finance|tally|data\s*entry|marketing|media\s*buyer|funnel|hr\s*recruiter|hr\s*executive)/i;
-  const isExcludedRole = !isContactOrPhoneQuery && otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media');
+  const otherRolePattern = /(?:web|website|developer|development|\bphp\b|\bpython\b|\breact\b|\bnode\b|\bjava\b|flutter|android|ios|content\s*writer|copywriter|\bwriter\b|\bwriting\b|tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales|\b(?:calling|caller)\s+(?:job|role|post|vacancy|work)\b|\bsales\b|\bbpo\b|receptionist|accountant|accounts|finance|tally|data\s*entry|marketing|media\s*buyer|funnel|hr\s*recruiter|hr\s*executive)/i;
+  const isExcludedRole = !isContactOrPhoneQuery && otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media') && !text.includes('reaction');
 
   if (isExcludedRole) {
     const textLower = text.toLowerCase();
@@ -1473,6 +1478,12 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
   const systemInstructions = (aiConfig.systemPrompt && aiConfig.systemPrompt.trim()) || `
 You are the professional, friendly HR & Recruitment Coordinator for Brand Setu Digital (Indore).
   `.trim();
+
+  // Ignore reactions completely - do NOT generate AI response for reactions
+  if (!userMessage || userMessage.includes('[reaction') || userMessage.toLowerCase().includes('reaction message received')) {
+    console.log(`ℹ️ Skipping AI response for reaction message from +${candidate.phone}`);
+    return null;
+  }
 
   // 0. Check off-topic before invoking Gemini or Fallback
   if (isOffTopicMessage(userMessage, candidate)) {
