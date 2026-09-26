@@ -875,9 +875,9 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
 
   targetDate.setUTCDate(targetDate.getUTCDate() + dayOffset);
 
-  // Default hour: 11:00 AM (between 10 AM - 12 PM morning slot)
-  let hour = 11;
-  let minute = 0;
+  // Default hour: 10:30 AM (Morning slot when candidate does not specify time)
+  let hour = 10;
+  let minute = 30;
 
   const timeMatch = schedulingText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje)?/i);
   if (timeMatch) {
@@ -979,6 +979,7 @@ Instructions:
 2. If candidate says simple acknowledgment ("ok", "thik h", "done", "yes", "sure", "thanks", "hmm", "haa thik h") and already has an interview scheduled, set isScheduling to false!
 3. If candidate says they CANNOT come without proposing a new time, set isScheduling to false!
 4. If candidate is explicitly scheduling or rescheduling to a specific time, compute the target date-time in ISO-8601 string format with "+05:30" offset (e.g. "2026-08-21T14:00:00+05:30"). Office hours: 10:00 AM to 06:00 PM.
+CRITICAL RULE: If candidate only mentions a date/day without specifying an exact time (e.g. "kal", "parso", "27 tareek ko", "Monday"), ALWAYS default the time strictly to 10:30 AM in the morning ("10:30:00+05:30"). NEVER return "00:00:00" and NEVER return "05:30:00"!
 5. If NO, set isScheduling to false.
 
 Return JSON strictly:
@@ -994,6 +995,27 @@ Return JSON strictly:
     if (result && result.text) {
       const parsed = extractJsonFromString(result.text);
       if (parsed && parsed.isScheduling && parsed.proposedDateTimeIso) {
+        // Normalize any missing time, UTC-midnight in IST (05:30), or invalid hour to 10:30 AM IST
+        const testD = new Date(parsed.proposedDateTimeIso);
+        if (!isNaN(testD.getTime())) {
+          const istParts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
+          }).formatToParts(testD);
+          const pMap = {};
+          istParts.forEach(p => pMap[p.type] = p.value);
+          let h = parseInt(pMap.hour, 10);
+          let m = parseInt(pMap.minute, 10);
+          if ((h === 5 && m === 30) || (h === 0 && m === 0) || h < 10 || h > 19) {
+            parsed.proposedDateTimeIso = `${pMap.year}-${pMap.month}-${pMap.day}T10:30:00+05:30`;
+            parsed.readableFormattedTime = `${pMap.day}/${pMap.month}/${pMap.year} at 10:30 AM`;
+          }
+        }
         return parsed;
       }
     }
@@ -1495,8 +1517,8 @@ You are the professional, friendly HR & Recruitment Coordinator for Brand Setu D
       console.log(`💻 Direct Freelance/WFH Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
       const isHi = (lang === 'hinglish' || lang === 'hindi');
       return isHi
-        ? `Bahut badiya! Hamare yahan *Freelancer* aur *Work From Home (WFH)* roles ke liye bhi opportunities open hain. 💻✨\n\nKripya batayein:\n1️⃣ Aap kis role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) me freelance / WFH karna chahte hain?\n2️⃣ Aap daily ya weekly kitne hours dedicate kar sakte hain aur aapka kitna experience hai?\n\nKripya apna updated *Resume (PDF)* aur work samples / portfolio link yahan share karein! 📄🎥`
-        : `Great! We welcome candidates for *Freelancer* and *Work From Home (WFH)* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which role (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking to work freelance / WFH in?\n2️⃣ How much experience do you have and how many hours can you dedicate?\n\nPlease share your updated *Resume (PDF)* and portfolio / work samples link here! 📄🎥`;
+        ? `Ji bilkul! Remote / Work From Home (WFH) aur Freelance roles ke liye hamari HR team candidate ki profile review karti hai. 💻📄\n\nKripya batayein:\n1️⃣ Aap kis role me WFH ya Freelance karna chahte hain?\n2️⃣ Aapko is field me kitna experience hai?\n\nKripya apna updated *Resume (PDF)* aur work samples / portfolio link yahan share kar dijiye. Hamari HR team profile review karke aapse aage connect karegi! 👍`
+        : `Sure! For Remote / Work From Home (WFH) and Freelance opportunities, our HR team reviews candidates' profiles directly. 💻📄\n\nPlease let us know:\n1️⃣ Which role are you looking to work in (WFH / Freelance)?\n2️⃣ How much experience do you have?\n\nPlease share your updated *Resume (PDF)* and work samples / portfolio link here. Our HR team will evaluate your profile and connect with you! 👍`;
     }
   }
 

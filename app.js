@@ -902,7 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           const tomorrow = new Date();
           tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(11, 0, 0, 0);
+          tomorrow.setHours(10, 30, 0, 0);
           tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
           scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
         }
@@ -1354,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(11, 0, 0, 0);
+        tomorrow.setHours(10, 30, 0, 0);
         tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
         scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
       }
@@ -1592,22 +1592,33 @@ document.addEventListener('DOMContentLoaded', () => {
   function getInterviewInvitationText(cand) {
     const candidateName = (cand.name && cand.name !== 'Candidate' && cand.name !== 'General Applicant') ? cand.name : 'Candidate';
     let inviteDateStr = '';
-    let inviteTimeStr = '10:00 am - 2:00 pm';
+    let inviteTimeStr = '10:30 am';
 
     if (cand.interviewDateTime) {
       const idate = new Date(cand.interviewDateTime);
       if (!isNaN(idate.getTime())) {
-        const day = String(idate.getDate()).padStart(2, '0');
-        const month = String(idate.getMonth() + 1).padStart(2, '0');
-        const year = idate.getFullYear();
-        inviteDateStr = `${day}/${month}/${year}`;
+        const istParts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23'
+        }).formatToParts(idate);
+        const pMap = {};
+        istParts.forEach(p => pMap[p.type] = p.value);
+        inviteDateStr = `${pMap.day}/${pMap.month}/${pMap.year}`;
 
-        const hrs = idate.getHours();
-        const mins = String(idate.getMinutes()).padStart(2, '0');
-        if (hrs !== 0 || idate.getMinutes() !== 0) {
+        let hrs = parseInt(pMap.hour, 10);
+        let mins = parseInt(pMap.minute, 10);
+
+        if ((hrs === 5 && mins === 30) || (hrs === 0 && mins === 0) || hrs < 10 || hrs > 19) {
+          inviteTimeStr = '10:30 am';
+        } else {
           const ampm = hrs >= 12 ? 'pm' : 'am';
           const h12 = hrs % 12 || 12;
-          inviteTimeStr = `${String(h12).padStart(2, '0')}:${mins} ${ampm}`;
+          inviteTimeStr = `${String(h12).padStart(2, '0')}:${String(mins).padStart(2, '0')} ${ampm}`;
         }
       }
     }
@@ -1780,7 +1791,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(11, 0, 0, 0);
+        tomorrow.setHours(10, 30, 0, 0);
         tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
         scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
       }

@@ -1394,9 +1394,36 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
     throw new Error('Candidate not found');
   }
 
-  const interviewDate = new Date(interviewDateTime);
+  let interviewDate = new Date(interviewDateTime);
   if (isNaN(interviewDate.getTime())) {
     throw new Error('Invalid interview date & time');
+  }
+
+  // Extract IST (Asia/Kolkata) date & time components reliably across any server OS/timezone
+  const istParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).formatToParts(interviewDate);
+  const partMap = {};
+  istParts.forEach(p => partMap[p.type] = p.value);
+  const iYear = partMap.year;
+  const iMonth = partMap.month;
+  const iDay = partMap.day;
+  let iHour = parseInt(partMap.hour, 10);
+  let iMinute = parseInt(partMap.minute, 10);
+
+  // If time is missing, UTC-midnight in IST (05:30), 00:00 midnight, or outside office hours (<10 or >19):
+  // Default strictly to 10:30 AM in the morning
+  if ((iHour === 5 && iMinute === 30) || (iHour === 0 && iMinute === 0) || iHour < 10 || iHour > 19) {
+    iHour = 10;
+    iMinute = 30;
+    // Reconstruct normalized Date object at 10:30 AM IST (+05:30)
+    interviewDate = new Date(`${iYear}-${iMonth}-${iDay}T10:30:00+05:30`);
   }
 
   const isRescheduled = !!candidate.interviewDateTime;
@@ -1432,20 +1459,11 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       const salutationEn = getCandidateSalutation(candidate, 'english');
       const salutationHi = getCandidateSalutation(candidate, 'hinglish');
 
-      // Format dynamic Date (DD/MM/YYYY) and Time
-      const iday = String(interviewDate.getDate()).padStart(2, '0');
-      const imonth = String(interviewDate.getMonth() + 1).padStart(2, '0');
-      const iyear = interviewDate.getFullYear();
-      const dateFormatted = `${iday}/${imonth}/${iyear}`;
-
-      const ihours = interviewDate.getHours();
-      const imins = String(interviewDate.getMinutes()).padStart(2, '0');
-      let timeFormatted = '10:00 am - 2:00 pm';
-      if (ihours !== 0 || interviewDate.getMinutes() !== 0) {
-        const ampm = ihours >= 12 ? 'pm' : 'am';
-        const h12 = ihours % 12 || 12;
-        timeFormatted = `${String(h12).padStart(2, '0')}:${imins} ${ampm}`;
-      }
+      // Format dynamic Date (DD/MM/YYYY) and Time (Asia/Kolkata)
+      const dateFormatted = `${iDay}/${iMonth}/${iYear}`;
+      const ampm = iHour >= 12 ? 'pm' : 'am';
+      const h12 = iHour % 12 || 12;
+      const timeFormatted = `${String(h12).padStart(2, '0')}:${String(iMinute).padStart(2, '0')} ${ampm}`;
 
       const candidateDisplayName = (candidate && candidate.name && candidate.name !== 'Candidate' && candidate.name !== 'General Applicant') ? candidate.name : 'Candidate';
 
