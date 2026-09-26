@@ -11,4 +11,6 @@ candidates_data.backup.json
 deleted_candidates.json
 backups/
 uploads/backups/
+scratch/
+*.local_save.json
 

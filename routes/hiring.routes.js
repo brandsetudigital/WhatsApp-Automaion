@@ -26,8 +26,9 @@ router.put('/candidate/:id', hiringController.updateCandidate);
 // Delete Candidate
 router.delete('/candidate/:id', hiringController.deleteCandidate);
 
-// Export Live Excel File
+// Export Live Excel File & Filter Count
 router.get('/export-excel', hiringController.exportExcel);
+router.get('/export-count', hiringController.getExportCount);
 
 // Database JSON Backup Download & Restore
 router.get('/backup/export', hiringController.exportBackupJson);

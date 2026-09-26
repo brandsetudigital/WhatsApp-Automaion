@@ -203,15 +203,48 @@
               <h3><i class="fa-solid fa-message"></i> 2. Message & Settings</h3>
             </div>
             <div class="card-body">
-              <div class="form-group">
-                <label for="messageTemplate">Message Template:</label>
-                <textarea id="messageTemplate" rows="6" placeholder="Hi {name}, your bill of {amount} for {city} is ready! Thank you for choosing us."></textarea>
+              <!-- Campaign Sending Mode -->
+              <div class="form-group mb-3">
+                <label><strong><i class="fa-solid fa-bullhorn"></i> Sending Mode:</strong></label>
+                <div style="display: flex; gap: 15px; margin-top: 5px; flex-wrap: wrap;">
+                  <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <input type="radio" name="campaignMode" id="campaignModeTemplate" value="template" checked>
+                    <span><strong>Meta Approved Template</strong> <small style="color: #25D366; font-weight: 600;">(Cold Outreach / New Contacts)</small></span>
+                  </label>
+                  <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <input type="radio" name="campaignMode" id="campaignModeCustom" value="custom">
+                    <span>Custom Text & Media <small class="text-muted">(Only for active 24h chats)</small></span>
+                  </label>
+                </div>
               </div>
 
-              <!-- Attachment Input -->
-              <div class="form-group">
-                <label for="mediaAttachment"><i class="fa-solid fa-paperclip"></i> Media Attachment (Optional Image/PDF):</label>
-                <input type="file" id="mediaAttachment" accept="image/*, application/pdf, .doc, .docx" class="form-control">
+              <!-- Template Settings Block -->
+              <div id="templateSettingsBlock" class="p-3 border rounded mb-3" style="background: rgba(37, 211, 102, 0.06); border: 1px solid rgba(37, 211, 102, 0.25); border-radius: 8px;">
+                <div class="form-row">
+                  <div class="form-group" style="flex: 2;">
+                    <label for="templateNameInput"><strong>Approved Template Name:</strong></label>
+                    <input type="text" id="templateNameInput" class="form-control" value="brandsetu_hiring_outreach_v2" placeholder="e.g. brandsetu_hiring_outreach_v2">
+                  </div>
+                  <div class="form-group" style="flex: 1;">
+                    <label for="templateLangInput"><strong>Language:</strong></label>
+                    <input type="text" id="templateLangInput" class="form-control" value="en" placeholder="en">
+                  </div>
+                </div>
+                <small class="text-muted"><i class="fa-solid fa-circle-check" style="color: #25D366;"></i> Sends verified Meta template with <code>{{1}}</code> candidate name parameter to ensure 100% cold delivery.</small>
+              </div>
+
+              <!-- Custom Text & Media Block -->
+              <div id="customMessageBlock" style="display: none;">
+                <div class="form-group">
+                  <label for="messageTemplate">Message Template:</label>
+                  <textarea id="messageTemplate" rows="5" placeholder="Hi {name}, thank you for contacting BrandSetu Digital!"></textarea>
+                </div>
+
+                <!-- Attachment Input -->
+                <div class="form-group">
+                  <label for="mediaAttachment"><i class="fa-solid fa-paperclip"></i> Media Attachment (Optional Image/PDF):</label>
+                  <input type="file" id="mediaAttachment" accept="image/*, application/pdf, .doc, .docx" class="form-control">
+                </div>
               </div>
 
               <!-- Delay Anti-Ban Settings -->
@@ -572,9 +605,9 @@
               <button id="openMobilePreviewBtn" class="btn btn-outline-success">
                 <i class="fa-solid fa-mobile-screen-button"></i> WhatsApp Mobile View
               </button>
-              <a href="/api/hiring/export-excel" id="exportExcelBtn" class="btn btn-success" download>
+              <button type="button" id="exportExcelBtn" class="btn btn-success" title="Filter by role or 24-hr timeframe and download Excel">
                 <i class="fa-solid fa-file-excel"></i> Download Excel (.xlsx)
-              </a>
+              </button>
               <button id="addCandidateBtn" class="btn btn-primary">
                 <i class="fa-solid fa-user-plus"></i> Add Candidate
               </button>
@@ -724,6 +757,10 @@
               <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
               <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
               <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
+              <option value="Telecaller / Inside Sales">📞 Telecaller / Inside Sales</option>
+              <option value="Telecaller / Sales Executive">💼 Telecaller / Sales Executive</option>
+              <option value="Sales Executive">📈 Sales Executive</option>
+              <option value="Accountant / Finance">💰 Accountant / Finance</option>
               <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
               <option value="Web Developer">💻 Web Developer</option>
               <option value="Other Digital Marketing Roles">💼 Other Digital Marketing Roles</option>
@@ -783,10 +820,15 @@
               <option value="SEO & AEO Expert">🔎 SEO & AEO Expert (2 Openings)</option>
               <option value="Social Media Manager">📱 Social Media Manager (6 Openings)</option>
               <option value="Digital Marketing Manager">📢 Digital Marketing Manager (3 Openings)</option>
+              <option value="Telecaller / Inside Sales">📞 Telecaller / Inside Sales</option>
+              <option value="Telecaller / Sales Executive">💼 Telecaller / Sales Executive</option>
+              <option value="Sales Executive">📈 Sales Executive</option>
+              <option value="Accountant / Finance">💰 Accountant / Finance</option>
               <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
               <option value="Web Developer">💻 Web Developer</option>
               <option value="Other Digital Marketing Roles">💼 Other Digital Marketing Roles</option>
               <option value="Influencer Collaboration">✨ Influencer Collaboration</option>
+              <option value="General Applicant">General Applicant</option>
             </select>
           </div>
           <div class="form-group mb-3">
@@ -805,6 +847,106 @@
             <button type="submit" class="btn btn-primary" id="confirmAddCandBtn">
               <i class="fa-solid fa-save"></i> Save Candidate
             </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Filtered Excel Modal -->
+  <div id="exportExcelModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box glass-card" style="max-width: 520px;">
+      <div class="modal-header flex-between">
+        <h3><i class="fa-solid fa-file-excel text-success"></i> Download Candidates Excel</h3>
+        <button class="close-btn" id="closeExportModalBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="exportExcelForm">
+          <p class="subtitle mb-3" style="font-size: 13px; color: var(--text-muted, #94a3b8);">
+            Filter candidate records before downloading so you only export what you need (e.g. Last 24 Hours or specific roles).
+          </p>
+
+          <div class="form-group mb-3">
+            <label class="form-label" style="font-weight: 600;"><i class="fa-solid fa-user-tag text-primary"></i> Filter by Role</label>
+            <select id="exportRoleSelect" class="form-control">
+              <option value="all">🌟 All Roles (Sabhi Roles)</option>
+              <option value="Video Editor">🎬 Video Editor</option>
+              <option value="AI Video Expert">🤖 AI Video Expert</option>
+              <option value="Graphic Designer">🎨 Graphic Designer</option>
+              <option value="SEO & AEO Expert">🔎 SEO & AEO Expert</option>
+              <option value="Social Media Manager">📱 Social Media Manager</option>
+              <option value="Digital Marketing Manager">📢 Digital Marketing Manager</option>
+              <option value="Telecaller / Inside Sales">📞 Telecaller / Inside Sales</option>
+              <option value="Telecaller / Sales Executive">💼 Telecaller / Sales Executive</option>
+              <option value="Sales Executive">📈 Sales Executive</option>
+              <option value="Accountant / Finance">💰 Accountant / Finance</option>
+              <option value="Web Developer">💻 Web Developer</option>
+              <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
+              <option value="Influencer Collaboration">✨ Influencer Collaboration</option>
+              <option value="General Applicant">📋 General Applicant</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" style="font-weight: 600;"><i class="fa-solid fa-clock text-warning"></i> Filter by Date / Timeframe</label>
+            <select id="exportTimeframeSelect" class="form-control">
+              <option value="24h" selected>⚡ Last 24 Hours (Pichhle 24 Ghante)</option>
+              <option value="today">📅 Today (Aaj ka Data)</option>
+              <option value="yesterday">📅 Yesterday (Kal ka Data)</option>
+              <option value="7d">🗓️ Last 7 Days (Pichhle 7 Din)</option>
+              <option value="30d">🗓️ Last 30 Days (Pichhle 30 Din)</option>
+              <option value="all">🌐 All Time (Sabhi Records)</option>
+              <option value="custom">📆 Custom Date Range...</option>
+            </select>
+          </div>
+
+          <!-- Custom Date Range Row (Hidden by default) -->
+          <div id="exportCustomDateRow" class="form-row mb-3" style="display: none; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label text-muted" style="font-size: 12px;">Start Date</label>
+              <input type="date" id="exportStartDate" class="form-control form-control-sm">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label text-muted" style="font-size: 12px;">End Date</label>
+              <input type="date" id="exportEndDate" class="form-control form-control-sm">
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" style="font-weight: 600;"><i class="fa-solid fa-list-check text-info"></i> Candidate Status (Optional)</label>
+            <select id="exportStatusSelect" class="form-control">
+              <option value="all">All Statuses (Sabhi Status)</option>
+              <option value="Applied">Applied (New)</option>
+              <option value="Resume Pending">Resume Pending</option>
+              <option value="Resume Received">Resume Received</option>
+              <option value="Interview Scheduled">Interview Scheduled</option>
+              <option value="Completed / Hired">Completed / Hired</option>
+              <option value="Not Interested">Not Interested</option>
+            </select>
+          </div>
+
+          <!-- Live Match Preview Badge -->
+          <div class="p-3 mb-3 rounded" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+            <div class="flex-between align-center">
+              <span style="font-size: 13px; color: #10b981; font-weight: 500;">
+                <i class="fa-solid fa-circle-check me-1"></i> Candidates ready to export:
+              </span>
+              <span id="exportLiveCountBadge" class="badge" style="background: #10b981; color: #fff; padding: 4px 10px; font-size: 13px; border-radius: 20px;">
+                Checking...
+              </span>
+            </div>
+          </div>
+
+          <div class="modal-footer flex-between gap-2" style="padding: 12px 0 0 0; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <a href="/api/hiring/export-excel" id="exportDirectAllLink" class="btn btn-outline-secondary btn-sm" download title="Download complete database without filters">
+              <i class="fa-solid fa-database"></i> Download All
+            </a>
+            <div class="flex gap-2">
+              <button type="button" class="btn btn-secondary" id="cancelExportModalBtn">Cancel</button>
+              <button type="submit" class="btn btn-success" id="confirmDownloadExcelBtn">
+                <i class="fa-solid fa-download"></i> Download Excel (.xlsx)
+              </button>
+            </div>
           </div>
         </form>
       </div>

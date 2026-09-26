@@ -1114,8 +1114,21 @@ app.post('/api/send-bulk', upload.single('media'), async (req, res) => {
 
       try {
         if (templateName) {
-          // Send Approved Meta Template Message
-          await whatsappCloudService.sendWhatsAppTemplate(phone, templateName, languageCode || 'en_US');
+          // Send Approved Meta Template Message with dynamic recipient parameter {{1}}
+          const candidateName = (typeof item === 'object' && (item.name || item.Name || item.candidate_name || item.fullname)) || 'Candidate';
+          const templateComponents = [
+            {
+              type: 'body',
+              parameters: [
+                {
+                  type: 'text',
+                  text: candidateName
+                }
+              ]
+            }
+          ];
+          await whatsappCloudService.sendWhatsAppTemplate(phone, templateName, languageCode || 'en', templateComponents);
+          messageContent = `[Meta Template: ${templateName}] (Recipient: ${candidateName})`;
         } else if (uploadedMediaId) {
           // Send Media Message with Caption
           if (isImage) {

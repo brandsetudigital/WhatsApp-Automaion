@@ -42,6 +42,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const maxDelayInput = document.getElementById('maxDelay');
   const startCampaignBtn = document.getElementById('startCampaignBtn');
   const stopCampaignBtn = document.getElementById('stopCampaignBtn');
+  const campaignModeTemplate = document.getElementById('campaignModeTemplate');
+  const campaignModeCustom = document.getElementById('campaignModeCustom');
+  const templateSettingsBlock = document.getElementById('templateSettingsBlock');
+  const customMessageBlock = document.getElementById('customMessageBlock');
+  const templateNameInput = document.getElementById('templateNameInput');
+  const templateLangInput = document.getElementById('templateLangInput');
+
+  if (campaignModeTemplate && campaignModeCustom) {
+    campaignModeTemplate.addEventListener('change', () => {
+      if (campaignModeTemplate.checked) {
+        if (templateSettingsBlock) templateSettingsBlock.style.display = 'block';
+        if (customMessageBlock) customMessageBlock.style.display = 'none';
+      }
+    });
+    campaignModeCustom.addEventListener('change', () => {
+      if (campaignModeCustom.checked) {
+        if (templateSettingsBlock) templateSettingsBlock.style.display = 'none';
+        if (customMessageBlock) customMessageBlock.style.display = 'block';
+      }
+    });
+  }
 
   // Auto-Reply DOM Elements
   const autoReplyForm = document.getElementById('autoReplyForm');
@@ -331,19 +352,35 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const templateText = messageTemplate.value.trim();
-    if (!templateText) {
-      alert('Please enter a message template.');
-      return;
+    const isTemplateMode = campaignModeTemplate ? campaignModeTemplate.checked : true;
+    let templateName = '';
+    let languageCode = 'en';
+    let templateText = '';
+
+    if (isTemplateMode) {
+      templateName = templateNameInput ? templateNameInput.value.trim() : 'brandsetu_hiring_outreach_v2';
+      languageCode = templateLangInput ? templateLangInput.value.trim() : 'en';
+      if (!templateName) {
+        alert('Please enter an approved Meta Template name.');
+        return;
+      }
+    } else {
+      templateText = messageTemplate.value.trim();
+      if (!templateText && (!mediaAttachment || mediaAttachment.files.length === 0)) {
+        alert('Please enter a message template or attach media.');
+        return;
+      }
     }
 
     const formData = new FormData();
     formData.append('recipients', JSON.stringify(recipients));
     formData.append('templateText', templateText);
+    formData.append('templateName', templateName);
+    formData.append('languageCode', languageCode);
     formData.append('minDelay', minDelayInput.value);
     formData.append('maxDelay', maxDelayInput.value);
 
-    if (mediaAttachment.files.length > 0) {
+    if (mediaAttachment && mediaAttachment.files.length > 0) {
       formData.append('media', mediaAttachment.files[0]);
     }
 
@@ -643,6 +680,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const addCandidateForm = document.getElementById('addCandidateForm');
   const closeAddCandidateModal = document.getElementById('closeAddCandidateModal');
   const cancelAddCandBtn = document.getElementById('cancelAddCandBtn');
+
+  // Filtered Excel Export Modal Elements
+  const exportExcelBtn = document.getElementById('exportExcelBtn');
+  const exportExcelModal = document.getElementById('exportExcelModal');
+  const exportExcelForm = document.getElementById('exportExcelForm');
+  const exportRoleSelect = document.getElementById('exportRoleSelect');
+  const exportTimeframeSelect = document.getElementById('exportTimeframeSelect');
+  const exportCustomDateRow = document.getElementById('exportCustomDateRow');
+  const exportStartDate = document.getElementById('exportStartDate');
+  const exportEndDate = document.getElementById('exportEndDate');
+  const exportStatusSelect = document.getElementById('exportStatusSelect');
+  const exportLiveCountBadge = document.getElementById('exportLiveCountBadge');
+  const closeExportModalBtn = document.getElementById('closeExportModalBtn');
+  const cancelExportModalBtn = document.getElementById('cancelExportModalBtn');
 
   async function loadCandidates() {
     try {
@@ -1088,6 +1139,82 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Filtered Excel Export Event Listeners & Live Match Counter
+  async function updateExportLiveCount() {
+    if (!exportLiveCountBadge) return;
+    const role = exportRoleSelect ? exportRoleSelect.value : 'all';
+    const timeframe = exportTimeframeSelect ? exportTimeframeSelect.value : '24h';
+    const status = exportStatusSelect ? exportStatusSelect.value : 'all';
+    const startDate = exportStartDate ? exportStartDate.value : '';
+    const endDate = exportEndDate ? exportEndDate.value : '';
+
+    exportLiveCountBadge.textContent = 'Counting...';
+    try {
+      const params = new URLSearchParams({ role, timeframe, status });
+      if (timeframe === 'custom') {
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+      }
+      const res = await fetch(`/api/hiring/export-count?${params.toString()}`);
+      const data = await res.json();
+      if (data.success) {
+        exportLiveCountBadge.textContent = `${data.count} candidates`;
+        exportLiveCountBadge.style.background = data.count > 0 ? '#10b981' : '#64748b';
+      } else {
+        exportLiveCountBadge.textContent = 'N/A';
+      }
+    } catch (err) {
+      exportLiveCountBadge.textContent = 'Error';
+    }
+  }
+
+  if (exportExcelBtn) {
+    exportExcelBtn.addEventListener('click', () => {
+      if (exportExcelModal) {
+        exportExcelModal.style.display = 'flex';
+        updateExportLiveCount();
+      }
+    });
+  }
+
+  if (closeExportModalBtn) closeExportModalBtn.addEventListener('click', () => { if (exportExcelModal) exportExcelModal.style.display = 'none'; });
+  if (cancelExportModalBtn) cancelExportModalBtn.addEventListener('click', () => { if (exportExcelModal) exportExcelModal.style.display = 'none'; });
+
+  if (exportTimeframeSelect) {
+    exportTimeframeSelect.addEventListener('change', () => {
+      if (exportCustomDateRow) {
+        exportCustomDateRow.style.display = (exportTimeframeSelect.value === 'custom') ? 'flex' : 'none';
+      }
+      updateExportLiveCount();
+    });
+  }
+
+  if (exportRoleSelect) exportRoleSelect.addEventListener('change', updateExportLiveCount);
+  if (exportStatusSelect) exportStatusSelect.addEventListener('change', updateExportLiveCount);
+  if (exportStartDate) exportStartDate.addEventListener('change', updateExportLiveCount);
+  if (exportEndDate) exportEndDate.addEventListener('change', updateExportLiveCount);
+
+  if (exportExcelForm) {
+    exportExcelForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const role = exportRoleSelect ? exportRoleSelect.value : 'all';
+      const timeframe = exportTimeframeSelect ? exportTimeframeSelect.value : '24h';
+      const status = exportStatusSelect ? exportStatusSelect.value : 'all';
+      const startDate = exportStartDate ? exportStartDate.value : '';
+      const endDate = exportEndDate ? exportEndDate.value : '';
+
+      const params = new URLSearchParams({ role, timeframe, status });
+      if (timeframe === 'custom') {
+        if (startDate) params.set('startDate', startDate);
+        if (endDate) params.set('endDate', endDate);
+      }
+
+      // Trigger browser download with filter query params
+      window.location.href = `/api/hiring/export-excel?${params.toString()}`;
+      if (exportExcelModal) exportExcelModal.style.display = 'none';
+    });
+  }
+
   // Real-time Socket Event for Candidates Pipeline
   socket.on('hiring:update', (data) => {
     if (data && data.candidates) {
@@ -1462,6 +1589,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function getInterviewInvitationText(cand) {
+    const candidateName = (cand.name && cand.name !== 'Candidate' && cand.name !== 'General Applicant') ? cand.name : 'Candidate';
+    let inviteDateStr = '';
+    let inviteTimeStr = '10:00 am - 2:00 pm';
+
+    if (cand.interviewDateTime) {
+      const idate = new Date(cand.interviewDateTime);
+      if (!isNaN(idate.getTime())) {
+        const day = String(idate.getDate()).padStart(2, '0');
+        const month = String(idate.getMonth() + 1).padStart(2, '0');
+        const year = idate.getFullYear();
+        inviteDateStr = `${day}/${month}/${year}`;
+
+        const hrs = idate.getHours();
+        const mins = String(idate.getMinutes()).padStart(2, '0');
+        if (hrs !== 0 || idate.getMinutes() !== 0) {
+          const ampm = hrs >= 12 ? 'pm' : 'am';
+          const h12 = hrs % 12 || 12;
+          inviteTimeStr = `${String(h12).padStart(2, '0')}:${mins} ${ampm}`;
+        }
+      }
+    }
+
+    if (!inviteDateStr) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const day = String(tomorrow.getDate()).padStart(2, '0');
+      const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const year = tomorrow.getFullYear();
+      inviteDateStr = `${day}/${month}/${year}`;
+    }
+
+    return `Dear ${candidateName},\n\nCongratulations! You have been shortlisted for the interview at BrandSetu Digital.\nWe are pleased to invite you for the next round of the selection process.\n\n📅 Date: ${inviteDateStr}\n⏰ Time: ${inviteTimeStr}\n                  \n📍Google Maps Location: https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nBhawarkua main road orange business park floor 103 mc donald's building, Indore\n\nPlease make sure to reach on time.\nFor any assistance, feel free to contact us.\n\nLooking forward to meeting you.\n\nWarm regards,\nBrandSetu Digital`;
+  }
+
   // Quick Action Chips in Mobile Simulator
   document.querySelectorAll('.wa-quick-chip').forEach(chip => {
     chip.addEventListener('click', async () => {
@@ -1477,7 +1639,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (template === 'resume') {
         textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;
       } else if (template === 'confirm') {
-        textToSend = `Dear ${cand.name || 'Candidate'}! 🎉 Your in-person interview for the *${cand.role || 'Applied'}* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍`;
+        textToSend = getInterviewInvitationText(cand);
       } else if (template === 'reminder') {
         if (!confirm('Send 1-Hr Interview Reminder to this candidate?')) return;
         try {
@@ -1966,7 +2128,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (template === 'resume') {
         textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;
       } else if (template === 'confirm') {
-        textToSend = `Dear ${cand.name || 'Candidate'}! 🎉 Your in-person interview for the *${cand.role || 'Applied'}* position is confirmed at our Indore office (103 Orange Business Park, Bhawarkua). Best of luck! 👍`;
+        textToSend = getInterviewInvitationText(cand);
       } else if (template === 'reminder') {
         if (!confirm('Send 1-Hr Interview Reminder to this candidate?')) return;
         try {

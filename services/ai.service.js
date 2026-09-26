@@ -1184,22 +1184,39 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     return getOfficeLocationDirectionsResponse(isHinglish ? 'hinglish' : 'english');
   }
 
-  // 1. DIGITAL MARKETING & OTHER ROLES CHECK (Content Writer, Web Dev, Telecaller, Media Buyer, etc.)
+  // 1. DIGITAL MARKETING & OTHER ROLES CHECK (Content Writer, Web Dev, Telecaller, Sales, Media Buyer, etc.)
   const isContactOrPhoneQuery = isOfficeDirectionsOrContactQuery(text) || /(?:calling|contact|phone)\s*(?:no|number|num)/i.test(text);
-  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|telecaller|telecalling|inside\s*sales|\b(?:calling|caller)\s+(?:job|role|post|vacancy|work)\b|sales|bpo|receptionist|accountant|data\s*entry|marketing|media\s*buyer|funnel)/i;
+  const otherRolePattern = /(?:web|website|developer|development|php|python|react|node|java|flutter|android|ios|content\s*writer|copywriter|writer|writing|tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales|\b(?:calling|caller)\s+(?:job|role|post|vacancy|work)\b|\bsales\b|bpo|receptionist|accountant|accounts|finance|tally|data\s*entry|marketing|media\s*buyer|funnel|hr\s*recruiter|hr\s*executive)/i;
   const isExcludedRole = !isContactOrPhoneQuery && otherRolePattern.test(text) && !text.includes('seo') && !text.includes('aeo') && !text.includes('video') && !text.includes('editor') && !text.includes('graphic') && !text.includes('design') && !text.includes('social media');
 
   if (isExcludedRole) {
+    const textLower = text.toLowerCase();
     let mentionedRole = 'Digital Marketing Role';
-    if (text.includes('web') || text.includes('developer')) mentionedRole = 'Web / Website Developer';
-    else if (text.includes('content') || text.includes('writer') || text.includes('copywriter')) mentionedRole = 'Content Writer / Copywriter';
-    else if (text.includes('telecaller') || text.includes('telecalling') || text.includes('inside sales') || /\b(?:calling|caller)\s+(?:job|role|post)\b/i.test(text)) mentionedRole = 'Telecaller / Inside Sales';
-    else if (text.includes('accountant')) mentionedRole = 'Accounts / Finance';
+    if (/(?:tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales)/i.test(textLower) || (/\b(?:calling|caller)\b/i.test(textLower) && textLower.includes('sales'))) {
+      mentionedRole = textLower.includes('sales') ? 'Telecaller / Sales Executive' : 'Telecaller / Inside Sales';
+    } else if (/(?:sales\s*executive|sales\s*manager|sales\s*job|sales\s*role|\bsales\b|bde|bda|business\s*development)/i.test(textLower)) {
+      mentionedRole = 'Sales Executive';
+    } else if (textLower.includes('web') || textLower.includes('developer')) {
+      mentionedRole = 'Web Developer';
+    } else if (textLower.includes('content') || textLower.includes('writer') || textLower.includes('copywriter')) {
+      mentionedRole = 'Content Writer / Copywriter';
+    } else if (/(?:accountant|accounting|accounts|finance|tally)/i.test(textLower)) {
+      mentionedRole = 'Accountant / Finance';
+    } else if (/(?:hr\s*recruiter|hr\s*executive|human\s*resource|recruiter)/i.test(textLower)) {
+      mentionedRole = 'HR Recruiter / HR Executive';
+    } else if (/(?:receptionist|front\s*desk|back\s*office|data\s*entry)/i.test(textLower)) {
+      mentionedRole = 'Office Admin / Back Office';
+    }
+
+    if (candidate && (!candidate.role || candidate.role === 'General Applicant')) {
+      candidate.role = mentionedRole;
+      candidate.justSelectedRole = true;
+    }
 
     if (isHinglish) {
-      return `${prefixHi}Bahut badiya! Brand Setu Digital me *${mentionedRole}* aur digital marketing/creative roles ke liye opportunities open hain. 💼✨\n\nKripya batayein:\n1️⃣ Aapka *${mentionedRole}* me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aap kis work mode me interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nKripya apna updated *Resume (PDF)* aur work samples / links yahan share karein taaki hamari team aapki profile review kar sake. 📄👍`;
+      return `${prefixHi}Bahut badiya! Brand Setu Digital me *${mentionedRole}* aur digital marketing/creative roles ke liye opportunities open hain. 💼✨\n\nKripya batayein:\n1️⃣ Aapka *${mentionedRole}* me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aapki core skills aur tools kya hain?\n\nKripya apna updated *Resume (PDF)* aur work samples / links yahan share karein taaki hamari HR team aapki profile review kar sake. 📄👍`;
     } else {
-      return `${prefixEn}Great! At Brand Setu Digital, we welcome applications for *${mentionedRole}* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *${mentionedRole}* (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our team can evaluate your profile. 📄👍`;
+      return `${prefixEn}Great! At Brand Setu Digital, we welcome applications for *${mentionedRole}* and all digital marketing & creative domains. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in *${mentionedRole}* (Fresher / Experienced)?\n2️⃣ What are your core skills and tools?\n\nPlease share your updated *Resume (PDF)* and work samples / links here so our HR team can evaluate your profile. 📄👍`;
     }
   }
 
@@ -1270,18 +1287,18 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   // 6. FAQ: WORK FROM HOME / REMOTE
   if (text.includes('wfh') || text.includes('work from home') || text.includes('remote') || text.includes('ghar se')) {
     if (isHinglish) {
-      return `${prefixHi}Haan bilkul! Hamare yahan *Work From Home (WFH) / Remote* aur *Freelancer* roles ke liye bhi candidates onboard kiye jaate hain. 💻✨\n\nKripya batayein:\n1️⃣ Aap kis position (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) ke liye WFH chahte hain?\n2️⃣ Aapka is field me kitna experience hai?\n\nKripya apna updated *Resume (PDF)* aur portfolio / Google Drive link share karein taaki hum aage badhein! 📄👍`;
+      return `${prefixHi}Ji bilkul! Remote / Work From Home (WFH) ke liye hamari HR team aapka resume & profile review karne ke baad aapse directly WhatsApp / Call par connect karegi. 🤝✨\n\nKripya apna updated *Resume (PDF)* aur work samples / portfolio yahan share kar dein taaki HR team review kar sake. 📄👍`;
     } else {
-      return `${prefixEn}Yes, absolutely! We onboard candidates for *Work From Home (WFH) / Remote* and *Freelancer* roles as well. 💻✨\n\nPlease let us know:\n1️⃣ Which position (Video Editor, Graphic Designer, SEO, Social Media, Content Writer, etc.) are you looking for WFH in?\n2️⃣ How much experience do you have in this field?\n\nPlease share your updated *Resume (PDF)* and portfolio / Google Drive link so our team can evaluate your profile. 📄👍`;
+      return `${prefixEn}Certainly! For Remote / Work From Home (WFH) roles, our HR team will review your profile and connect with you directly via WhatsApp / Call. 🤝✨\n\nMeanwhile, please share your updated *Resume (PDF)* and work portfolio here so our HR team can review it. 📄👍`;
     }
   }
 
   // 6.5. FAQ: PART-TIME / FREELANCER / LIMITED HOURS
   if (isPartTimeQuery(text) || text.includes('freelance') || text.includes('freelancer')) {
     if (isHinglish) {
-      return `${prefixHi}Bahut badiya! Hamare yahan *Freelancer* aur *Part-Time / Flexible hours* ke liye bhi opportunities open hain. 🤝✨\n\nKripya batayein:\n1️⃣ Aap kis role me freelance ya part-time kaam karna chahte hain?\n2️⃣ Aap daily ya weekly kitne hours dedicate kar sakte hain?\n\nKripya apna updated *Resume (PDF)* aur best work samples ka link yahan share karein! 📄🎥`;
+      return `${prefixHi}Ji bilkul! Freelancer / Part-Time roles ke liye hamari HR team aapka resume & work samples review karne ke baad aapse directly WhatsApp / Call par connect karegi. 🤝✨\n\nKripya apna updated *Resume (PDF)* aur best work samples / portfolio ka link yahan share kar dein taaki HR team review kar sake. 📄🎥`;
     } else {
-      return `${prefixEn}Great! We offer opportunities for *Freelancers* and *Part-Time / Flexible hours* as well. 🤝✨\n\nPlease let us know:\n1️⃣ Which role are you looking to work freelance or part-time in?\n2️⃣ How many hours per day or week can you dedicate?\n\nPlease share your updated *Resume (PDF)* and your best work samples / portfolio link here! 📄🎥`;
+      return `${prefixEn}Certainly! For Freelancer / Part-Time roles, our HR team will review your profile and connect with you directly via WhatsApp / Call. 🤝✨\n\nMeanwhile, please share your updated *Resume (PDF)* and best work samples / portfolio link here so our HR team can review it. 📄🎥`;
     }
   }
 
@@ -1370,6 +1387,40 @@ async function generateHiringAIResponse(candidate, userMessage, messageData = {}
     : (process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : '');
 
   const lang = detectLanguage(userMessage);
+
+  // If candidate role is still General Applicant / empty and userMessage mentions a specific role:
+  if (candidate && (!candidate.role || candidate.role === 'General Applicant')) {
+    const textLower = (userMessage || '').toLowerCase();
+    let detectedMentionedRole = null;
+    if (/(?:tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales)/i.test(textLower) || (/\b(?:calling|caller)\b/i.test(textLower) && textLower.includes('sales'))) {
+      detectedMentionedRole = textLower.includes('sales') ? 'Telecaller / Sales Executive' : 'Telecaller / Inside Sales';
+    } else if (/(?:sales\s*executive|sales\s*manager|sales\s*job|sales\s*role|\bsales\b|bde|bda|business\s*development)/i.test(textLower)) {
+      detectedMentionedRole = 'Sales Executive';
+    } else if (textLower.includes('web') || textLower.includes('developer')) {
+      detectedMentionedRole = 'Web Developer';
+    } else if (textLower.includes('content') || textLower.includes('writer') || textLower.includes('copywriter')) {
+      detectedMentionedRole = 'Content Writer / Copywriter';
+    } else if (/(?:accountant|accounting|accounts|finance|tally)/i.test(textLower)) {
+      detectedMentionedRole = 'Accountant / Finance';
+    } else if (/(?:hr\s*recruiter|hr\s*executive|human\s*resource|recruiter)/i.test(textLower)) {
+      detectedMentionedRole = 'HR Recruiter / HR Executive';
+    } else if (/(?:receptionist|front\s*desk|back\s*office|data\s*entry)/i.test(textLower)) {
+      detectedMentionedRole = 'Office Admin / Back Office';
+    } else if (textLower.includes('video editor') || textLower.includes('video editing')) {
+      detectedMentionedRole = 'Video Editor';
+    } else if (textLower.includes('graphic') || textLower.includes('designer')) {
+      detectedMentionedRole = 'Graphic Designer';
+    } else if (textLower.includes('seo') || textLower.includes('aeo')) {
+      detectedMentionedRole = 'SEO & AEO Expert';
+    } else if (textLower.includes('social media')) {
+      detectedMentionedRole = 'Social Media Manager';
+    }
+
+    if (detectedMentionedRole) {
+      candidate.role = detectedMentionedRole;
+      candidate.justSelectedRole = true;
+    }
+  }
 
   // Candidate Name
   let candName = (candidate.name || '').trim();
@@ -1478,13 +1529,12 @@ CRITICAL CONVERSATIONAL & GREETING RULES (MANDATORY):
 4. RESUME FORMAT REQUIREMENT: Resume MUST be in PDF format (.pdf). If candidate sends images/photos or asks about resume, remind them that only PDF resumes are accepted.
 5. PORTFOLIO FORMAT REQUIREMENT: Portfolio / work samples must be shared as a valid link (Google Drive, Behance, Figma, YouTube link).
 6. OFF-TOPIC MESSAGES: If the user message is irrelevant to hiring or job positions (e.g. casual chit-chat, personal questions, songs, jokes, loans, weather), politely remind them that this helpline is strictly for BrandSetu Digital recruitment.
-7. WORK MODE INQUIRY RULE (ABSOLUTE MANDATORY - NEVER REPEAT):
-   - Inquiring about work mode (Full-Time In-Office / Work From Home / Freelancer / Part-Time) must ONLY happen in the VERY FIRST interaction (Step 1 or Step 2) when candidate has NOT chosen their role or work mode yet.
-   - NEVER ask about work mode in subsequent or ongoing messages ("har message me ye bolna nahi hai").
-   - If candidate's role is already known, or they have already mentioned Full-Time / Internship / Fresher / Freelancer / WFH / Part-Time, or their Work Mode is already set in CANDIDATE PROFILE (${candidateSummary.workMode}), or their Resume/Portfolio has already been received:
-     --> NEVER ask them if they want Full-Time, WFH, Freelancer, or Part-Time!
-     --> NEVER send any variation of "Please let me know if you are looking for Full-Time (In-Office), Work From Home, Freelancer, or Part-Time position"!
-   - If Resume / Portfolio is already received (Step 4): NEVER ask for work mode or role again! Simply acknowledge that HR is reviewing their profile, answer their specific query, or proceed to interview scheduling.
+7. WORK MODE POLICY (CRITICAL):
+   - All positions are primarily In-Office Full-Time by default.
+   - DO NOT mention, offer, or ask about Work From Home (WFH) or Freelancer upfront.
+   - Never ask: "Are you looking for Full-Time, WFH, or Freelancer?"
+   - IF the candidate explicitly asks about WFH or Freelancing on their own: DO NOT reject or refuse them. Tell them that for Remote / WFH / Freelance roles, our HR team will review their profile/resume and connect with them directly. Ask for their updated Resume (PDF) and portfolio.
+
 8. HUMAN-LIKE TONE & ZERO REPETITION (CRITICAL):
    - Talk like a real, warm, considerate human HR recruiter on WhatsApp. Do NOT sound like an automated IVR, chatbot, or rigid script.
    - ALWAYS read RECENT CONVERSATION HISTORY. NEVER repeat questions, templates, or sentences that were already said in previous turns.
@@ -1506,16 +1556,14 @@ Present the open positions & influencer collaborations:
 7️⃣ ✨ Influencer Collaboration!
 
 Note: Candidates for other Digital Marketing Roles (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) can also apply by mentioning their role.
-Work Modes Available: Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time.
 Ask which position or collaboration they are applying for (reply 1 to 7 or role name).
 
-👉 STEP 2 (If role is chosen, but Experience / Work Mode / Qualification is pending):
+👉 STEP 2 (If role is chosen, but Experience / Tools / Qualification is pending):
 - If candidate selected 🎬 Video Editor:
   Ask:
   1. Which software do they use? (Premiere Pro, After Effects, DaVinci, CapCut)
   2. What type of video editing do they specialize in? (Reels/Shorts, YouTube, Commercials, Motion Graphics)
-  3. What is their preferred work mode? (Full-Time In-Office / Work From Home / Freelancer / Part-Time)
-  4. Are they Fresher or Experienced?
+  3. Are they Fresher or Experienced?
 - If candidate selected ✨ Influencer Collaboration:
   Send this exact collaboration onboarding message:
   "Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:"
@@ -1525,9 +1573,9 @@ Ask which position or collaboration they are applying for (reply 1 to 7 or role 
   3. How many followers do they have and what are their average views?
   4. What type of collaboration do they prefer? (Paid Reel, Barter, Campaign, Brand Ambassador)
 - If candidate selected 💼 Other Digital Marketing Roles (Content Writer, Web Developer, Telecaller, etc.):
-  CRITICAL: NEVER say "hiring nahi hai" or "no vacancy"! Warmly welcome them, ask about their experience, skills/tools, and preferred work mode (Full-Time / WFH / Freelancer / Part-Time).
+  CRITICAL: NEVER say "hiring nahi hai" or "no vacancy"! Warmly welcome them, ask about their experience, skills/tools.
 - If candidate selected other roles (Graphic Designer, AI Video, SEO, Social Media, Digital Marketing):
-  Ask if Fresher or Experienced, and their preferred work mode (Full-Time / WFH / Freelancer / Part-Time).
+  Ask if Fresher or Experienced, and their core skills/tools.
 
 👉 STEP 3 (If role & experience/qualification are known, but Resume / Portfolio is pending):
 - For Influencers: Ask for their Instagram/social media profile link or insights screenshot.
@@ -1550,7 +1598,7 @@ Ask which position or collaboration they are applying for (reply 1 to 7 or role 
 - NEVER reschedule unless the candidate explicitly gives a new specific time/day.
 
 CRITICAL POLICIES & SPECIAL QUERY HANDLING:
-- FREELANCER / WORK FROM HOME (WFH) / PART-TIME: Candidates are welcome for Freelancer, WFH, and Part-Time across all domains. IMPORTANT: Asking about work mode is ONLY for the initial inquiry (Step 1 or Step 2). Once the candidate's work mode or role is known, or if their Resume has already been received, NEVER ask them about work mode again.
+- FREELANCER / WORK FROM HOME (WFH) / PART-TIME: All positions are primarily In-Office Full-Time by default. DO NOT offer or ask about WFH/Freelancer upfront. If a candidate explicitly asks if WFH or Freelance is available, DO NOT refuse them: tell them that for Remote / WFH / Freelance roles, our HR team will review their profile/resume and connect with them directly. Request their updated Resume (PDF) and portfolio link.
 - ALL DIGITAL MARKETING ROLES: Candidates can apply for ANY digital marketing related role (SEO, SMM, Content Writer, Copywriter, Web Developer, Ads Specialist, Telecaller, Graphic Designer, Video Editor, Media Buyer). NEVER deny hiring or say "abhi vacancy nahi hai". Talk to them and collect their details and resume.
 - INFLUENCER COLLABORATION: Use the special Influencer Collaboration onboarding form and collect their content niche, handle, follower count, and audience insights.
 - SALARY / STIPEND: State clearly that compensation is evaluated based on experience, skills, and assessment, and discussed during the process.

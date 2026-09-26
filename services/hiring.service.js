@@ -285,6 +285,201 @@ function loadCandidates() {
 }
 
 /**
+ * Format and generate Excel Workbook for any list of candidates
+ */
+function generateExcelWorkbook(candidateList = []) {
+  const excelRows = (candidateList || []).map((c, index) => {
+    let interviewFormatted = 'Not Scheduled';
+    if (c.interviewDateTime) {
+      try {
+        const d = new Date(c.interviewDateTime);
+        interviewFormatted = d.toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+      } catch (e) {
+        interviewFormatted = c.interviewDateTime;
+      }
+    }
+
+    let appliedOnFormatted = '';
+    if (c.createdAt) {
+      try {
+        appliedOnFormatted = new Date(c.createdAt).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+      } catch (e) {
+        appliedOnFormatted = c.createdAt;
+      }
+    }
+
+    return {
+      'S.No': index + 1,
+      'Candidate Name': c.name || 'Candidate',
+      'WhatsApp Phone': c.phone ? `+${c.phone}` : '',
+      'Role Applied': c.role || 'Not Specified',
+      'Work Mode': c.workType || 'Full-Time',
+      'Interview Mode': c.interviewMode === 'online' ? 'Online (Google Meet)' : 'In-Person (Indore Office)',
+      'Resume Received': c.resumeReceived ? 'YES' : 'PENDING',
+      'Portfolio / Drive / Social Link': c.portfolio || (c.socialHandle ? `Social: ${c.socialHandle} (${c.followers || 'N/A'})` : ''),
+      'Candidate Status': c.status || 'Applied',
+      'Interview Date & Time': interviewFormatted,
+      'Experience': c.experience || '',
+      'City': c.city || 'Indore',
+      'Resume Reminder Sent': c.resumeReminderSent ? 'YES' : 'NO',
+      'Interview 1hr Reminder': c.interviewReminderSent ? 'YES' : 'NO',
+      'Applied Date': appliedOnFormatted,
+      'Last Message': c.lastMessage || '',
+      'Notes': c.notes || ''
+    };
+  });
+
+  const worksheet = xlsx.utils.json_to_sheet(excelRows);
+
+  worksheet['!cols'] = [
+    { wch: 6 },  // S.No
+    { wch: 20 }, // Name
+    { wch: 18 }, // Phone
+    { wch: 22 }, // Role
+    { wch: 16 }, // Work Mode
+    { wch: 24 }, // Interview Mode
+    { wch: 16 }, // Resume Received
+    { wch: 32 }, // Portfolio / Social Link
+    { wch: 20 }, // Status
+    { wch: 24 }, // Interview Date & Time
+    { wch: 16 }, // Experience
+    { wch: 14 }, // City
+    { wch: 22 }, // Resume Reminder
+    { wch: 22 }, // Interview Reminder
+    { wch: 22 }, // Applied Date
+    { wch: 30 }, // Last Message
+    { wch: 25 }  // Notes
+  ];
+
+  const workbook = xlsx.utils.book_new();
+  xlsx.utils.book_append_sheet(workbook, worksheet, 'Candidates Hiring');
+  return workbook;
+}
+
+/**
+ * Generate Excel binary buffer for streaming or downloading
+ */
+function generateExcelBuffer(candidateList = []) {
+  const workbook = generateExcelWorkbook(candidateList);
+  return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+}
+
+/**
+ * Filter candidates by role, timeframe (24h, today, 7d, etc.), status, and search
+ */
+function getFilteredCandidates(filters = {}) {
+  const {
+    role,
+    timeframe = 'all',
+    status,
+    search,
+    dateBasis = 'applied',
+    startDate,
+    endDate
+  } = filters;
+
+  const now = Date.now();
+  const ONE_HOUR = 60 * 60 * 1000;
+  const ONE_DAY = 24 * ONE_HOUR;
+
+  // Calculate India (Asia/Kolkata) today boundaries
+  const nowInIndia = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const todayStartIndia = new Date(nowInIndia.getFullYear(), nowInIndia.getMonth(), nowInIndia.getDate()).getTime();
+  const yesterdayStartIndia = todayStartIndia - ONE_DAY;
+
+  return candidates.filter(c => {
+    if (!c) return false;
+
+    // 1. Role Filter
+    if (role && role !== 'all') {
+      const candRole = (c.role || '').toLowerCase();
+      const targetRole = role.toLowerCase().trim();
+
+      if (targetRole === 'telecaller') {
+        if (!candRole.includes('telecaller') && !candRole.includes('telecoler') && !candRole.includes('inside sales') && !candRole.includes('calling')) {
+          return false;
+        }
+      } else if (targetRole === 'sales') {
+        if (!candRole.includes('sales')) {
+          return false;
+        }
+      } else if (targetRole === 'accountant') {
+        if (!candRole.includes('account') && !candRole.includes('finance') && !candRole.includes('tally')) {
+          return false;
+        }
+      } else if (candRole !== targetRole && !candRole.includes(targetRole) && !targetRole.includes(candRole)) {
+        return false;
+      }
+    }
+
+    // 2. Status Filter
+    if (status && status !== 'all') {
+      const candStatus = (c.status || '').toLowerCase();
+      const targetStatus = status.toLowerCase();
+      if (candStatus !== targetStatus && !candStatus.includes(targetStatus)) {
+        return false;
+      }
+    }
+
+    // 3. Timeframe / Date Filter
+    if (timeframe && timeframe !== 'all') {
+      let candDateMs = null;
+      if (dateBasis === 'interview' && c.interviewDateTime) {
+        candDateMs = new Date(c.interviewDateTime).getTime();
+      } else if (dateBasis === 'activity') {
+        candDateMs = new Date(c.updatedAt || c.createdAt || 0).getTime();
+      } else {
+        // default: applied date, fall back to updatedAt
+        candDateMs = new Date(c.createdAt || c.updatedAt || 0).getTime();
+      }
+
+      if (!candDateMs || isNaN(candDateMs)) return false;
+
+      if (timeframe === '24h') {
+        if ((now - candDateMs) > (24 * ONE_HOUR)) return false;
+      } else if (timeframe === 'today') {
+        const cDateIndia = new Date(new Date(candDateMs).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).getTime();
+        if (cDateIndia < todayStartIndia) return false;
+      } else if (timeframe === 'yesterday') {
+        const cDateIndia = new Date(new Date(candDateMs).toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })).getTime();
+        if (cDateIndia < yesterdayStartIndia || cDateIndia >= todayStartIndia) return false;
+      } else if (timeframe === '7d') {
+        if ((now - candDateMs) > (7 * ONE_DAY)) return false;
+      } else if (timeframe === '30d') {
+        if ((now - candDateMs) > (30 * ONE_DAY)) return false;
+      } else if (timeframe === 'custom') {
+        if (startDate && candDateMs < new Date(startDate).getTime()) return false;
+        if (endDate && candDateMs > (new Date(endDate).getTime() + ONE_DAY)) return false;
+      }
+    }
+
+    // 4. Search Filter
+    if (search && search.trim()) {
+      const q = search.toLowerCase().trim();
+      const matches = (
+        (c.name && c.name.toLowerCase().includes(q)) ||
+        (c.phone && c.phone.includes(q)) ||
+        (c.role && c.role.toLowerCase().includes(q)) ||
+        (c.city && c.city.toLowerCase().includes(q)) ||
+        (c.experience && c.experience.toLowerCase().includes(q)) ||
+        (c.notes && c.notes.toLowerCase().includes(q))
+      );
+      if (!matches) return false;
+    }
+
+    return true;
+  });
+}
+
+/**
  * Save candidates to JSON, Mirror Backup, Hourly Snapshot, and Excel file
  */
 function saveCandidatesAndSyncExcel(syncToMongo = true) {
@@ -353,81 +548,8 @@ function saveCandidatesAndSyncExcel(syncToMongo = true) {
       });
     }
 
-    // 2. Format data for Excel Export
-    const excelRows = candidates.map((c, index) => {
-      let interviewFormatted = 'Not Scheduled';
-      if (c.interviewDateTime) {
-        try {
-          const d = new Date(c.interviewDateTime);
-          interviewFormatted = d.toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          });
-        } catch (e) {
-          interviewFormatted = c.interviewDateTime;
-        }
-      }
-
-      let appliedOnFormatted = '';
-      if (c.createdAt) {
-        try {
-          appliedOnFormatted = new Date(c.createdAt).toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            dateStyle: 'medium',
-            timeStyle: 'short'
-          });
-        } catch (e) {
-          appliedOnFormatted = c.createdAt;
-        }
-      }
-
-      return {
-        'S.No': index + 1,
-        'Candidate Name': c.name || 'Candidate',
-        'WhatsApp Phone': c.phone ? `+${c.phone}` : '',
-        'Role Applied': c.role || 'Not Specified',
-        'Work Mode': c.workType || 'Full-Time',
-        'Interview Mode': c.interviewMode === 'online' ? 'Online (Google Meet)' : 'In-Person (Indore Office)',
-        'Resume Received': c.resumeReceived ? 'YES' : 'PENDING',
-        'Portfolio / Drive / Social Link': c.portfolio || (c.socialHandle ? `Social: ${c.socialHandle} (${c.followers || 'N/A'})` : ''),
-        'Candidate Status': c.status || 'Applied',
-        'Interview Date & Time': interviewFormatted,
-        'Experience': c.experience || '',
-        'City': c.city || 'Indore',
-        'Resume Reminder Sent': c.resumeReminderSent ? 'YES' : 'NO',
-        'Interview 1hr Reminder': c.interviewReminderSent ? 'YES' : 'NO',
-        'Applied Date': appliedOnFormatted,
-        'Last Message': c.lastMessage || '',
-        'Notes': c.notes || ''
-      };
-    });
-
-    // 3. Create Excel Workbook and Sheet
-    const worksheet = xlsx.utils.json_to_sheet(excelRows);
-    
-    // Set column widths for clean readability in Excel
-    worksheet['!cols'] = [
-      { wch: 6 },  // S.No
-      { wch: 20 }, // Name
-      { wch: 18 }, // Phone
-      { wch: 22 }, // Role
-      { wch: 16 }, // Work Mode
-      { wch: 16 }, // Resume Received
-      { wch: 32 }, // Portfolio / Social Link
-      { wch: 20 }, // Status
-      { wch: 24 }, // Interview Date & Time
-      { wch: 16 }, // Experience
-      { wch: 14 }, // City
-      { wch: 22 }, // Resume Reminder
-      { wch: 22 }, // Interview Reminder
-      { wch: 22 }, // Applied Date
-      { wch: 30 }, // Last Message
-      { wch: 25 }  // Notes
-    ];
-
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, 'Candidates Hiring');
+    // 2. Generate and write full Excel workbook
+    const workbook = generateExcelWorkbook(candidates);
     xlsx.writeFile(workbook, CANDIDATES_EXCEL_FILE);
 
     // Notify UI via socket
@@ -658,9 +780,9 @@ function getCandidateSalutation(candidate, lang = 'english') {
 function getWelcomeRolesReply(lang = 'english') {
   const isHi = (lang === 'hinglish' || lang === 'hindi');
   if (isHi) {
-    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum in active positions aur collaborations ke liye onboarding kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* Agar aap kisi anya *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) ke liye apply karna chahte hain, toh aap uska naam bhi likh sakte hain.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Aap **kis position ya collaboration** ke liye apply/connect kar rahe hain? (1 to 7 number ya role ka naam likhein) 📝`;
+    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum in active positions aur collaborations ke liye onboarding kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* Agar aap kisi anya *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) ke liye apply karna chahte hain, toh aap uska naam bhi likh sakte hain.\n\n👉 Aap **kis position ya collaboration** ke liye apply/connect kar rahe hain? (1 to 7 number ya role ka naam likhein) 📝`;
   }
-  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n🌐 *Work Modes:* Full-Time (In-Office) | Work From Home (WFH) | Freelancer | Part-Time\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝`;
+  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝`;
 }
 
 /**
@@ -677,24 +799,35 @@ function getRoleSelectedReply(role, lang = 'english') {
   // Tailored Track: Video Editor
   if (role === 'Video Editor' || (role && role.toLowerCase().includes('video editor'))) {
     if (isHi) {
-      return `Bahut badiya! Aapne *Video Editor* select kiya hai. 🎬👍\n\nKripya batayein:\n1️⃣ Aap kaunse software use karte hain? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ Kis type ke videos edit karte hain? (Instagram Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Aap kis work mode ke liye apply kar rahe hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ Aapko kitna experience hai (Fresher / Experienced)? 💼`;
+      return `Bahut badiya! Aapne *Video Editor* select kiya hai. 🎬👍\n\nKripya batayein:\n1️⃣ Aap kaunse software use karte hain? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ Kis type ke videos edit karte hain? (Instagram Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Aapko kitna experience hai (Fresher / Experienced)? 💼`;
     }
-    return `Great! You have selected *Video Editor*. 🎬👍\n\nPlease let us know:\n1️⃣ Which software do you use? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ What type of videos do you edit? (Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n4️⃣ How much experience do you have (Fresher / Experienced)? 💼`;
+    return `Great! You have selected *Video Editor*. 🎬👍\n\nPlease let us know:\n1️⃣ Which software do you use? (Premiere Pro, After Effects, DaVinci Resolve, CapCut Pro)\n2️⃣ What type of videos do you edit? (Reels/Shorts, YouTube long-form, Commercial Ads, Motion Graphics)\n3️⃣ How much experience do you have (Fresher / Experienced)? 💼`;
   }
 
-  // Tailored Track: Other Digital Marketing Roles (Content Writer, Web Developer, etc.)
-  if (role === 'Other Digital Marketing Roles' || (role && (role.toLowerCase().includes('content') || role.toLowerCase().includes('web') || role.toLowerCase().includes('digital marketing') || role.toLowerCase().includes('telecaller')))) {
+  // Tailored Track: Other Roles (Content Writer, Web Developer, Telecaller, Sales, Accounts, HR, etc.)
+  if (role === 'Other Digital Marketing Roles' || (role && (
+    role.toLowerCase().includes('content') ||
+    role.toLowerCase().includes('web') ||
+    role.toLowerCase().includes('digital marketing') ||
+    role.toLowerCase().includes('telecaller') ||
+    role.toLowerCase().includes('tele') ||
+    role.toLowerCase().includes('sales') ||
+    role.toLowerCase().includes('account') ||
+    role.toLowerCase().includes('hr') ||
+    role.toLowerCase().includes('admin') ||
+    role.toLowerCase().includes('inside sales')
+  ))) {
     if (isHi) {
-      return `Bahut badiya! Aapne *${role}* select kiya hai. 💼✨\n\nKripya batayein:\n1️⃣ Aapka is field me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aap kis work mode me interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ Aapki core skills aur tools kya hain? 📝`;
+      return `Bahut badiya! Aapne *${role}* select kiya hai. 💼✨\n\nKripya batayein:\n1️⃣ Aapka is field me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aapki core skills aur tools kya hain? 📝`;
     }
-    return `Great! You have selected *${role}*. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in this field (Fresher / Experienced)?\n2️⃣ What is your preferred work mode? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*)\n3️⃣ What are your core skills and tools? 📝`;
+    return `Great! You have selected *${role}*. 💼✨\n\nPlease let us know:\n1️⃣ How much experience do you have in this field (Fresher / Experienced)?\n2️⃣ What are your core skills and tools? 📝`;
   }
 
   // Standard Openings (Graphic Designer, AI Video, SEO, Social Media, etc.)
   if (isHi) {
-    return `Bahut badiya! Aapne *${role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher* ke liye apply kar rahe hain ya *Experienced* ke liye? (Agar experienced hain, to kitne time ka experience hai?)\n2️⃣ Aap kis work mode ke liye interested hain? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼`;
+    return `Bahut badiya! Aapne *${role}* select kiya hai. 👍\n\nKripya batayein:\n1️⃣ Aap *Fresher* ke liye apply kar rahe hain ya *Experienced* ke liye? (Agar experienced hain, to kitne time ka experience hai?)\n2️⃣ Aapki core skills aur tools kya hain? 🎨`;
   }
-  return `Great! You have selected *${role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ Which work mode are you applying for? (*Full-Time In-Office / Work From Home / Freelancer / Part-Time*) 💼`;
+  return `Great! You have selected *${role}*. 👍\n\nPlease let us know:\n1️⃣ Are you applying as a *Fresher* or *Experienced*? (If experienced, how many years/months?)\n2️⃣ What are your core skills and tools? 🎨`;
 }
 
 /**
@@ -705,8 +838,8 @@ function getExperienceAnsweredReply(candidate, lang = 'english') {
   const role = (candidate && candidate.role && candidate.role !== 'General Applicant') ? candidate.role : 'Video Editor';
   const candName = (candidate && candidate.name && candidate.name !== 'Candidate') ? candidate.name.split(' ')[0] : '';
   const isWfh = (candidate && (candidate.workType === 'Work From Home' || candidate.workType === 'Freelancer' || (candidate.experience && /wfh|work from home|remote/i.test(candidate.experience))));
-  const wfhPrefixHi = isWfh ? 'Haan bilkul, Work From Home (WFH) / Remote options available hain! 💻✨ ' : '';
-  const wfhPrefixEn = isWfh ? 'Yes, Work From Home (WFH) / Remote options are available! 💻✨ ' : '';
+  const wfhPrefixHi = isWfh ? 'Remote / Work From Home / Freelancer roles ke liye hamari HR team aapki profile review karne ke baad aapse directly connect karegi. 🤝✨ ' : '';
+  const wfhPrefixEn = isWfh ? 'For Remote / Work From Home / Freelancer roles, our HR team will review your profile and connect with you directly. 🤝✨ ' : '';
 
   if (role === 'Influencer Collaboration' || role.toLowerCase().includes('influencer')) {
     return isHi
@@ -814,7 +947,7 @@ function trackOutgoingCampaignMessage(rawPhone, messageText) {
  * Handle incoming message for Candidate Tracking & State Management
  */
 function trackCandidateFromMessage(messageData) {
-  const phone = cleanPhone(messageData.customerPhone);
+  const phone = cleanPhone(messageData.customerPhone || messageData.phone || messageData.sender);
   if (!phone) return null;
 
   const text = String(messageData.messageText || '').trim();
@@ -868,8 +1001,20 @@ function trackCandidateFromMessage(messageData) {
 
   const hasResumeSignal = hasValidDocumentUpload || hasPortfolioLink;
 
+  // Check if this is a fresh application intent (e.g. candidate clicks Instagram Ad, types "apply", "new apply", "restart", "start", or sends ad greeting)
+  const isFreshApplyIntent = (
+    lower === 'apply' ||
+    lower === 'new apply' ||
+    lower === 'restart' ||
+    lower.startsWith('apply for') ||
+    lower.startsWith('apply ') ||
+    lower.includes('can i get more info') ||
+    lower.includes('looking for job') ||
+    lower.includes('hiring ke liye')
+  );
+
   // Check if candidate is currently awaiting Step 2 (Experience / Qualification / Work mode)
-  const isAwaitingExperience = candidate && candidate.role && candidate.role !== 'General Applicant' && (!candidate.experience || candidate.experience === '');
+  const isAwaitingExperience = !isFreshApplyIntent && candidate && candidate.role && candidate.role !== 'General Applicant' && (!candidate.experience || candidate.experience === '');
 
   const cleanTrimmed = lower.replace(/[^\w\s]/g, '').trim();
   let detectedRole = null;
@@ -948,20 +1093,47 @@ function trackCandidateFromMessage(messageData) {
       }
     } else if (cleanTrimmedForRole === '6' || cleanTrimmedForRole.startsWith('6 ') || lowerForRole.includes('performance marketing') || lowerForRole.includes('media buyer') || lowerForRole.includes('meta ads') || lowerForRole.includes('facebook ads') || lowerForRole.includes('google ads') || (lowerForRole.includes('digital marketing') && (lowerForRole.includes('manager') || lowerForRole.includes('lead') || lowerForRole.includes('head')))) {
       detectedRole = 'Digital Marketing Manager';
-    } else if (lowerForRole.includes('content writer') || lowerForRole.includes('copywriter') || lowerForRole.includes('content writing') || lowerForRole.includes('blog writer')) {
+    } else if (lowerForRole.includes('content writer') || lowerForRole.includes('copywriter') || lowerForRole.includes('content writing') || lowerForRole.includes('blog writer') || lowerForRole.includes('article writer') || lowerForRole.includes('script writer')) {
       detectedRole = 'Content Writer / Copywriter';
-    } else if (lowerForRole.includes('web developer') || lowerForRole.includes('website developer') || lowerForRole.includes('wordpress') || lowerForRole.includes('frontend') || lowerForRole.includes('fullstack') || lowerForRole.includes('backend') || lowerForRole.includes('web development')) {
+    } else if (lowerForRole.includes('web developer') || lowerForRole.includes('website developer') || lowerForRole.includes('wordpress') || lowerForRole.includes('frontend') || lowerForRole.includes('fullstack') || lowerForRole.includes('backend') || lowerForRole.includes('web development') || lowerForRole.includes('website designer')) {
       detectedRole = 'Web Developer';
     } else if (
-      !/(?:calling|contact|phone)\s*(?:no|number|num)/i.test(lowerForRole) &&
-      (lowerForRole.includes('telecaller') || lowerForRole.includes('telecalling') || lowerForRole.includes('inside sales') || /\b(?:calling|caller)\s+(?:job|role|post|vacancy|work|profile|hiring)\b/i.test(lowerForRole) || /\b(?:tele\s*caller|tele\s*calling)\b/i.test(lowerForRole))
+      /(?:tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales|bpo|voice\s*process)/i.test(lowerForRole) ||
+      (/\b(?:calling|caller|telecall)\b/i.test(lowerForRole) && !/(?:call\s*me|call\s*back|phone\s*no|contact\s*no)/i.test(lowerForRole))
     ) {
-      detectedRole = 'Telecaller / Inside Sales';
+      if (lowerForRole.includes('sales')) {
+        detectedRole = 'Telecaller / Sales Executive';
+      } else {
+        detectedRole = 'Telecaller / Inside Sales';
+      }
+    } else if (
+      /(?:sales\s*executive|sales\s*manager|sales\s*job|sales\s*role|sales\s*work|field\s*sales|bda|bde|business\s*development|\bmarketing\s*sales\b)/i.test(lowerForRole) ||
+      (/\bsales\b/i.test(lowerForRole) && !/(?:point\s*of\s*sale|sales\s*tax)/i.test(lowerForRole))
+    ) {
+      detectedRole = 'Sales Executive';
+    } else if (/(?:accountant|accounting|accounts|tally|finance|billing)/i.test(lowerForRole)) {
+      detectedRole = 'Accountant / Finance';
+    } else if (/(?:hr\s*recruiter|hr\s*executive|human\s*resource|talent\s*acquisition|\brecruiter\b|\brecruitment\b)/i.test(lowerForRole)) {
+      detectedRole = 'HR Recruiter / HR Executive';
+    } else if (/(?:receptionist|front\s*desk|office\s*assistant|back\s*office|data\s*entry|computer\s*operator)/i.test(lowerForRole)) {
+      detectedRole = 'Office Admin / Back Office';
     } else if (cleanTrimmedForRole === '7' || cleanTrimmedForRole.startsWith('7 ') || cleanTrimmedForRole === '8' || cleanTrimmedForRole.startsWith('8 ') || lowerForRole.includes('influencer') || lowerForRole.includes('collab') || lowerForRole.includes('collaboration') || lowerForRole.includes('pr package') || lowerForRole.includes('brand deal') || lowerForRole.includes('sponsorship') || (lowerForRole.includes('creator') && !lowerForRole.includes('social') && !lowerForRole.includes('editor') && !lowerForRole.includes('designer') && !lowerForRole.includes('writer'))) {
       detectedRole = 'Influencer Collaboration';
       if (!detectedWorkType) detectedWorkType = 'Influencer Collaboration';
     } else if (lowerForRole.includes('lead gen') || lowerForRole.includes('digital marketing') || lowerForRole.includes('marketing')) {
       detectedRole = 'Other Digital Marketing Roles';
+    }
+
+    // Dynamic extraction if candidate says "apply for XYZ" or "XYZ ke liye apply"
+    if (!detectedRole) {
+      const explicitRoleMatch = lowerForRole.match(/(?:apply(?:ing)?\s*(?:for|as|karna|krna)?|interested\s*in|ke\s*liye\s*apply|role\s*(?:of|is|[:=-]))\s*([a-zA-Z\s]{3,30})/i);
+      if (explicitRoleMatch && explicitRoleMatch[1]) {
+        const potentialRole = explicitRoleMatch[1].trim();
+        const nonRoleWords = ['job', 'interview', 'work', 'internship', 'fresher', 'experience', 'sir', 'maam', 'brandsetu', 'indore', 'here', 'please', 'details', 'urgent', 'karna', 'krna', 'hai', 'h'];
+        if (!nonRoleWords.includes(potentialRole.toLowerCase()) && potentialRole.length >= 3) {
+          detectedRole = potentialRole.split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        }
+      }
     }
 
     // Capture experience if explicitly stated in initial role message (exclude single menu choice digits 1-7)
@@ -1007,17 +1179,6 @@ function trackCandidateFromMessage(messageData) {
       }
     }
   }
-
-  // Check if this is a fresh application intent (e.g. candidate clicks Instagram Ad, types "apply", "new apply", "restart", "start", or sends ad greeting)
-  const isFreshApplyIntent = (
-    lower === 'apply' ||
-    lower === 'new apply' ||
-    lower === 'restart' ||
-    lower.startsWith('apply for') ||
-    lower.includes('can i get more info') ||
-    lower.includes('looking for job') ||
-    lower.includes('hiring ke liye')
-  );
 
   // Fallback to WhatsApp profile name if valid
   const rawCustomerName = (messageData.customerName || '').trim();
@@ -1271,27 +1432,36 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       const salutationEn = getCandidateSalutation(candidate, 'english');
       const salutationHi = getCandidateSalutation(candidate, 'hinglish');
 
-      if (isEnglish) {
-        if (isOnline) {
+      // Format dynamic Date (DD/MM/YYYY) and Time
+      const iday = String(interviewDate.getDate()).padStart(2, '0');
+      const imonth = String(interviewDate.getMonth() + 1).padStart(2, '0');
+      const iyear = interviewDate.getFullYear();
+      const dateFormatted = `${iday}/${imonth}/${iyear}`;
+
+      const ihours = interviewDate.getHours();
+      const imins = String(interviewDate.getMinutes()).padStart(2, '0');
+      let timeFormatted = '10:00 am - 2:00 pm';
+      if (ihours !== 0 || interviewDate.getMinutes() !== 0) {
+        const ampm = ihours >= 12 ? 'pm' : 'am';
+        const h12 = ihours % 12 || 12;
+        timeFormatted = `${String(h12).padStart(2, '0')}:${imins} ${ampm}`;
+      }
+
+      const candidateDisplayName = (candidate && candidate.name && candidate.name !== 'Candidate' && candidate.name !== 'General Applicant') ? candidate.name : 'Candidate';
+
+      if (isOnline) {
+        if (isEnglish) {
           confirmMsg = isRescheduled
-            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         } else {
           confirmMsg = isRescheduled
-            ? `${salutationEn} 🔄\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
-            : `${salutationEn} 🎉\n\nYour in-person interview for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Please bring your updated Resume and work samples/portfolio.\n\nFor any questions or directions, reply here or contact us at +91 9329232025.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital`;
+            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         }
       } else {
-        // Hinglish
-        if (isOnline) {
-          confirmMsg = isRescheduled
-            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${formattedTime}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
-        } else {
-          confirmMsg = isRescheduled
-            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview *reschedule* ho gaya hai.\n\n📅 *Updated Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital`
-            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka in-person interview schedule ho gaya hai.\n\n📅 *Date & Time:* ${formattedTime}\n📍 *Office Address:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\n📌 Kripya apna updated Resume aur portfolio saath lekar aayein.\n\nKisi bhi jaankari ya location ke liye aap +91 9329232025 par call ya message kar sakte hain.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital`;
-        }
+        // Standard In-Person Interview Invitation format (Indore Office)
+        confirmMsg = `Dear ${candidateDisplayName},\n\n${isRescheduled ? 'Your interview at BrandSetu Digital has been rescheduled as requested.' : 'Congratulations! You have been shortlisted for the interview at BrandSetu Digital.'}\nWe are pleased to invite you for the next round of the selection process.\n\n📅 Date: ${dateFormatted}\n⏰ Time: ${timeFormatted}\n                  \n📍Google Maps Location: https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nBhawarkua main road orange business park floor 103 mc donald's building, Indore\n\nPlease make sure to reach on time.\nFor any assistance, feel free to contact us.\n\nLooking forward to meeting you.\n\nWarm regards,\nBrandSetu Digital`;
       }
 
       const candidateRecipient = candidate.whatsappChatId || candidate.phone;
@@ -1747,6 +1917,9 @@ module.exports = {
   },
   getHiringStats,
   saveCandidatesAndSyncExcel,
+  generateExcelWorkbook,
+  generateExcelBuffer,
+  getFilteredCandidates,
   restoreFromBackup,
   trackCandidateFromMessage,
   trackOutgoingCampaignMessage,

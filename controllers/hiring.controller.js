@@ -136,13 +136,63 @@ function deleteCandidate(req, res) {
 
 function exportExcel(req, res) {
   try {
+    const { role, timeframe, status, search, dateBasis, startDate, endDate } = req.query;
+
+    // Refresh memory / disk sync
     hiringService.saveCandidatesAndSyncExcel();
-    if (!fs.existsSync(hiringService.CANDIDATES_EXCEL_FILE)) {
-      return res.status(404).json({ success: false, error: 'Excel file not generated yet' });
+
+    const candidateList = hiringService.getFilteredCandidates({
+      role,
+      timeframe,
+      status,
+      search,
+      dateBasis,
+      startDate,
+      endDate
+    });
+
+    const buffer = hiringService.generateExcelBuffer(candidateList);
+
+    // Build clean human-friendly filename
+    const filenameParts = ['BrandSetu', 'Candidates'];
+    if (role && role !== 'all') {
+      const cleanRoleSlug = role.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15);
+      filenameParts.push(cleanRoleSlug);
     }
+    if (timeframe && timeframe !== 'all') {
+      filenameParts.push(timeframe.toUpperCase());
+    } else {
+      const dateStr = new Date().toISOString().split('T')[0];
+      filenameParts.push(dateStr);
+    }
+    const finalFilename = `${filenameParts.join('_')}.xlsx`;
+
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=BrandSetu_Hiring_Candidates.xlsx');
-    res.download(hiringService.CANDIDATES_EXCEL_FILE, 'BrandSetu_Hiring_Candidates.xlsx');
+    res.setHeader('Content-Disposition', `attachment; filename="${finalFilename}"`);
+    res.send(buffer);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
+function getExportCount(req, res) {
+  try {
+    const { role, timeframe, status, search, dateBasis, startDate, endDate } = req.query;
+    const candidateList = hiringService.getFilteredCandidates({
+      role,
+      timeframe,
+      status,
+      search,
+      dateBasis,
+      startDate,
+      endDate
+    });
+    const all = hiringService.getCandidates();
+    res.json({
+      success: true,
+      count: candidateList.length,
+      total: all.length
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -206,6 +256,7 @@ module.exports = {
   createCandidate,
   deleteCandidate,
   exportExcel,
+  getExportCount,
   exportBackupJson,
   importBackupJson
 };
