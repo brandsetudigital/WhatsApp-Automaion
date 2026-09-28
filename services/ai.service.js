@@ -338,7 +338,7 @@ function isOfficeDirectionsOrContactQuery(rawText) {
 
   return (
     // Asking for directions, navigation, entrance, where to come
-    /(?:where\s*(?:i\s*can|can\s*i)\s*come|from\s*where\s*(?:i\s*can|can\s*i)\s*come|how\s*to\s*reach|how\s*can\s*i\s*reach|where\s*is\s*(?:the\s*)?office|guide\s*me\s*(?:from|where|how|to)|directions?|rasta\s*bata|kaise\s*aana\s*hai|kaise\s*aaye|kaise\s*pahuche|kahan\s*se\s*aana\s*hai|entry\s*kahan|gate\s*kahan|gate\s*kaha|kahan\s*par\s*hai|kaha\s*par\s*hai|entrance|which\s*floor|building\s*kahan|apple\s*hospital\s*ke\s*pass\s*kahan)/i.test(text) ||
+    /(?:where\s*(?:i\s*can|can\s*i)\s*come|from\s*where\s*(?:i\s*can|can\s*i)\s*come|how\s*to\s*reach|how\s*can\s*i\s*reach|where\s*is\s*(?:the\s*|your\s*)?office|where.*office|guide\s*me\s*(?:from|where|how|to)|directions?|rasta\s*bata|kaise\s*aana\s*hai|kaise\s*aaye|kaise\s*pahuche|kahan\s*se\s*aana\s*hai|entry\s*kahan|gate\s*kahan|gate\s*kaha|kahan\s*par\s*hai|kaha\s*par\s*hai|entrance|which\s*floor|building\s*kahan|apple\s*hospital\s*ke\s*pass\s*kahan)/i.test(text) ||
     // Can't find office or lost
     /(?:office\s*n[ahi]+[i]?\s*mil|n[ahi]+[i]?\s*mil\s*raha|cannot\s*find|can'?t\s*find|unable\s*to\s*find|lost|building\s*n[ahi]+[i]?|kahan\s*hai\s*office|kaha\s*hai\s*office|office\s*dhoondh)/i.test(text) ||
     // Requesting location / map
@@ -357,6 +357,64 @@ function getOfficeLocationDirectionsResponse(lang = 'hinglish') {
     return `📍 *Brand Setu Digital - Office Location & Help:* 🏢\n\n📌 *Address:*\nOffice No. 103, 1st Floor, Orange Business Park, Bhawarkua Main Road, Near Apple Hospital (Transport Nagar), Indore (M.P.) - 452014\n\n🚶‍♂️ *Office Tak Kaise Pahunchein (Directions):*\n• Bhawarkua Main Road par *Apple Hospital* ke paas *Orange Business Park* building hai.\n• Building me enter karke *Lift / Stairs se 1st Floor (Office No. 103)* par aayein.\n• Reception par Brand Setu Digital ke baare me puchein.\n\n📞 *Agar office dhoondhne ya directions me koi dikkat ho, toh turant in numbers par call karein:*\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nHamari team aapko guide kar degi! See you shortly! 😊👍`;
   }
   return `📍 *Brand Setu Digital - Office Location & Contact:* 🏢\n\n📌 *Address:*\nOffice No. 103, 1st Floor, Orange Business Park, Bhawarkua Main Road, Near Apple Hospital (Transport Nagar), Indore (M.P.) - 452014\n\n🚶‍♂️ *How to Reach (Directions):*\n• The office is located in *Orange Business Park* on Bhawarkua Main Road (Near Apple Hospital).\n• Please take the lift/stairs to the *1st Floor (Office No. 103)*.\n• Check in at the reception for Brand Setu Digital.\n\n📞 *If you need any help finding the office or directions, please call us directly:*\n👉 *+91 9329232025*\n👉 *+91 9669765911*\n\nOur team will assist you! See you shortly! 😊👍`;
+}
+
+/**
+ * Detect if candidate is unable to attend, sick, unwell, or has an emergency
+ */
+function isUnableToAttendOrSickMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const sickPattern = /(?:not\s*feeling\s*well|unwell|sick|tabiyat|bimar|fever|headache|hospital|doctor|accident|emergency|won'?t\s*be\s*able|unable\s*to\s*(?:attend|come)|cannot\s*(?:attend|come)|can'?t\s*(?:attend|come)|nahi\s*aa\s*paung[ai]|nhi\s*aa\s*paung[ai]|aaj\s*nahi\s*aa\s*sakt[ai]|kal\s*nahi\s*aa\s*sakt[ai]|nahi\s*aa\s*pa\s*raha|nahi\s*aa\s*sakta|nahi\s*aa\s*sakti|nahi\s*aa\s*paunga|nhi\s*aa\s*paunga|nahi\s*aa\s*payenge|nhi\s*aa\s*payenge)/i;
+  return sickPattern.test(text);
+}
+
+/**
+ * Detect pure slot refusal ("No", "Nah", "Nahi") to an interview invitation
+ */
+function isSlotRefusalMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const clean = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+  return /^(?:no|nah|nahi|nhi|nope|naa|nahi\s*aa\s*paunga|nhi\s*aa\s*paunga|nahi\s*aa\s*paungi|nhi\s*aa\s*paungi|not\s*possible|nahi\s*ho\s*payega|nhi\s*ho\s*payega|can'?t\s*come|cannot\s*come|not\s*able\s*to\s*come)$/i.test(clean);
+}
+
+/**
+ * Detect queries about BrandSetu Digital company name or company details
+ */
+function isCompanyInfoQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:company.*name|name.*company|company\s*ka\s*naam|konsi\s*company|which\s*company|about\s*(?:the\s*)?company|what\s*(?:is|'?s)?\s*(?:the\s*)?company\s*name|company\s*details|company\s*kya\s*hai|company\s*ke\s*baare)/i.test(text);
+}
+
+/**
+ * Return BrandSetu Digital company info response
+ */
+function getCompanyInfoResponse(lang = 'hinglish') {
+  const isHi = (lang === 'hinglish' || lang === 'hindi');
+  if (isHi) {
+    return `🏢 *BrandSetu Digital* Indore ki leading Creative Media, AI Video Production aur Performance Digital Marketing Agency hai. 🚀✨\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n🌐 *Website:* https://brandsetudigital.com/\n📞 *Help:* +91 9329232025\n\nHum high-impact creative brand campaigns, reels, commercial ads aur digital performance marketing handle karte hain. 👍`;
+  }
+  return `🏢 *BrandSetu Digital* is a leading Creative Media, AI Video Production, and Performance Digital Marketing Agency based in Indore. 🚀✨\n\n📍 *Office:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n🌐 *Website:* https://brandsetudigital.com/\n📞 *Contact:* +91 9329232025\n\nWe specialize in high-impact creative brand campaigns, viral reels, video production, and performance ads. 👍`;
+}
+
+/**
+ * Detect festival greetings or wishes (e.g. Ganesh Chaturthi, Diwali, Eid)
+ */
+function isGreetingOrFestivalMessage(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:ganesh|ganpati|bappa|morya|diwali|deepavali|eid|holi|navratri|festival|wishes\b|greetings\b|shubhkamnaye|ram\s*navami|dussehra|raksha\s*bandhan|new\s*year\s*wishes)/i.test(text);
+}
+
+/**
+ * Detect queries asking for interview result / HR feedback / status
+ */
+function isFeedbackOrStatusQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:status|result|update|feedback|kya\s*hua|hua\s*kya|select\s*hua|selection|shortlist|call\s*aayega|kab\s*tak\s*batayenge|joining|offer\s*letter|interview\s*ka\s*result)/i.test(text);
 }
 
 /**
@@ -382,6 +440,22 @@ function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
 
   // 1. Candidate sends simple acknowledgment ("ok", "thik h", "thank you", "ji", "👍")
   if (isAcknowledgementMessage(userMessage)) {
+    const isScheduled = !!(candidate && candidate.interviewDateTime);
+    if (!isScheduled) {
+      // CANDIDATE DOES NOT HAVE AN INTERVIEW SCHEDULED! NEVER say "See you at the interview"!
+      if (candidate && candidate.resumeReceived) {
+        return isEnglish
+          ? `We have your details and our team is reviewing them. We will update you shortly! 👍`
+          : `Aapki details hamare paas hain aur HR team review kar rahi hai. Hum jald update karenge! 👍`;
+      }
+      if (candidate && candidate.role && candidate.role !== 'General Applicant') {
+        return isEnglish
+          ? `Please share your updated Resume (PDF) so we can proceed with your application! 📄👍`
+          : `Kripya apna updated Resume (PDF) yahan share kar dein taaki hum aage proceed kar sakein! 📄👍`;
+      }
+      return isEnglish ? `Got it! 👍` : `Bilkul! 👍`;
+    }
+
     const last2Assistant = recentAssistantMsgs.slice(-2);
     const hasRecentAck = last2Assistant.some(msg => 
       msg.includes('Interview me milte hain') ||
@@ -764,6 +838,19 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     return null;
   }
 
+  // 0.05 If candidate is sick, unwell, or unable to attend without a clear alternative day/time: NEVER schedule!
+  if (isUnableToAttendOrSickMessage(text)) {
+    const hasAlt = /(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)\b)/i.test(text);
+    if (!hasAlt) {
+      return null;
+    }
+  }
+
+  // 0.06 If candidate explicitly says NO / Nah / Nahi to interview proposal: NEVER schedule!
+  if (isSlotRefusalMessage(text)) {
+    return null;
+  }
+
   // 0.1 Interview scheduling is strictly allowed ONLY if candidate has submitted resume or received slot proposal
   if (candidate && !candidate.resumeReceived && !candidate.interviewSlotProposed) {
     return null;
@@ -777,9 +864,9 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     }
 
     // Must have explicit reschedule keyword OR explicit new day/time to allow rescheduling
-    const hasExplicitReschedule = /(?:reschedule|shift|instead|change\s*time|dusre\s*din|dusra\s*time|time\s*badal)/i.test(text);
+    const hasExplicitReschedule = /(?:reschedule|shift|instead|change\s*time|dusre\s*din|dusra\s*time|time\s*badal|afternoon|dopahar)/i.test(text);
     const hasExplicitDay = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(text);
-    const hasExplicitTime = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(text);
+    const hasExplicitTime = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)\b|\b(?:dopahar|subah|shaam|afternoon)\s*\d{0,2}\b)/i.test(text);
 
     // If there is no explicit day/time and no explicit reschedule keyword, DO NOT reschedule
     if (!hasExplicitReschedule && !hasExplicitDay && !hasExplicitTime) {
@@ -796,28 +883,32 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   }
 
   // 2. Detect Negation (e.g. "kal nahi aa sakta", "cannot come tomorrow", "not possible", "nahi ho payega", "not available")
-  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi|busy\s*hu|kisi\s*aur\s*din)/i;
+  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|won'?t\s*be\s*able|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi|busy\s*hu|kisi\s*aur\s*din|not\s*feeling\s*well|unwell|sick|tabiyat)/i;
   const hasNegation = negationPattern.test(text);
 
   // 3. Determine working text: if there's negation with reschedule clause
   let schedulingText = text;
   if (hasNegation) {
+    const hasAltDayOrTime = /(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)\b)/i.test(text);
+    if (!hasAltDayOrTime) {
+      return null; // Candidate said NO / Not available / Sick without alternative date or time
+    }
     const rescheduleMatch = text.match(/(?:reschedule|shift|instead|naya\s*time|dusre\s*din|phir|ab|parso|monday|tuesday|wednesday|thursday|friday|saturday)\s*(?:my\s*interview|to|for|ko)?\s*(.*)/i);
     if (rescheduleMatch && rescheduleMatch[1] && rescheduleMatch[1].trim().length > 2) {
       schedulingText = rescheduleMatch[0].trim();
     } else {
-      const alternativeMatch = text.match(/(?:aaj|today|tomorrow|kal|monday|tuesday|wednesday|thursday|friday|saturday)\s*(?:ko)?\s*\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)?/i);
+      const alternativeMatch = text.match(/(?:aaj|today|tomorrow|kal|monday|tuesday|wednesday|thursday|friday|saturday)\s*(?:ko)?\s*\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)?/i);
       if (alternativeMatch && !negationPattern.test(alternativeMatch[0])) {
         schedulingText = alternativeMatch[0];
       } else {
-        return null; // Candidate said NO / Not available without alternative date
+        return null;
       }
     }
   }
 
   // 4. Check for Affirmative Confirmation (Only when interview slot was explicitly proposed by HR)
   const cleanTrimmed = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-  const hasConditionalOrRemote = /(?:but|par\b|lekin|agar|if\b|remote|wfh|work\s*from\s*home|online|virtual|is\s*it\s*fine|chalega\s*kya|possible\s*hai|ghar\s*se)/i.test(text);
+  const hasConditionalOrRemote = /(?:but\b|lekin\b|kintu\b|parantu\b|par\s*(?:agar|lekin|kya|bhi)|agar\b|\bif\b|remote|wfh|work\s*from\s*home|online|virtual|ghar\s*se)/i.test(text);
   if (hasConditionalOrRemote) {
     return null; // Let the remote/virtual query handler manage it!
   }
@@ -831,14 +922,14 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
   const isAffirmative = (!candidate || !candidate.interviewDateTime) && isSlotProposed && !hasConditionalOrRemote && affirmativePattern.test(text);
 
-  // If message contains a date range (e.g. "between 18-20 sep", "18-20 sep"), let date range handler prompt for specific time
-  if (/(?:between\s*\d{1,2}|-\s*\d{1,2}\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec)?)/i.test(schedulingText) && !/(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b)/i.test(schedulingText)) {
+  // If message contains a multi-day month range (e.g. "between 18-20 sep"), let date range handler prompt for specific time
+  if (/(?:between\s*\d{1,2}\s*(?:to|-|and)\s*\d{1,2}\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec)|\b\d{1,2}\s*-\s*\d{1,2}\s*(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|september|oct|nov|dec))/i.test(schedulingText)) {
     return null;
   }
 
   // 5. Must have day indicator OR explicit time keyword OR affirmative response when interview slot is pending
   const hasDayIndicator = /\b(tomorrow|kal|aaj|today|parso|parson|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(schedulingText);
-  const hasExplicitTimeModifier = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\b|\b(?:dopahar|subah|shaam)\s*\d{1,2}\b)/i.test(schedulingText);
+  const hasExplicitTimeModifier = /(?:\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)\b|\b(?:dopahar|subah|shaam|afternoon|morning|evening)\b)/i.test(schedulingText);
 
   if (!hasDayIndicator && !hasExplicitTimeModifier && !isAffirmative) {
     return null;
@@ -875,31 +966,68 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
 
   targetDate.setUTCDate(targetDate.getUTCDate() + dayOffset);
 
+  // Sunday Office Off Rule: BrandSetu Digital is strictly CLOSED on Sundays!
+  if (targetDate.getUTCDay() === 0) {
+    targetDate.setUTCDate(targetDate.getUTCDate() + 1); // Roll over to Monday!
+  }
+
   // Default hour: 10:30 AM (Morning slot when candidate does not specify time)
   let hour = 10;
   let minute = 30;
 
-  const timeMatch = schedulingText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje)?/i);
-  if (timeMatch) {
-    let rawHour = parseInt(timeMatch[1], 10);
-    const rawMin = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-    const modifier = timeMatch[3] ? timeMatch[3].toLowerCase() : '';
+  // Check for time ranges like "between 12 and 1", "between 11 and 1", "between 11 AM and 1 PM", "12 to 1", "between 12 and 1 o'clock"
+  const rangeMatch = schedulingText.match(/(?:between\s*)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:and|to|-)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
+  if (rangeMatch && !/(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(schedulingText)) {
+    let startH = parseInt(rangeMatch[1], 10);
+    const startM = rangeMatch[2] ? parseInt(rangeMatch[2], 10) : 0;
+    const startMod = (rangeMatch[3] || rangeMatch[6] || '').toLowerCase();
 
-    if (rawHour >= 1 && rawHour <= 12) {
-      if (modifier === 'pm') {
-        if (rawHour !== 12) rawHour += 12;
-      } else if (modifier === 'am') {
-        if (rawHour === 12) rawHour = 0;
-      } else if (modifier === 'baje' || !modifier) {
-        if (rawHour >= 1 && rawHour <= 6) {
-          rawHour += 12;
-        }
+    if (startH >= 1 && startH <= 12) {
+      if (startMod === 'pm') {
+        if (startH !== 12) startH += 12;
+      } else if (startMod === 'am') {
+        if (startH === 12) startH = 0;
+      } else {
+        if (startH >= 1 && startH <= 6) startH += 12;
       }
     }
+    if (startH >= 10 && startH <= 18) {
+      hour = startH;
+      minute = startM;
+    }
+  } else {
+    // Single time match e.g. "12 o'clock", "12:30 pm", "2 baje", "3 pm", "10 am"
+    const timeMatch = schedulingText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
+    if (timeMatch) {
+      let rawHour = parseInt(timeMatch[1], 10);
+      const rawMin = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+      const modifier = timeMatch[3] ? timeMatch[3].toLowerCase() : '';
 
-    if (rawHour >= 10 && rawHour <= 18) {
-      hour = rawHour;
-      minute = rawMin;
+      if (rawHour >= 1 && rawHour <= 12) {
+        if (modifier === 'pm') {
+          if (rawHour !== 12) rawHour += 12;
+        } else if (modifier === 'am') {
+          if (rawHour === 12) rawHour = 0;
+        } else if (modifier === 'baje' || modifier.includes('clock') || !modifier) {
+          if (rawHour >= 1 && rawHour <= 6) {
+            rawHour += 12;
+          }
+        }
+      }
+
+      if (rawHour >= 10 && rawHour <= 18) {
+        hour = rawHour;
+        minute = rawMin;
+      }
+    } else if (schedulingText.includes('afternoon') || schedulingText.includes('dopahar')) {
+      hour = 14;
+      minute = 0;
+    } else if (schedulingText.includes('evening') || schedulingText.includes('shaam')) {
+      hour = 16;
+      minute = 0;
+    } else if (schedulingText.includes('morning') || schedulingText.includes('subah')) {
+      hour = 10;
+      minute = 30;
     }
   }
 
@@ -937,6 +1065,19 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
     return null;
   }
 
+  // Pure sickness / unable to attend check
+  if (isUnableToAttendOrSickMessage(userMessage)) {
+    const hasAlt = /(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}(?::\d{2})?\s*(?:baje|am|pm|o'?clock)\b)/i.test(userMessage);
+    if (!hasAlt) {
+      return null;
+    }
+  }
+
+  // Pure refusal check
+  if (isSlotRefusalMessage(userMessage)) {
+    return null;
+  }
+
   if (candidate && !candidate.resumeReceived && !candidate.interviewSlotProposed) {
     return null;
   }
@@ -947,13 +1088,13 @@ async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
     }
   }
 
-  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi)/i;
-  if (negationPattern.test(userMessage) && !/(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}\s*(?:baje|am|pm)\b)/i.test(userMessage)) {
+  const negationPattern = /(?:nhi\s*a\s*s[a-z]*|nahi\s*aa\s*s[a-z]*|nahi\s*aa\s*p[a-z]*|nhi\s*aa\s*p[a-z]*|not\s*coming|can'?t\s*come|cannot\s*come|unable\s*to\s*come|won'?t\s*be\s*able|not\s*possible|not\s*available|cancel|nahi\s*ho\s*payega|kal\s*nahi|kal\s*nhi)/i;
+  if (negationPattern.test(userMessage) && !/(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}\s*(?:baje|am|pm|o'?clock)\b)/i.test(userMessage)) {
     return null; // Pure negation without alternative
   }
 
   // Fast pre-filter: Skip LLM call if message has no scheduling/time/affirmative keywords
-  const scheduleKeywords = /(?:kal|tomorrow|today|aaj|parso|baje|am|pm|interview|schedule|reschedule|monday|tuesday|wednesday|thursday|friday|saturday|sunday|aunga|aungi|aa\s*raha|haan|yes|yep|sure|done|online|google\s*meet|\b(?:1[0-2]|[1-9])\s*(?:baje|am|pm|o'?clock)?\b)/i;
+  const scheduleKeywords = /(?:kal|tomorrow|today|aaj|parso|baje|am|pm|interview|schedule|reschedule|monday|tuesday|wednesday|thursday|friday|saturday|sunday|aunga|aungi|aa\s*raha|haan|yes|yep|sure|done|online|google\s*meet|afternoon|dopahar|\b(?:1[0-2]|[1-9])\s*(?:baje|am|pm|o'?clock)?\b)/i;
   if (!scheduleKeywords.test(userMessage)) {
     return null;
   }
@@ -975,18 +1116,20 @@ Candidate message: "${userMessage}"
 Candidate already has scheduled interview: ${candidate && candidate.interviewDateTime ? candidate.interviewDateTime : 'No'}
 
 Instructions:
-1. Determine if candidate is proposing/confirming a specific date, day, or time when they CAN come for an in-person interview (e.g., "Tomorrow at 2 PM", "Monday 11 AM", "Kal 3 baje aa jaunga", "Today at 4 PM", "Reschedule to today 5 PM").
+1. Determine if candidate is proposing/confirming a specific date, day, or time when they CAN come for an in-person interview (e.g., "Tomorrow at 2 PM", "Monday 11 AM", "Kal 3 baje aa jaunga", "Today at 4 PM", "Reschedule to today 5 PM", "between 12 and 1", "in afternoon possible").
 2. If candidate says simple acknowledgment ("ok", "thik h", "done", "yes", "sure", "thanks", "hmm", "haa thik h") and already has an interview scheduled, set isScheduling to false!
-3. If candidate says they CANNOT come without proposing a new time, set isScheduling to false!
-4. If candidate is explicitly scheduling or rescheduling to a specific time, compute the target date-time in ISO-8601 string format with "+05:30" offset (e.g. "2026-08-21T14:00:00+05:30"). Office hours: 10:00 AM to 06:00 PM.
-CRITICAL RULE: If candidate only mentions a date/day without specifying an exact time (e.g. "kal", "parso", "27 tareek ko", "Monday"), ALWAYS default the time strictly to 10:30 AM in the morning ("10:30:00+05:30"). NEVER return "00:00:00" and NEVER return "05:30:00"!
-5. If NO, set isScheduling to false.
+3. If candidate is sick, unwell, or says they CANNOT come / unable to attend without proposing a clear future date, set isScheduling to false!
+4. SUNDAY CLOSED RULE: BrandSetu Digital is strictly CLOSED on Sunday. NEVER schedule an interview on a Sunday! If candidate asks for Sunday, roll over to Monday at 10:30 AM ("10:30:00+05:30").
+5. AFTERNOON: If candidate asks if afternoon is possible ("in afternoon possible", "dopahar me aa sakta hu") without a specific time, set time to 2:00 PM ("14:00:00+05:30").
+6. If candidate only mentions a date/day without specifying an exact time (e.g. "kal", "parso", "27 tareek ko", "Monday"), ALWAYS default the time strictly to 10:30 AM in the morning ("10:30:00+05:30"). NEVER return "00:00:00" and NEVER return "05:30:00"!
+7. If candidate specifies a time range like "between 12 and 1", use the start time (12:00 PM).
+8. If NO, set isScheduling to false.
 
 Return JSON strictly:
 {
   "isScheduling": true,
   "proposedDateTimeIso": "YYYY-MM-DDTHH:mm:ss+05:30",
-  "readableFormattedTime": "e.g., Friday, 21 Aug at 2:00 PM"
+  "readableFormattedTime": "e.g., Monday, 28 Sep at 10:30 AM"
 }
 `;
 
@@ -995,9 +1138,14 @@ Return JSON strictly:
     if (result && result.text) {
       const parsed = extractJsonFromString(result.text);
       if (parsed && parsed.isScheduling && parsed.proposedDateTimeIso) {
-        // Normalize any missing time, UTC-midnight in IST (05:30), or invalid hour to 10:30 AM IST
         const testD = new Date(parsed.proposedDateTimeIso);
         if (!isNaN(testD.getTime())) {
+          // Sunday check: Roll to Monday if Sunday
+          const weekdayStr = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short' }).format(testD);
+          if (weekdayStr === 'Sun') {
+            testD.setDate(testD.getDate() + 1);
+          }
+
           const istParts = new Intl.DateTimeFormat('en-CA', {
             timeZone: 'Asia/Kolkata',
             year: 'numeric',
@@ -1012,9 +1160,15 @@ Return JSON strictly:
           let h = parseInt(pMap.hour, 10);
           let m = parseInt(pMap.minute, 10);
           if ((h === 5 && m === 30) || (h === 0 && m === 0) || h < 10 || h > 19) {
-            parsed.proposedDateTimeIso = `${pMap.year}-${pMap.month}-${pMap.day}T10:30:00+05:30`;
-            parsed.readableFormattedTime = `${pMap.day}/${pMap.month}/${pMap.year} at 10:30 AM`;
+            h = 10;
+            m = 30;
           }
+          const hhStr = String(h).padStart(2, '0');
+          const mmStr = String(m).padStart(2, '0');
+          parsed.proposedDateTimeIso = `${pMap.year}-${pMap.month}-${pMap.day}T${hhStr}:${mmStr}:00+05:30`;
+          const ampm = h >= 12 ? 'PM' : 'AM';
+          const h12 = h % 12 || 12;
+          parsed.readableFormattedTime = `${pMap.day}/${pMap.month}/${pMap.year} at ${h12}:${mmStr} ${ampm}`;
         }
         return parsed;
       }
@@ -1206,6 +1360,50 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // 0.2 SICK / UNWELL / EMERGENCY NOTIFICATION
+  if (isUnableToAttendOrSickMessage(text)) {
+    if (candidate && candidate.interviewDateTime) {
+      candidate.status = 'Reschedule Requested';
+    }
+    if (isHinglish) {
+      return `${prefixHi}Koi baat nahi, take care! Aap jab theek mehsoos karein ya aapka suitable date/time ho, tab hume bata dein. Hum aapka interview reschedule kar denge. Get well soon! 🌸`;
+    } else {
+      return `${prefixEn}No problem at all, please take care! Whenever you feel better, please let us know your preferred date and time, and we will be happy to reschedule your interview. Get well soon! 🌸`;
+    }
+  }
+
+  // 0.3 PURE REFUSAL / NO TO INTERVIEW PROPOSAL
+  if (isSlotRefusalMessage(text)) {
+    if (isHinglish) {
+      return `${prefixHi}Theek hai, koi baat nahi! Kya aap kisi aur date ya time par convenient feel karenge, ya online Google Meet interview prefer karenge? Kripya apna suitable time batayein. 👍`;
+    } else {
+      return `${prefixEn}No problem at all! Would you prefer a different date/time, or would you prefer an online Google Meet interview? Please let us know your preferred time. 👍`;
+    }
+  }
+
+  // 0.4 COMPANY NAME / ABOUT COMPANY INQUIRY
+  if (isCompanyInfoQuery(text)) {
+    return getCompanyInfoResponse(lang);
+  }
+
+  // 0.45 FESTIVAL / HOLIDAY WISHES
+  if (isGreetingOrFestivalMessage(text)) {
+    if (isHinglish) {
+      return `Aapko bhi bohot bohot shubhkamnayein! 🙏✨ Agar aap BrandSetu Digital ke open job roles ke liye connect kar rahe hain, toh kripya apna updated Resume (PDF) share karein. 📄👍`;
+    } else {
+      return `Warm greetings to you as well! 🙏✨ If you are connecting regarding open positions at BrandSetu Digital, please share your updated Resume (PDF) here. 📄👍`;
+    }
+  }
+
+  // 0.46 FEEDBACK / INTERVIEW RESULT QUERY
+  if (isFeedbackOrStatusQuery(text)) {
+    if (isHinglish) {
+      return `Hello! 😊 Aapke interview ka update hamari HR team aapse jald hi WhatsApp / Call par directly share karegi. Dhanyawad! 👍`;
+    } else {
+      return `Hello! 😊 Our HR team will share the official update regarding your interview with you directly via WhatsApp / Call shortly. Thank you! 👍`;
+    }
+  }
+
   // 0.5 OFFICE DIRECTIONS, NAVIGATION & CALLING CONTACT NUMBERS CHECK
   if (isOfficeDirectionsOrContactQuery(text)) {
     return getOfficeLocationDirectionsResponse(isHinglish ? 'hinglish' : 'english');
@@ -1370,6 +1568,16 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
 
   // ── STEP 4: RESUME / PORTFOLIO RECEIVED (Immediate acknowledgment, HR review) ──
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
+    const hasAlreadyAcknowledged = (candidate.chatHistory || []).some(m =>
+      m.role === 'assistant' && (m.text.includes('receive ho gaya') || m.text.includes('reviewing your profile') || m.text.includes('sharing your resume'))
+    );
+    if (hasAlreadyAcknowledged) {
+      if (isHinglish) {
+        return `Aapka resume & portfolio hamari HR team ke paas hai aur review chal raha hai. Jald hi aapko interview schedule ke liye update kiya jayega. Agar aapka koi specific sawal hai toh batayein! 👍`;
+      } else {
+        return `Our HR team has your resume & portfolio under review. We will update you shortly for the next steps and interview schedule! Feel free to ask if you have any questions! 👍`;
+      }
+    }
     if (isHinglish) {
       return `${prefixHi}Aapka Resume / Portfolio receive ho gaya hai, dhanyawad! 📄✨\n\nHamari HR team aapki profile aur work samples ko review kar rahi hai. Hum jald hi aage ke process ke liye aapse connect karenge! 👍`;
     } else {
@@ -1739,5 +1947,11 @@ module.exports = {
   generateContextualFallbackResponse,
   getOffTopicBoundaryResponse,
   getOffTopicWarningResponse,
-  detectLanguage
+  detectLanguage,
+  isUnableToAttendOrSickMessage,
+  isSlotRefusalMessage,
+  isCompanyInfoQuery,
+  getCompanyInfoResponse,
+  isGreetingOrFestivalMessage,
+  isFeedbackOrStatusQuery
 };

@@ -1426,12 +1426,40 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
     interviewDate = new Date(`${iYear}-${iMonth}-${iDay}T10:30:00+05:30`);
   }
 
+  // Sunday Office Off Rule (BrandSetu Digital is strictly CLOSED on Sundays):
+  const weekdayStr = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short' }).format(interviewDate);
+  let rolledFromSunday = false;
+  if (weekdayStr === 'Sun') {
+    // Add 24 hours to roll over to Monday
+    interviewDate = new Date(interviewDate.getTime() + 24 * 60 * 60 * 1000);
+    rolledFromSunday = true;
+
+    // Re-extract IST parts for the rolled Monday date
+    const rolledParts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23'
+    }).formatToParts(interviewDate);
+    const rolledMap = {};
+    rolledParts.forEach(p => rolledMap[p.type] = p.value);
+    iYear = rolledMap.year;
+    iMonth = rolledMap.month;
+    iDay = rolledMap.day;
+    iHour = parseInt(rolledMap.hour, 10);
+    iMinute = parseInt(rolledMap.minute, 10);
+  }
+
   const isRescheduled = !!candidate.interviewDateTime;
   candidate.interviewDateTime = interviewDate.toISOString();
   candidate.interviewMode = (mode === 'online' || candidate.interviewMode === 'online') ? 'online' : 'in_person';
   candidate.status = 'Interview Scheduled';
   candidate.interviewReminderSent = false; // Reset 1-hr reminder for new schedule
   candidate.interviewReminderSentAt = null;
+  candidate.missedInterviewFollowUpSent = false;
   if (role && role !== 'General Applicant') candidate.role = role;
   if (notes) candidate.notes = notes;
   candidate.updatedAt = new Date().toISOString();
@@ -1466,20 +1494,23 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
       const timeFormatted = `${String(h12).padStart(2, '0')}:${String(iMinute).padStart(2, '0')} ${ampm}`;
 
       const candidateDisplayName = (candidate && candidate.name && candidate.name !== 'Candidate' && candidate.name !== 'General Applicant') ? candidate.name : 'Candidate';
+      const sundayNotice = rolledFromSunday
+        ? (isEnglish ? '\n\n📌 *Note:* Our office is closed on Sundays, so your interview is scheduled for Monday.' : '\n\n📌 *Note:* Hamara office Sunday ko off rehta hai, isliye aapka interview Monday ke liye schedule kiya gaya hai.')
+        : '';
 
       if (isOnline) {
         if (isEnglish) {
           confirmMsg = isRescheduled
-            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         } else {
           confirmMsg = isRescheduled
-            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
+            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
         }
       } else {
         // Standard In-Person Interview Invitation format (Indore Office)
-        confirmMsg = `Dear ${candidateDisplayName},\n\n${isRescheduled ? 'Your interview at BrandSetu Digital has been rescheduled as requested.' : 'Congratulations! You have been shortlisted for the interview at BrandSetu Digital.'}\nWe are pleased to invite you for the next round of the selection process.\n\n📅 Date: ${dateFormatted}\n⏰ Time: ${timeFormatted}\n                  \n📍Google Maps Location: https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nBhawarkua main road orange business park floor 103 mc donald's building, Indore\n\nPlease make sure to reach on time.\nFor any assistance, feel free to contact us.\n\nLooking forward to meeting you.\n\nWarm regards,\nBrandSetu Digital`;
+        confirmMsg = `Dear ${candidateDisplayName},\n\n${isRescheduled ? 'Your interview at BrandSetu Digital has been rescheduled as requested.' : 'Congratulations! You have been shortlisted for the interview at BrandSetu Digital.'}\nWe are pleased to invite you for the next round of the selection process.\n\n📅 Date: ${dateFormatted}\n⏰ Time: ${timeFormatted}${sundayNotice}\n                  \n📍Google Maps Location: https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nBhawarkua main road orange business park floor 103 mc donald's building, Indore\n\nPlease make sure to reach on time.\nFor any assistance, feel free to contact us.\n\nLooking forward to meeting you.\n\nWarm regards,\nBrandSetu Digital`;
       }
 
       const candidateRecipient = candidate.whatsappChatId || candidate.phone;
@@ -1679,27 +1710,204 @@ async function sendInterviewSlotProposal(candidate) {
 }
 
 /**
+ * Send Missed Interview (No-Show) Follow-up to Candidate
+ */
+async function sendMissedInterviewFollowUp(candidate) {
+  candidate.missedInterviewFollowUpSent = true;
+  candidate.missedInterviewFollowUpSentAt = new Date().toISOString();
+  candidate.status = 'Reschedule Requested';
+  saveCandidatesAndSyncExcel();
+
+  try {
+    const isEnglish = (candidate.lang === 'english');
+    const interviewDate = new Date(candidate.interviewDateTime);
+    const formattedTime = interviewDate.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+    const candName = getCandidateDisplayName(candidate) || 'Candidate';
+    const msg = isEnglish
+      ? `Dear ${candName}! 🔔\n\nYour in-person interview at *BrandSetu Digital* was scheduled today at *${formattedTime}*, but we noticed you were unable to visit our office.\n\n👉 Would you like to reschedule your interview for tomorrow or another date? Please let us know your preferred time so we can update your schedule. 👍\n- HR Team, BrandSetu Digital (+91 9329232025 / +91 9669765911)`
+      : `Dear ${candName}! 🔔\n\nBrandSetu Digital me aapka in-person interview aaj *${formattedTime}* par scheduled tha, par aap pahunch nahi paye.\n\n👉 Kya aap kal ya kisi aur din interview reschedule karwana chahte hain? Kripya apna suitable time batayein taaki hum aapka interview reschedule kar sakein. 👍\n- HR Team, BrandSetu Digital (+91 9329232025 / +91 9669765911)`;
+
+    const recipient = candidate.whatsappChatId || candidate.phone;
+    await whatsappCloudService.sendWhatsAppText(recipient, msg);
+    appendChatHistory(candidate, 'assistant', msg);
+    saveCandidatesAndSyncExcel();
+    console.log(`🔔 Missed interview follow-up dispatched to ${candName} (+${candidate.phone})`);
+  } catch (err) {
+    console.error(`Error sending missed interview follow-up to +${candidate.phone}:`, err.message);
+  }
+}
+
+/**
+ * Send Follow-up for Missing Step (Role, Experience, or Resume) - Maximum 3 Reminders Total
+ */
+async function sendMissingStepFollowUp(candidate, stepType) {
+  candidate.followUpCount = (candidate.followUpCount || 0) + 1;
+  candidate.lastFollowUpSentAt = new Date().toISOString();
+  saveCandidatesAndSyncExcel();
+
+  const isEnglish = (candidate.lang === 'english');
+  const candName = getCandidateDisplayName(candidate) || 'Candidate';
+  let followUpMsg = '';
+
+  if (candidate.followUpCount >= 3) {
+    // 3rd and final follow-up: Send polite closing message and mark Closed
+    candidate.status = 'Closed';
+    candidate.closedAt = new Date().toISOString();
+    saveCandidatesAndSyncExcel();
+
+    followUpMsg = isEnglish
+      ? `Hello ${candName}! 😊 Since we haven't received your response, we are closing this conversation for now. Whenever you are ready to apply for positions at BrandSetu Digital, simply reply with "Hi" or send your Resume (PDF) here. Best wishes! ✨`
+      : `Hello ${candName}! 😊 Aapki taraf se reply na aane par humne yeh chat filhaal close kar di hai. Jab bhi aap BrandSetu Digital me apply karna chahein, aap yahan "Hi" bhej sakte hain ya apna Resume (PDF) share kar sakte hain. Best wishes! ✨`;
+  } else {
+    if (stepType === 'role') {
+      followUpMsg = isEnglish
+        ? `Hello ${candName}! 😊 We noticed you connected with BrandSetu Digital regarding open positions. Could you please let us know which position or collaboration you would like to apply for? (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager) 📝`
+        : `Hello ${candName}! 😊 Aapne BrandSetu Digital me job ke liye connect kiya tha. Kripya batayein aap inme se kis position ke liye apply karna chahte hain? (1. Video Editor, 2. AI Video Expert, 3. Graphic Designer, 4. SEO & AEO Expert, 5. Social Media Manager, 6. Digital Marketing Manager) 📝`;
+    } else if (stepType === 'experience') {
+      followUpMsg = isEnglish
+        ? `Hello ${candName}! 😊 Regarding your application for *${candidate.role}* at BrandSetu Digital: Could you please let us know if you are applying as a Fresher or Experienced? And what are your core tools/skills? 💼`
+        : `Hello ${candName}! 😊 BrandSetu Digital me *${candidate.role}* position ke liye: Kripya batayein aap Fresher hain ya Experienced? Aur aapke core skills ya tools kya hain? 💼`;
+    } else if (stepType === 'resume') {
+      candidate.resumeReminderSent = true;
+      candidate.resumeReminderSentAt = new Date().toISOString();
+      followUpMsg = isEnglish
+        ? `Hello ${candName}! 😊 Please share your updated *Resume (PDF)* and your portfolio / work samples link here so our HR team can review and proceed with your interview! 📄💼`
+        : `Hello ${candName}! 😊 Kripya apna updated *Resume (PDF)* aur work samples / portfolio link yahan share kar dein taaki HR team aapki profile review karke interview schedule kar sake! 📄💼`;
+    }
+  }
+
+  const recipient = candidate.whatsappChatId || candidate.phone;
+  try {
+    await whatsappCloudService.sendWhatsAppText(recipient, followUpMsg);
+    appendChatHistory(candidate, 'assistant', followUpMsg);
+    saveCandidatesAndSyncExcel();
+    console.log(`⏰ Missing step follow-up (${stepType}, count: ${candidate.followUpCount}/3) sent to ${candName} (+${candidate.phone})`);
+  } catch (err) {
+    console.error(`Error sending missing step follow-up to +${candidate.phone}:`, err.message);
+  }
+}
+
+/**
+ * Execute Official HR Decision (Select, Reject, On Hold) and Notify Candidate
+ */
+async function executeHrDecision(candidateIdOrPhone, action, customNote = '') {
+  const targetClean = cleanPhone(candidateIdOrPhone);
+  const candidate = candidates.find(c => {
+    const cPhone = cleanPhone(c.phone);
+    return c.id === candidateIdOrPhone || cPhone === targetClean || cPhone.endsWith(targetClean) || targetClean.endsWith(cPhone);
+  });
+
+  if (!candidate) {
+    throw new Error('Candidate not found');
+  }
+
+  const roleName = candidate.role || 'Job Role';
+  const candName = getCandidateDisplayName(candidate) || 'Candidate';
+  const act = String(action || '').toLowerCase().trim();
+
+  let candidateMsg = '';
+  let statusResult = '';
+
+  if (act === 'select' || act === 'selected' || act === 'pass' || act === 'hired' || act === 'offer') {
+    candidate.status = 'Selected';
+    candidate.hrDecision = 'Selected';
+    candidate.hrDecisionAt = new Date().toISOString();
+    candidate.resumeReminderSent = true;
+    candidate.interviewReminderSent = true;
+    if (customNote) candidate.notes = `${candidate.notes ? candidate.notes + ' | ' : ''}HR Select Note: ${customNote}`;
+    candidate.updatedAt = new Date().toISOString();
+
+    candidateMsg = `Dear ${candName}! 🎉 *Congratulations!*\n\nWe are pleased to inform you that you have been *SELECTED* for the *${roleName}* position at *BrandSetu Digital* following your interview! 👏✨\n\n📍 *Office Location:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n📞 *HR Contact:* +91 9329232025\n\nOur HR team will connect with you shortly regarding the formal Offer Letter, documentation, and joining details. 📄💼\n\nWelcome to the BrandSetu Digital family! 🚀\n- HR Team, BrandSetu Digital`;
+    statusResult = 'Selected';
+  } else if (act === 'reject' || act === 'rejected') {
+    candidate.status = 'Rejected';
+    candidate.hrDecision = 'Rejected';
+    candidate.hrDecisionAt = new Date().toISOString();
+    candidate.resumeReminderSent = true;
+    candidate.interviewReminderSent = true;
+    if (customNote) candidate.notes = `${candidate.notes ? candidate.notes + ' | ' : ''}HR Reject Note: ${customNote}`;
+    candidate.updatedAt = new Date().toISOString();
+
+    candidateMsg = `Dear ${candName},\n\nThank you for taking the time to interview for the *${roleName}* position at *BrandSetu Digital*. 🙏\n\nWhile we appreciate your skills and time, we have decided to move forward with other candidates whose experience more closely matches our immediate requirements at this time.\n\nWe will keep your profile in our talent pool for relevant future openings. We wish you all the best in your career ahead! 🌟\n\nBest regards,\n- HR Team, BrandSetu Digital`;
+    statusResult = 'Rejected';
+  } else if (act === 'hold' || act === 'pending' || act === 'review') {
+    candidate.status = 'On Hold';
+    candidate.hrDecision = 'On Hold';
+    candidate.hrDecisionAt = new Date().toISOString();
+    candidate.resumeReminderSent = true;
+    candidate.interviewReminderSent = true;
+    if (customNote) candidate.notes = `${candidate.notes ? candidate.notes + ' | ' : ''}HR Hold Note: ${customNote}`;
+    candidate.updatedAt = new Date().toISOString();
+
+    candidateMsg = `Dear ${candName},\n\nThank you for attending the interview for the *${roleName}* position at *BrandSetu Digital*. 🙏\n\nYour profile is currently *Under Evaluation / On Hold* as our hiring committee completes all scheduled candidate rounds.\n\nWe will update you with the final decision within 2-3 business days. 👍\n\nBest regards,\n- HR Team, BrandSetu Digital`;
+    statusResult = 'On Hold';
+  } else {
+    throw new Error(`Invalid HR action: ${action}. Must be select, reject, or hold.`);
+  }
+
+  saveCandidatesAndSyncExcel();
+
+  try {
+    const recipient = candidate.whatsappChatId || candidate.phone;
+    await whatsappCloudService.sendWhatsAppText(recipient, candidateMsg);
+    appendChatHistory(candidate, 'assistant', candidateMsg);
+    saveCandidatesAndSyncExcel();
+    console.log(`✅ HR Decision (${statusResult}) dispatched to ${candName} (+${candidate.phone})`);
+  } catch (err) {
+    console.error(`Error sending HR decision WhatsApp message to +${candidate.phone}:`, err.message);
+  }
+
+  if (ioInstance) {
+    ioInstance.emit('hiring-updated', {
+      candidates: candidates,
+      candidateId: candidate.id,
+      candidate: candidate,
+      stats: getHiringStats()
+    });
+  }
+
+  return { candidate, message: candidateMsg, action: statusResult };
+}
+
+/**
  * Background Automation Cron / Interval
  * Checks every 60 seconds:
- * 1. Missing Resume Reminders (4 hours after apply)
+ * 1. Missing Step Follow-ups (Role, Experience, Resume - max 3 times)
  * 2. 1-Hour Interview Reminders (Between 45 to 65 mins before interview)
  * 3. Delayed Interview Slot Proposal (10 to 15 mins after Resume Received)
+ * 4. Missed Interview (No-Show) Follow-up (>= 2 hours after scheduled time)
  */
 function runHiringAutomationCheck() {
   const now = new Date().getTime();
-  const FOUR_HOURS_MS = 4 * 60 * 60 * 1000; // 4 Hours
-  const TEN_MINS_MS = 10 * 60 * 1000; // 10 Minutes
+  const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
+  const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
+  const TEN_MINS_MS = 10 * 60 * 1000;
 
   candidates.forEach(candidate => {
-    // 1. Missing Resume Reminder (After 4 Hours if not received)
-    if (!candidate.resumeReceived && !candidate.resumeReminderSent && candidate.status !== 'Not Interested' && candidate.status !== 'Closed' && candidate.createdAt) {
-      const createdTime = new Date(candidate.createdAt).getTime();
-      const elapsed = now - createdTime;
-      if (elapsed >= FOUR_HOURS_MS) {
-        console.log(`⏰ Triggering 4-hour missing resume reminder for ${candidate.name || 'Candidate'} (+${candidate.phone})`);
-        sendResumeReminder(candidate.id).catch(err => {
-          // Logged inside sendResumeReminder
+    // 0. Exclude processed, hired, or inactive statuses completely from ANY automated messages
+    const EXCLUDED_STATUSES = ['Selected', 'Rejected', 'On Hold', 'Closed', 'Not Interested', 'Hired'];
+    if (EXCLUDED_STATUSES.includes(candidate.status)) return;
+
+    // 1. Missed Interview (No-Show) Follow-Up:
+    // If candidate has interview scheduled today, interview time passed by >= 2 hours,
+    // and candidate has NOT been marked attended or interviewed, and follow-up not sent yet:
+    if (candidate.status === 'Interview Scheduled' && candidate.interviewDateTime && !candidate.missedInterviewFollowUpSent) {
+      const interviewTime = new Date(candidate.interviewDateTime).getTime();
+      const elapsedSinceInterview = now - interviewTime;
+      const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+      // If between 2 hours and 24 hours after scheduled time
+      if (elapsedSinceInterview >= TWO_HOURS_MS && elapsedSinceInterview <= TWENTY_FOUR_HOURS_MS) {
+        console.log(`🔔 Triggering missed interview follow-up for ${candidate.name} (+${candidate.phone})`);
+        sendMissedInterviewFollowUp(candidate).catch(err => {
+          console.error('Error sending missed interview follow-up:', err.message);
         });
+        return; // Don't trigger other reminders in same cycle
       }
     }
 
@@ -1715,6 +1923,7 @@ function runHiringAutomationCheck() {
         sendInterview1HrReminder(candidate).catch(err => {
           // Logged inside sendInterview1HrReminder
         });
+        return;
       }
     }
 
@@ -1729,6 +1938,39 @@ function runHiringAutomationCheck() {
         sendInterviewSlotProposal(candidate).catch(err => {
           console.error('Error in sendInterviewSlotProposal:', err.message);
         });
+        return;
+      }
+    }
+
+    // 4. Missing Step Follow-ups (Strictly Max 3 Reminders Total across all stages)
+    const followUpsSent = candidate.followUpCount || 0;
+    if (followUpsSent >= 3) {
+      if (candidate.status !== 'Closed') {
+        candidate.status = 'Closed';
+        candidate.closedAt = new Date().toISOString();
+        saveCandidatesAndSyncExcel();
+      }
+      return;
+    }
+
+    const lastFollowUpTime = candidate.lastFollowUpSentAt ? new Date(candidate.lastFollowUpSentAt).getTime() : 0;
+    const timeSinceLastFollowUp = now - lastFollowUpTime;
+    const lastActivityTime = candidate.updatedAt ? new Date(candidate.updatedAt).getTime() : (candidate.createdAt ? new Date(candidate.createdAt).getTime() : now);
+    const timeSinceActivity = now - lastActivityTime;
+
+    // Minimum 4 hours between follow-ups, and minimum 2 hours after last candidate message/creation
+    if (timeSinceLastFollowUp >= FOUR_HOURS_MS && timeSinceActivity >= TWO_HOURS_MS && !candidate.interviewDateTime) {
+      // Step A: Candidate connected/said Hi, but has NOT selected a role yet
+      if (!candidate.role || candidate.role === 'General Applicant') {
+        sendMissingStepFollowUp(candidate, 'role').catch(err => console.error('Error sending role follow-up:', err.message));
+      }
+      // Step B: Candidate selected role, but has NOT answered Fresher / Experience
+      else if (!candidate.experience || candidate.experience === '') {
+        sendMissingStepFollowUp(candidate, 'experience').catch(err => console.error('Error sending experience follow-up:', err.message));
+      }
+      // Step C: Candidate selected role & experience, but has NOT shared PDF Resume
+      else if (!candidate.resumeReceived && !candidate.resumeReminderSent) {
+        sendMissingStepFollowUp(candidate, 'resume').catch(err => console.error('Error sending resume follow-up:', err.message));
       }
     }
   });
@@ -1772,75 +2014,26 @@ async function handleHrWhatsAppCommand(senderPhone, messageText) {
   const rawTargetPhone = match[2];
   const targetClean = cleanPhone(rawTargetPhone);
 
-  // Find candidate by phone number matching
-  const candidate = candidates.find(c => {
-    const cPhone = cleanPhone(c.phone);
-    return cPhone === targetClean || cPhone.endsWith(targetClean) || targetClean.endsWith(cPhone);
-  });
-
-  if (!candidate) {
-    return `⚠️ *Candidate Not Found!*\n\nPhone: +${targetClean} hamare CRM database me nahi mila. Kripya candidate ka 10-digit mobile number check karein.`;
-  }
-
-  const roleName = candidate.role || 'SEO Expert';
-  const candName = candidate.name || 'Candidate';
-
-  if (action === 'select' || action === 'selected' || action === 'pass' || action === 'hired' || action === 'offer') {
-    candidate.status = 'Selected';
-    candidate.updatedAt = new Date().toISOString();
-    saveCandidatesAndSyncExcel();
-
-    const candidateMsg = `Dear ${candName}! 🎉 *Congratulations!*\n\nWe are pleased to inform you that you have been *SELECTED* for the *${roleName}* position at *BrandSetu Digital* following your in-person interview! 👏✨\n\n📍 *Office Location:* 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n📞 *HR Contact:* +91 9329232025\n\nOur HR team will connect with you shortly regarding the formal Offer Letter, documentation, and joining details. 📄💼\n\nWelcome to the BrandSetu Digital family! 🚀\n- HR Team, BrandSetu Digital`;
-
-    try {
-      await whatsappCloudService.sendWhatsAppText(candidate.phone, candidateMsg);
-      appendChatHistory(candidate, 'assistant', candidateMsg);
-    } catch (err) {
-      console.error('Error sending WhatsApp selection message:', err.message);
-    }
-
-    return `✅ *Action Successful!*\n\nCandidate *${candName}* (+${candidate.phone}) ko *Selected* mark kar diya gaya hai aur unke WhatsApp par official Congratulations & Selection message send kar diya gaya hai! 🎉`;
-  }
-
-  if (action === 'reject' || action === 'rejected') {
-    candidate.status = 'Rejected';
-    candidate.updatedAt = new Date().toISOString();
-    saveCandidatesAndSyncExcel();
-
-    const candidateMsg = `Dear ${candName},\n\nThank you for taking the time to visit our Indore office and interview for the *${roleName}* position at *BrandSetu Digital*. 🙏\n\nWhile we appreciate your skills and time, we have decided to move forward with other candidates whose experience more closely matches our immediate requirements at this time.\n\nWe will keep your profile in our talent pool for relevant future openings. We wish you all the best in your career ahead! 🌟\n\nBest regards,\n- HR Team, BrandSetu Digital`;
-
-    try {
-      await whatsappCloudService.sendWhatsAppText(candidate.phone, candidateMsg);
-      appendChatHistory(candidate, 'assistant', candidateMsg);
-    } catch (err) {
-      console.error('Error sending WhatsApp rejection message:', err.message);
-    }
-
-    return `✅ *Action Successful!*\n\nCandidate *${candName}* (+${candidate.phone}) ko *Rejected* mark kar diya gaya hai aur unke WhatsApp par polite feedback message send kar diya gaya hai. 👍`;
-  }
-
-  if (action === 'hold' || action === 'pending' || action === 'review') {
-    candidate.status = 'On Hold';
-    candidate.updatedAt = new Date().toISOString();
-    saveCandidatesAndSyncExcel();
-
-    const candidateMsg = `Dear ${candName},\n\nThank you for attending the in-person interview for the *${roleName}* position at *BrandSetu Digital*. 🙏\n\nYour profile is currently *Under Evaluation / On Hold* as our hiring committee completes all scheduled candidate rounds.\n\nWe will update you with the final decision within 2-3 business days. 👍\n\nBest regards,\n- HR Team, BrandSetu Digital`;
-
-    try {
-      await whatsappCloudService.sendWhatsAppText(candidate.phone, candidateMsg);
-      appendChatHistory(candidate, 'assistant', candidateMsg);
-    } catch (err) {
-      console.error('Error sending WhatsApp on-hold message:', err.message);
-    }
-
-    return `✅ *Action Successful!*\n\nCandidate *${candName}* (+${candidate.phone}) ko *On Hold* mark kar diya gaya hai aur unke WhatsApp par update message bhej diya gaya hai. ⏳`;
-  }
-
   if (action === 'status') {
+    const candidate = candidates.find(c => {
+      const cPhone = cleanPhone(c.phone);
+      return cPhone === targetClean || cPhone.endsWith(targetClean) || targetClean.endsWith(cPhone);
+    });
+    if (!candidate) {
+      return `⚠️ *Candidate Not Found!*\n\nPhone: +${targetClean} hamare CRM database me nahi mila.`;
+    }
+    const roleName = candidate.role || 'Job Role';
+    const candName = getCandidateDisplayName(candidate);
     return `📋 *Candidate Status Info:*\n\n👤 *Name:* ${candName}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${roleName}\n📊 *Status:* ${candidate.status}\n📅 *Interview:* ${candidate.interviewDateTime || 'Not Scheduled'}\n📄 *Resume:* ${candidate.resumeReceived ? 'Received' : 'Pending'}\n🔗 *Portfolio:* ${candidate.portfolio || 'N/A'}`;
   }
 
-  return null;
+  try {
+    const result = await executeHrDecision(targetClean, action);
+    const candName = getCandidateDisplayName(result.candidate);
+    return `✅ *Action Successful!*\n\nCandidate *${candName}* (+${result.candidate.phone}) ko *${result.action}* mark kar diya gaya hai aur official message send ho gaya hai! 👍`;
+  } catch (err) {
+    return `⚠️ *Action Failed:*\n\n${err.message}`;
+  }
 }
 
 /**
@@ -1956,6 +2149,9 @@ module.exports = {
   isValidPortfolioUrl,
   isThirdPartyRecruitmentForward,
   handleHrWhatsAppCommand,
+  executeHrDecision,
+  sendMissedInterviewFollowUp,
+  sendMissingStepFollowUp,
   sendMessageToCandidate,
   deleteCandidate,
   getDeletedPhones,

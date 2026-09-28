@@ -198,6 +198,23 @@ async function processIncomingWhatsAppMessage(messageData) {
       } else {
         // Candidate sent an IMAGE, photo, screenshot, audio, or non-PDF file
         const isEnglish = (candidate.lang === 'english');
+        const mediaCheckText = `${messageData.mediaFilename || ''} ${messageText || ''}`.trim();
+
+        // Check if candidate sent a holiday or festival greeting graphic (e.g. Ganesh Chaturthi, Diwali)
+        if (aiService.isGreetingOrFestivalMessage(mediaCheckText)) {
+          console.log(`🎉 Candidate +${customerPhone} sent festival graphic: "${mediaCheckText}"`);
+          const festReply = isEnglish
+            ? `Warm greetings to you as well! 🙏✨ If you are applying for job openings at BrandSetu Digital, please share your updated Resume (PDF) here. 📄👍`
+            : `Aapko bhi bohot bohot shubhkamnayein! 🙏✨ Agar aap BrandSetu Digital ke open job roles ke liye apply kar rahe hain, toh kripya apna updated Resume (PDF) share karein. 📄👍`;
+
+          try {
+            const isMetaSource = messageData.source === 'meta';
+            await whatsappCloudService.sendWhatsAppText(replyRecipient, festReply, isMetaSource);
+            hiringService.appendChatHistory(candidate, 'assistant', festReply);
+            hiringService.saveCandidatesAndSyncExcel();
+          } catch (e) {}
+          return;
+        }
 
         // Check if candidate ALREADY submitted a PDF resume or portfolio
         if (candidate.resumeReceived || candidate.portfolio) {
@@ -287,6 +304,47 @@ async function processIncomingWhatsAppMessage(messageData) {
     return; // Stop immediately!
   }
 
+  // 1.55 Candidate Status is Selected, Rejected, or On Hold:
+  // Strictly NO automated follow-ups/questionnaires. If they message asking for update/feedback, reply politely that HR will contact directly.
+  if (candidate && ['Selected', 'Rejected', 'On Hold'].includes(candidate.status)) {
+    const isAck = aiService.isAcknowledgementMessage(messageText);
+    const candName = hiringService.getCandidateDisplayName(candidate) || 'Candidate';
+    const isHi = (candidate.lang === 'hinglish' || candidate.lang === 'hindi');
+
+    // Simple acknowledgment like "ok", "thank you", "👍"
+    if (isAck) {
+      console.log(`ℹ️ Acknowledgment from ${candidate.status} candidate +${customerPhone}: "${messageText}"`);
+      return;
+    }
+
+    // Candidate asks for feedback, interview result, status, or any general query:
+    console.log(`ℹ️ Query from ${candidate.status} candidate +${customerPhone}: "${messageText}" -> Sending polite HR notification`);
+    const politeUpdateMsg = isHi
+      ? `Hello ${candName}! 😊 Aapke interview ka update hamari HR team aapse jald hi WhatsApp / Call par directly share karegi. Dhanyawad! 👍`
+      : `Hello ${candName}! 😊 Our HR team will share the official update regarding your interview with you directly via WhatsApp / Call shortly. Thank you! 👍`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, politeUpdateMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', politeUpdateMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+    } catch (e) {
+      console.error('Error sending polite status reply:', e.message);
+    }
+    return; // STOP! No questionnaires, no reminders, no rescheduling!
+  }
+
+  // 1.56 Candidate was previously Marked "Closed" (after 3 unanswered follow-ups):
+  if (candidate && candidate.status === 'Closed') {
+    console.log(`🔄 Candidate +${customerPhone} sent message after being Closed. Reactivating application...`);
+    candidate.status = candidate.resumeReceived ? 'Resume Received' : (candidate.role && candidate.role !== 'General Applicant' ? 'Resume Pending' : 'Applied');
+    candidate.closedAt = null;
+    candidate.followUpCount = 0;
+    candidate.resumeReminderSent = false;
+    candidate.interviewReminderSent = false;
+    candidate.updatedAt = new Date().toISOString();
+  }
+
   // 1.6 If Candidate was previously marked "Not Interested" and reaches back out:
   if (candidate && candidate.status === 'Not Interested') {
     // A) If it is just a pure closing acknowledgment right after closing (like "🙏🙏", "ok", "thanks"), ignore politely
@@ -340,7 +398,61 @@ async function processIncomingWhatsAppMessage(messageData) {
     return;
   }
 
-  // 1.7 If candidate already has an interview scheduled and sends simple acknowledgment ("ok", "thik h", "ok sir")
+  // 1.7 Candidate is Sick / Unwell / Has Emergency / Unable to attend today
+  if (candidate && messageText && aiService.isUnableToAttendOrSickMessage(messageText)) {
+    const hasAltDate = /(?:parso|monday|tuesday|wednesday|thursday|friday|saturday|\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje|o'?clock)\b)/i.test(messageText);
+    if (!hasAltDate) {
+      console.log(`🌸 Candidate ${candidate.name} (+${candidate.phone}) informed sick/unable to attend: "${messageText}"`);
+      if (candidate.interviewDateTime) {
+        candidate.status = 'Reschedule Requested';
+      }
+      const isHi = (candidate.lang === 'hinglish' || candidate.lang === 'hindi');
+      const sickReply = isHi
+        ? `Koi baat nahi, take care! Aap jab theek mehsoos karein ya aapka suitable date/time ho, tab hume bata dein. Hum aapka interview reschedule kar denge. Get well soon! 🌸`
+        : `No problem at all, please take care! Whenever you feel better, please let us know your preferred date and time, and we will be happy to reschedule your interview. Get well soon! 🌸`;
+
+      try {
+        const isMetaSource = messageData.source === 'meta';
+        await whatsappCloudService.sendWhatsAppText(replyRecipient, sickReply, isMetaSource);
+        hiringService.appendChatHistory(candidate, 'assistant', sickReply);
+        hiringService.saveCandidatesAndSyncExcel();
+        io.emit('hiring-updated', {
+          candidates: hiringService.getCandidates(),
+          stats: hiringService.getHiringStats(),
+          candidateId: candidate.id
+        });
+      } catch (e) {
+        console.error('Error sending sick reply:', e.message);
+      }
+      return; // STOP! Do NOT reschedule for today!
+    }
+  }
+
+  // 1.71 Candidate says NO / Refusal to proposed slot
+  if (candidate && messageText && aiService.isSlotRefusalMessage(messageText)) {
+    console.log(`🙅 Candidate ${candidate.name} (+${candidate.phone}) refused proposed slot: "${messageText}"`);
+    const isHi = (candidate.lang === 'hinglish' || candidate.lang === 'hindi');
+    const refusalReply = isHi
+      ? `Theek hai, koi baat nahi! Kya aap kisi aur date ya time par convenient feel karenge, ya online Google Meet interview prefer karenge? Kripya apna suitable time batayein. 👍`
+      : `No problem at all! Would you prefer a different date/time, or would you prefer an online Google Meet interview? Please let us know your preferred time. 👍`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, refusalReply, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', refusalReply);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending refusal reply:', e.message);
+    }
+    return;
+  }
+
+  // 1.72 If candidate already has an interview scheduled and sends simple acknowledgment ("ok", "thik h", "ok sir")
   if (candidate && candidate.interviewDateTime && aiService.isAcknowledgementMessage(messageText)) {
     console.log(`👍 Candidate ${candidate.name} (+${candidate.phone}) sent acknowledgment for scheduled interview`);
     const isEnglish = (candidate.lang === 'english');
@@ -614,7 +726,8 @@ async function processIncomingWhatsAppMessage(messageData) {
   // 2. Check for Automatic Interview Scheduling Intent ONLY if candidate has active application AND submitted resume/received proposal
   let interviewScheduledNow = false;
   const isEligibleForScheduling = candidate && (candidate.resumeReceived || candidate.interviewSlotProposed);
-  if (isEligibleForScheduling && messageText && messageText.length > 2 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
+  const isSickOrRefusal = aiService.isUnableToAttendOrSickMessage(messageText) || aiService.isSlotRefusalMessage(messageText);
+  if (isEligibleForScheduling && !isSickOrRefusal && messageText && messageText.length > 2 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
     try {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
       if (scheduleIntent && scheduleIntent.isScheduling && scheduleIntent.proposedDateTimeIso) {

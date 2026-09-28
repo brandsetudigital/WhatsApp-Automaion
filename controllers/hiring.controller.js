@@ -246,12 +246,31 @@ function importBackupJson(req, res) {
   }
 }
 
+async function executeCandidateHrDecision(req, res) {
+  try {
+    const { candidateId, action, note } = req.body;
+    if (!candidateId || !action) {
+      return res.status(400).json({ success: false, error: 'Candidate ID and action (select, reject, hold) are required' });
+    }
+
+    const result = await hiringService.executeHrDecision(candidateId, action, note);
+    res.json({
+      success: true,
+      message: `Candidate successfully marked as ${result.action} and official notification sent!`,
+      candidate: result.candidate
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 module.exports = {
   getCandidates,
   markCandidateMessagesRead,
   scheduleCandidateInterview,
   sendCandidateReminder,
   sendCandidateMessage,
+  executeCandidateHrDecision,
   updateCandidate,
   createCandidate,
   deleteCandidate,

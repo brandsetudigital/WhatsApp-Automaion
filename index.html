@@ -564,6 +564,15 @@
                       <button class="wa-quick-chip inbox-quick-chip" data-template="reminder">
                         <i class="fa-solid fa-bell"></i> 1-Hr Reminder
                       </button>
+                      <button class="wa-quick-chip inbox-quick-chip hr-chip-select" data-template="hr-select" title="Mark candidate as Selected & send WhatsApp offer. All future automations stop.">
+                        <i class="fa-solid fa-user-check text-success"></i> Select (HR)
+                      </button>
+                      <button class="wa-quick-chip inbox-quick-chip hr-chip-hold" data-template="hr-hold" title="Mark candidate as On Hold & send WhatsApp update. All future automations stop.">
+                        <i class="fa-solid fa-pause text-warning"></i> Put On Hold (HR)
+                      </button>
+                      <button class="wa-quick-chip inbox-quick-chip hr-chip-reject" data-template="hr-reject" title="Mark candidate as Rejected & send polite WhatsApp message. All future automations stop.">
+                        <i class="fa-solid fa-user-xmark text-danger"></i> Reject (HR)
+                      </button>
                     </div>
                   </div>
 
@@ -659,7 +668,7 @@
                 <button class="pill-btn active" data-filter="all">All Candidates (<span id="countAll">0</span>)</button>
                 <button class="pill-btn" data-filter="pending">Missing Resume (<span id="countPending">0</span>)</button>
                 <button class="pill-btn" data-filter="scheduled">Interviews (<span id="countScheduled">0</span>)</button>
-                <button class="pill-btn" data-filter="completed">Completed / Hired (<span id="countCompleted">0</span>)</button>
+                <button class="pill-btn" data-filter="completed">Decided / Hired (<span id="countCompleted">0</span>)</button>
               </div>
               <div class="search-box">
                 <input type="text" id="candidateSearchInput" placeholder="Search by name, phone or role..." class="form-control form-control-sm">
@@ -1066,6 +1075,15 @@
                 </button>
                 <button class="wa-quick-chip" data-template="reminder">
                   <i class="fa-solid fa-bell"></i> 1-Hr Reminder
+                </button>
+                <button class="wa-quick-chip hr-chip-select" data-template="hr-select" title="Mark as Selected & send WhatsApp offer">
+                  <i class="fa-solid fa-user-check text-success"></i> Select
+                </button>
+                <button class="wa-quick-chip hr-chip-hold" data-template="hr-hold" title="Mark as On Hold & send WhatsApp update">
+                  <i class="fa-solid fa-pause text-warning"></i> Hold
+                </button>
+                <button class="wa-quick-chip hr-chip-reject" data-template="hr-reject" title="Mark as Rejected & send polite rejection">
+                  <i class="fa-solid fa-user-xmark text-danger"></i> Reject
                 </button>
               </div>
             </div>

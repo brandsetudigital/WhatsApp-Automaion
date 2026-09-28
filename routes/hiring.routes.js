@@ -17,6 +17,9 @@ router.post('/send-reminder', hiringController.sendCandidateReminder);
 // Send Custom WhatsApp Message to Candidate
 router.post('/send-message', hiringController.sendCandidateMessage);
 
+// HR Decision Actions (Select, Reject, Hold) with WhatsApp notification & automation halt
+router.post('/hr-action', hiringController.executeCandidateHrDecision);
+
 // Create Candidate Manually
 router.post('/candidate', hiringController.createCandidate);
 

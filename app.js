@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (countAll) countAll.textContent = candidatesList.length;
     if (countPending) countPending.textContent = candidatesList.filter(c => !c.resumeReceived).length;
     if (countScheduled) countScheduled.textContent = candidatesList.filter(c => c.status === 'Interview Scheduled').length;
-    if (countCompleted) countCompleted.textContent = candidatesList.filter(c => c.status === 'Completed' || c.status === 'Selected').length;
+    if (countCompleted) countCompleted.textContent = candidatesList.filter(c => ['Completed', 'Selected', 'Rejected', 'On Hold', 'Hired'].includes(c.status)).length;
   }
 
   function renderCandidatesTable() {
@@ -749,7 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 2. Tab Filter
       if (currentCandidateFilter === 'pending') return !c.resumeReceived;
       if (currentCandidateFilter === 'scheduled') return c.status === 'Interview Scheduled';
-      if (currentCandidateFilter === 'completed') return (c.status === 'Completed' || c.status === 'Selected');
+      if (currentCandidateFilter === 'completed') return ['Completed', 'Selected', 'Rejected', 'On Hold', 'Hired'].includes(c.status);
       return true; // 'all'
     });
 
@@ -807,6 +807,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (c.status === 'Interview Scheduled') statusClass = 'badge-status-scheduled';
       else if (c.status === 'Resume Received') statusClass = 'badge-status-received';
       else if (c.status === 'Completed' || c.status === 'Selected') statusClass = 'badge-status-completed';
+      else if (c.status === 'Rejected') statusClass = 'badge-status-rejected';
+      else if (c.status === 'On Hold') statusClass = 'badge-status-hold';
+      else if (c.status === 'Closed' || c.status === 'Not Interested') statusClass = 'badge-status-closed';
 
       // Reminders status
       let remindersInfo = [];
@@ -860,6 +863,15 @@ document.addEventListener('DOMContentLoaded', () => {
                   <i class="fa-solid fa-clock"></i>
                 </button>
               ` : ''}
+              <button class="btn-icon-action hr-action-btn text-success" data-id="${c.id}" data-action="select" title="HR Select: Mark as Selected & Send Offer on WhatsApp">
+                <i class="fa-solid fa-user-check"></i>
+              </button>
+              <button class="btn-icon-action hr-action-btn text-warning" data-id="${c.id}" data-action="hold" title="HR Hold: Mark as On Hold & Send WhatsApp Update">
+                <i class="fa-solid fa-pause"></i>
+              </button>
+              <button class="btn-icon-action hr-action-btn text-danger" data-id="${c.id}" data-action="reject" title="HR Reject: Mark as Rejected & Send Polite Message">
+                <i class="fa-solid fa-user-xmark"></i>
+              </button>
               <button class="btn-icon-action btn-icon-danger delete-cand-btn" data-id="${c.id}" title="Delete">
                 <i class="fa-solid fa-trash"></i>
               </button>
@@ -955,6 +967,41 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         } catch (e) {
           alert('Network error: ' + e.message);
+        }
+      });
+    });
+
+    // HR Decision Actions (Select, Hold, Reject)
+    document.querySelectorAll('.hr-action-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        const cand = candidatesList.find(c => c.id === id);
+        const name = cand ? cand.name : 'Candidate';
+
+        let confirmText = '';
+        if (action === 'select') confirmText = `Kya aap "${name}" ko SELECT karke WhatsApp par Selection / Offer message bhejna chahte hain?\n\n(Iske baad candidate ko sabhi automated reminders band ho jayenge.)`;
+        else if (action === 'reject') confirmText = `Kya aap "${name}" ko REJECT karke WhatsApp par polite rejection message bhejna chahte hain?\n\n(Iske baad candidate ko sabhi automated reminders band ho jayenge.)`;
+        else if (action === 'hold') confirmText = `Kya aap "${name}" ko ON HOLD par rakhkar WhatsApp par status update bhejna chahte hain?\n\n(Iske baad candidate ko sabhi automated reminders band ho jayenge.)`;
+
+        if (!confirm(confirmText)) return;
+
+        try {
+          const res = await fetch('/api/hiring/hr-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId: id, action })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert(`✅ Candidate status updated to "${data.candidate?.status || action}" and WhatsApp message sent!`);
+            loadCandidates();
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
         }
       });
     });
@@ -1670,6 +1717,27 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('Network error: ' + e.message);
         }
         return;
+      } else if (template === 'hr-select' || template === 'hr-hold' || template === 'hr-reject') {
+        const action = template.replace('hr-', '');
+        const actLabel = action === 'select' ? 'SELECT (Offer)' : action === 'hold' ? 'ON HOLD' : 'REJECT';
+        if (!confirm(`Kya aap "${cand.name || 'Candidate'}" ko ${actLabel} mark karke WhatsApp par official HR message bhejna chahte hain?\n\n(Iske baad automated follow-ups stop ho jayenge.)`)) return;
+        try {
+          const res = await fetch('/api/hiring/hr-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId: cand.id, action })
+          });
+          const d = await res.json();
+          if (d.success) {
+            alert(`✅ Candidate marked as ${d.candidate?.status || action}!`);
+            loadCandidates();
+          } else {
+            alert('Error: ' + d.error);
+          }
+        } catch (e) {
+          alert('Network error: ' + e.message);
+        }
+        return;
       }
 
       if (textToSend && waPhoneInput) {
@@ -2151,6 +2219,27 @@ document.addEventListener('DOMContentLoaded', () => {
           const d = await res.json();
           if (d.success) {
             alert('1-Hr Interview Reminder sent!');
+            loadCandidates();
+          } else {
+            alert('Error: ' + d.error);
+          }
+        } catch (e) {
+          alert('Network error: ' + e.message);
+        }
+        return;
+      } else if (template === 'hr-select' || template === 'hr-hold' || template === 'hr-reject') {
+        const action = template.replace('hr-', '');
+        const actLabel = action === 'select' ? 'SELECT (Offer)' : action === 'hold' ? 'ON HOLD' : 'REJECT';
+        if (!confirm(`Kya aap "${cand.name || 'Candidate'}" ko ${actLabel} mark karke WhatsApp par official HR message bhejna chahte hain?\n\n(Iske baad automated follow-ups stop ho jayenge.)`)) return;
+        try {
+          const res = await fetch('/api/hiring/hr-action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ candidateId: cand.id, action })
+          });
+          const d = await res.json();
+          if (d.success) {
+            alert(`✅ Candidate marked as ${d.candidate?.status || action}!`);
             loadCandidates();
           } else {
             alert('Error: ' + d.error);
