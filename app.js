@@ -837,7 +837,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             ${interviewText}
-            ${c.notes ? `<div class="text-dim" style="font-size:0.72rem; margin-top:2px;"><i class="fa-solid fa-note-sticky"></i> ${escapeHtml(c.notes)}</div>` : ''}
+            ${c.expectedSalary ? `<div class="text-warning" style="font-size:0.72rem; margin-top:2px;"><i class="fa-solid fa-indian-rupee-sign"></i> Exp: ${escapeHtml(c.expectedSalary)}</div>` : ''}
+            ${c.feedback ? `<div class="text-info" style="font-size:0.72rem; margin-top:2px;" title="${escapeHtml(c.feedback)}"><i class="fa-solid fa-clipboard-check"></i> ${escapeHtml(c.feedback.length > 35 ? c.feedback.slice(0, 35) + '...' : c.feedback)}</div>` : (c.notes ? `<div class="text-dim" style="font-size:0.72rem; margin-top:2px;"><i class="fa-solid fa-note-sticky"></i> ${escapeHtml(c.notes)}</div>` : '')}
           </td>
           <td>
             <span class="badge-status ${statusClass}">${escapeHtml(c.status || 'Applied')}</span>
@@ -863,6 +864,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   <i class="fa-solid fa-clock"></i>
                 </button>
               ` : ''}
+              <button class="btn-icon-action cand-feedback-btn text-info" data-id="${c.id}" title="Interview Feedback & Evaluation (Save to Excel & Profile - No WhatsApp)">
+                <i class="fa-solid fa-clipboard-check"></i> Feedback
+              </button>
               <button class="btn-icon-action hr-action-btn text-success" data-id="${c.id}" data-action="select" title="HR Select: Mark as Selected & Send Offer on WhatsApp">
                 <i class="fa-solid fa-user-check"></i>
               </button>
@@ -1006,6 +1010,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Interview Feedback & Evaluation button
+    document.querySelectorAll('.cand-feedback-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCandidateFeedbackModal(btn.dataset.id);
+      });
+    });
+
     // Delete Candidate button
     document.querySelectorAll('.delete-cand-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -1131,6 +1143,102 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (err) {
         alert('Error scheduling interview: ' + err.message);
+      }
+    });
+  }
+
+  // Interview Evaluation & Internal Feedback Modal Handlers
+  const feedbackModal = document.getElementById('feedbackModal');
+  const closeFeedbackModal = document.getElementById('closeFeedbackModal');
+  const cancelFeedbackBtn = document.getElementById('cancelFeedbackBtn');
+  const feedbackForm = document.getElementById('feedbackForm');
+  const inboxFeedbackBtn = document.getElementById('inboxFeedbackBtn');
+  const waHdrFeedbackBtn = document.getElementById('waHdrFeedbackBtn');
+
+  function openCandidateFeedbackModal(candidateId) {
+    if (!candidateId) {
+      alert('Kripya pehle kisi candidate ko select karein.');
+      return;
+    }
+    const cand = candidatesList.find(c => c.id === candidateId || c.phone === candidateId);
+    if (!cand) return;
+
+    const feedbackCandidateId = document.getElementById('feedbackCandidateId');
+    const feedbackCandidateInfo = document.getElementById('feedbackCandidateInfo');
+    const feedbackRole = document.getElementById('feedbackRole');
+    const feedbackStatus = document.getElementById('feedbackStatus');
+    const feedbackExperience = document.getElementById('feedbackExperience');
+    const feedbackExpectation = document.getElementById('feedbackExpectation');
+    const feedbackAttendedAt = document.getElementById('feedbackAttendedAt');
+    const feedbackDescription = document.getElementById('feedbackDescription');
+
+    if (feedbackCandidateId) feedbackCandidateId.value = cand.id;
+    if (feedbackCandidateInfo) feedbackCandidateInfo.value = `${cand.name || 'Candidate'} (+${cand.phone || ''})`;
+    if (feedbackRole) feedbackRole.value = cand.role || 'Video Editor';
+    if (feedbackStatus) feedbackStatus.value = cand.status || 'Interview Attended';
+    if (feedbackExperience) feedbackExperience.value = cand.experience || '';
+    if (feedbackExpectation) feedbackExpectation.value = cand.expectedSalary || cand.expectation || '';
+    if (feedbackDescription) feedbackDescription.value = cand.feedback || cand.description || cand.notes || '';
+
+    if (feedbackAttendedAt) {
+      const dateVal = cand.attendedAt || cand.interviewDateTime || new Date().toISOString();
+      try {
+        const d = new Date(dateVal);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        feedbackAttendedAt.value = d.toISOString().slice(0, 16);
+      } catch (e) {
+        feedbackAttendedAt.value = new Date().toISOString().slice(0, 16);
+      }
+    }
+
+    if (feedbackModal) {
+      feedbackModal.style.display = 'flex';
+    }
+  }
+
+  if (closeFeedbackModal) closeFeedbackModal.addEventListener('click', () => { if (feedbackModal) feedbackModal.style.display = 'none'; });
+  if (cancelFeedbackBtn) cancelFeedbackBtn.addEventListener('click', () => { if (feedbackModal) feedbackModal.style.display = 'none'; });
+  if (inboxFeedbackBtn) inboxFeedbackBtn.addEventListener('click', () => openCandidateFeedbackModal(selectedInboxCandidateId));
+  if (waHdrFeedbackBtn) waHdrFeedbackBtn.addEventListener('click', () => openCandidateFeedbackModal(activeMobileCandidateId));
+
+  if (feedbackForm) {
+    feedbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('feedbackCandidateId').value;
+      const role = document.getElementById('feedbackRole').value;
+      const status = document.getElementById('feedbackStatus').value;
+      const experience = document.getElementById('feedbackExperience').value.trim();
+      const expectation = document.getElementById('feedbackExpectation').value.trim();
+      const attendedAtVal = document.getElementById('feedbackAttendedAt').value;
+      const description = document.getElementById('feedbackDescription').value.trim();
+
+      try {
+        const res = await fetch(`/api/hiring/candidate/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            role,
+            status,
+            experience,
+            expectedSalary: expectation,
+            expectation: expectation,
+            attendedAt: attendedAtVal ? new Date(attendedAtVal).toISOString() : new Date().toISOString(),
+            feedback: description,
+            description: description,
+            notes: description
+          })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          if (feedbackModal) feedbackModal.style.display = 'none';
+          alert('✅ Candidate interview evaluation & feedback saved to Excel & Profile successfully!\n(No WhatsApp message sent to candidate)');
+          loadCandidates();
+        } else {
+          alert('Error: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
       }
     });
   }

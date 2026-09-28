@@ -316,24 +316,52 @@ function generateExcelWorkbook(candidateList = []) {
       }
     }
 
+    let attendedFormatted = '';
+    if (c.attendedAt) {
+      try {
+        const d = new Date(c.attendedAt);
+        attendedFormatted = d.toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+      } catch (e) {
+        attendedFormatted = c.attendedAt;
+      }
+    } else if (c.interviewDateTime && ['Interview Attended', 'Selected', 'Completed', 'On Hold', 'Rejected'].includes(c.status)) {
+      try {
+        const d = new Date(c.interviewDateTime);
+        attendedFormatted = d.toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        });
+      } catch (e) {
+        attendedFormatted = c.interviewDateTime;
+      }
+    }
+
     return {
       'S.No': index + 1,
       'Candidate Name': c.name || 'Candidate',
       'WhatsApp Phone': c.phone ? `+${c.phone}` : '',
       'Role Applied': c.role || 'Not Specified',
+      'Experience': c.experience || '',
+      'Salary / Expectation': c.expectedSalary || c.expectation || '',
+      'Interview Attended (Kab Aaya)': attendedFormatted || 'Pending Visit',
+      'Interview Date & Time': interviewFormatted,
+      'Candidate Status': c.status || 'Applied',
+      'Interview Feedback & Description': c.feedback || c.description || c.notes || '',
       'Work Mode': c.workType || 'Full-Time',
       'Interview Mode': c.interviewMode === 'online' ? 'Online (Google Meet)' : 'In-Person (Indore Office)',
       'Resume Received': c.resumeReceived ? 'YES' : 'PENDING',
       'Portfolio / Drive / Social Link': c.portfolio || (c.socialHandle ? `Social: ${c.socialHandle} (${c.followers || 'N/A'})` : ''),
-      'Candidate Status': c.status || 'Applied',
-      'Interview Date & Time': interviewFormatted,
-      'Experience': c.experience || '',
       'City': c.city || 'Indore',
       'Resume Reminder Sent': c.resumeReminderSent ? 'YES' : 'NO',
       'Interview 1hr Reminder': c.interviewReminderSent ? 'YES' : 'NO',
       'Applied Date': appliedOnFormatted,
       'Last Message': c.lastMessage || '',
-      'Notes': c.notes || ''
+      'Internal Notes': c.notes || ''
     };
   });
 
@@ -344,19 +372,22 @@ function generateExcelWorkbook(candidateList = []) {
     { wch: 20 }, // Name
     { wch: 18 }, // Phone
     { wch: 22 }, // Role
+    { wch: 20 }, // Experience
+    { wch: 22 }, // Salary / Expectation
+    { wch: 24 }, // Interview Attended (Kab Aaya)
+    { wch: 24 }, // Interview Date & Time
+    { wch: 20 }, // Status
+    { wch: 38 }, // Interview Feedback & Description
     { wch: 16 }, // Work Mode
     { wch: 24 }, // Interview Mode
     { wch: 16 }, // Resume Received
     { wch: 32 }, // Portfolio / Social Link
-    { wch: 20 }, // Status
-    { wch: 24 }, // Interview Date & Time
-    { wch: 16 }, // Experience
     { wch: 14 }, // City
     { wch: 22 }, // Resume Reminder
     { wch: 22 }, // Interview Reminder
     { wch: 22 }, // Applied Date
     { wch: 30 }, // Last Message
-    { wch: 25 }  // Notes
+    { wch: 25 }  // Internal Notes
   ];
 
   const workbook = xlsx.utils.book_new();

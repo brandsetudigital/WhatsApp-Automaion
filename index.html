@@ -518,6 +518,9 @@
                     </div>
 
                     <div class="wa-inbox-actions">
+                      <button class="btn-icon-action" id="inboxFeedbackBtn" title="Interview Evaluation & Feedback (Internal Excel Save - No WhatsApp)">
+                        <i class="fa-solid fa-clipboard-check text-info"></i> <span class="d-none d-md-inline">Evaluation</span>
+                      </button>
                       <button class="btn-icon-action" id="inboxScheduleBtn" title="Schedule Interview">
                         <i class="fa-solid fa-calendar-plus"></i> <span class="d-none d-md-inline">Schedule</span>
                       </button>
@@ -802,6 +805,93 @@
     </div>
   </div>
 
+  <!-- Interview Evaluation & Internal Feedback Modal (No WhatsApp Message) -->
+  <div id="feedbackModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box glass-card" style="max-width: 580px;">
+      <div class="modal-header flex-between">
+        <h3><i class="fa-solid fa-clipboard-check text-info"></i> Interview Evaluation & Feedback</h3>
+        <button class="close-btn" id="closeFeedbackModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="feedbackForm">
+          <input type="hidden" id="feedbackCandidateId">
+          
+          <!-- Confidential HR Notice Banner -->
+          <div class="p-2 mb-3 rounded" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.35); font-size: 12.5px; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-lock fa-lg"></i>
+            <span><strong>Internal HR Record:</strong> Yeh data direct Excel (.xlsx) aur profile me save hoga. Candidate ko WhatsApp message <u>NAHI</u> jayega.</span>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Candidate Name & Phone</label>
+            <input type="text" id="feedbackCandidateInfo" class="form-control" readonly>
+          </div>
+
+          <div class="form-row mb-3" style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Role Evaluated</label>
+              <select id="feedbackRole" class="form-control">
+                <option value="Video Editor">🎬 Video Editor</option>
+                <option value="AI Video Expert">🤖 AI Video Expert</option>
+                <option value="Graphic Designer">🎨 Graphic Designer</option>
+                <option value="SEO & AEO Expert">🔎 SEO & AEO Expert</option>
+                <option value="Social Media Manager">📱 Social Media Manager</option>
+                <option value="Digital Marketing Manager">📢 Digital Marketing Manager</option>
+                <option value="Telecaller / Inside Sales">📞 Telecaller / Inside Sales</option>
+                <option value="Telecaller / Sales Executive">💼 Telecaller / Sales Executive</option>
+                <option value="Sales Executive">📈 Sales Executive</option>
+                <option value="Accountant / Finance">💰 Accountant / Finance</option>
+                <option value="Content Writer / Copywriter">✍️ Content Writer / Copywriter</option>
+                <option value="Web Developer">💻 Web Developer</option>
+                <option value="Other Digital Marketing Roles">💼 Other Digital Marketing Roles</option>
+                <option value="General Applicant">General Applicant</option>
+              </select>
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Interview Status / Result</label>
+              <select id="feedbackStatus" class="form-control">
+                <option value="Interview Attended">✅ Interview Attended (Conducted)</option>
+                <option value="Selected">🟢 Selected (Hire / Offer)</option>
+                <option value="On Hold">🟡 On Hold (Under Consideration)</option>
+                <option value="Rejected">🔴 Rejected</option>
+                <option value="Interview Scheduled">📅 Rescheduled / Scheduled</option>
+                <option value="Did Not Attend">❌ Did Not Attend (No-Show)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row mb-3" style="display: flex; gap: 10px;">
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Candidate Experience</label>
+              <input type="text" id="feedbackExperience" placeholder="e.g. 2 Years in Premiere Pro, Fresher, etc." class="form-control">
+            </div>
+            <div class="form-group" style="flex: 1;">
+              <label class="form-label">Salary / Expectation</label>
+              <input type="text" id="feedbackExpectation" placeholder="e.g. ₹25,000/mo, Immediate joining" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Interview Attended Time (Kab Aaya Tha)</label>
+            <input type="datetime-local" id="feedbackAttendedAt" class="form-control">
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Detailed Interview Feedback & Description</label>
+            <textarea id="feedbackDescription" rows="4" placeholder="Candidate ka complete interview description, practical test performance, skills evaluated, communication, strengths aur final feedback..." class="form-control"></textarea>
+          </div>
+
+          <div class="modal-footer flex-end gap-2">
+            <button type="button" class="btn btn-secondary" id="cancelFeedbackBtn">Cancel</button>
+            <button type="submit" class="btn btn-success" id="confirmFeedbackBtn">
+              <i class="fa-solid fa-file-excel"></i> Save to Excel & Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Candidate Modal -->
   <div id="addCandidateModal" class="modal-backdrop" style="display: none;">
     <div class="modal-box glass-card">
@@ -1014,6 +1104,9 @@
               </div>
 
               <div class="wa-hdr-actions">
+                <button class="wa-hdr-icon-btn" id="waHdrFeedbackBtn" title="Interview Evaluation & Feedback (Internal Excel)">
+                  <i class="fa-solid fa-clipboard-check text-info"></i>
+                </button>
                 <button class="wa-hdr-icon-btn" id="waHdrCallBtn" title="WhatsApp Voice Call">
                   <i class="fa-solid fa-phone"></i>
                 </button>

@@ -73,7 +73,23 @@ function updateCandidate(req, res) {
       return res.status(404).json({ success: false, error: 'Candidate not found' });
     }
 
-    const { name, role, city, experience, portfolio, resumeReceived, status, notes, interviewDateTime } = req.body;
+    const {
+      name,
+      role,
+      city,
+      experience,
+      portfolio,
+      resumeReceived,
+      status,
+      notes,
+      interviewDateTime,
+      expectedSalary,
+      expectation,
+      attendedAt,
+      feedback,
+      description
+    } = req.body;
+
     if (name !== undefined) candidate.name = name;
     if (role !== undefined) candidate.role = role;
     if (city !== undefined) candidate.city = city;
@@ -83,10 +99,20 @@ function updateCandidate(req, res) {
     if (status !== undefined) candidate.status = status;
     if (notes !== undefined) candidate.notes = notes;
     if (interviewDateTime !== undefined) candidate.interviewDateTime = interviewDateTime;
+    if (expectedSalary !== undefined) candidate.expectedSalary = expectedSalary;
+    if (expectation !== undefined) candidate.expectation = expectation;
+    if (attendedAt !== undefined) candidate.attendedAt = attendedAt;
+    if (feedback !== undefined) candidate.feedback = feedback;
+    if (description !== undefined) candidate.description = description;
+
     candidate.updatedAt = new Date().toISOString();
 
     hiringService.saveCandidatesAndSyncExcel();
-    res.json({ success: true, message: 'Candidate updated successfully', candidate });
+    res.json({
+      success: true,
+      message: 'Candidate interview evaluation & profile updated successfully (No WhatsApp message sent)',
+      candidate
+    });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
