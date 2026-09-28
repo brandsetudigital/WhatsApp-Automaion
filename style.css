@@ -1699,19 +1699,25 @@ select option {
 .wa-date-pill {
   display: flex;
   justify-content: center;
-  margin: 4px 0 8px;
+  align-items: center;
+  margin: 10px 0 8px;
+  position: sticky;
+  top: 4px;
+  z-index: 5;
+  width: 100%;
 }
 
 .wa-date-pill span {
   background: #182229;
   color: #8696a0;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  padding: 3px 10px;
-  border-radius: 6px;
+  padding: 4px 12px;
+  border-radius: 8px;
   text-transform: uppercase;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  letter-spacing: 0.4px;
 }
 
 /* Message Stream Container */

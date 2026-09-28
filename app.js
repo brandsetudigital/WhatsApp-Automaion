@@ -1450,6 +1450,74 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
+   * Calculate WhatsApp-authentic date divider label:
+   * - Today -> "TODAY"
+   * - Yesterday -> "YESTERDAY"
+   * - Within last 7 days (2-6 days ago) -> Day name, e.g. "MONDAY", "SUNDAY"
+   * - Older than 7 days -> Full date, e.g. "18 SEPTEMBER 2026"
+   */
+  function getWhatsAppDateDividerLabel(isoString) {
+    if (!isoString) return 'TODAY';
+    try {
+      const msgDate = new Date(isoString);
+      if (isNaN(msgDate.getTime())) return 'TODAY';
+
+      const now = new Date();
+      const msgDay = new Date(msgDate.getFullYear(), msgDate.getMonth(), msgDate.getDate());
+      const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const diffMs = nowDay.getTime() - msgDay.getTime();
+      const diffDays = Math.round(diffMs / (24 * 60 * 60 * 1000));
+
+      if (diffDays === 0) {
+        return 'TODAY';
+      } else if (diffDays === 1) {
+        return 'YESTERDAY';
+      } else if (diffDays > 1 && diffDays < 7) {
+        return msgDate.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+      } else {
+        return msgDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+      }
+    } catch (e) {
+      return 'TODAY';
+    }
+  }
+
+  /**
+   * Format message timestamp for conversation cards in contact list:
+   * - Today -> "11:43 AM"
+   * - Yesterday -> "Yesterday"
+   * - Within last 7 days -> Day name, e.g. "Sun", "Sat"
+   * - Older -> Date e.g. "24/09/26"
+   */
+  function formatWhatsAppContactTime(isoString) {
+    if (!isoString) return '';
+    try {
+      const d = new Date(isoString);
+      if (isNaN(d.getTime())) return '';
+      const now = new Date();
+      const dDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const diffDays = Math.round((nowDay - dDay) / (24 * 60 * 60 * 1000));
+
+      if (diffDays === 0) {
+        return formatTime(isoString);
+      } else if (diffDays === 1) {
+        return 'Yesterday';
+      } else if (diffDays > 1 && diffDays < 7) {
+        return d.toLocaleDateString('en-US', { weekday: 'short' });
+      } else {
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = String(d.getFullYear()).slice(-2);
+        return `${day}/${month}/${year}`;
+      }
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
    * Open WhatsApp Mobile Simulator for a specific candidate
    */
   function openCandidateWhatsAppMobile(candidateId) {
@@ -1515,10 +1583,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderCandidateWhatsAppChat(candidate) {
     if (!waPhoneChatStream) return;
 
-    const history = candidate.chatHistory || [];
+    let history = (candidate.chatHistory || []).slice();
+    history.sort((a, b) => {
+      const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return ta - tb;
+    });
 
     if (history.length === 0) {
       waPhoneChatStream.innerHTML = `
+        <div class="wa-date-pill"><span>TODAY</span></div>
         <div class="wa-msg-row incoming">
           <div class="wa-bubble incoming">
             <div class="wa-bubble-sender">${escapeHtml(candidate.name || 'Candidate')}</div>
@@ -1533,12 +1607,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let html = '';
+    let lastDateKey = null;
+
     history.forEach((msg) => {
       const isUser = msg.role === 'user';
       const rowClass = isUser ? 'incoming' : 'outgoing';
       const bubbleClass = isUser ? 'incoming' : 'outgoing';
       const senderLabel = isUser ? escapeHtml(candidate.name || 'Candidate') : 'BrandSetu HR';
       const timeStr = formatTime(msg.timestamp);
+
+      // WhatsApp Date Divider
+      const d = msg.timestamp ? new Date(msg.timestamp) : null;
+      const dateKey = (d && !isNaN(d.getTime())) ? `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` : 'default';
+      if (dateKey !== lastDateKey) {
+        lastDateKey = dateKey;
+        const dividerLabel = getWhatsAppDateDividerLabel(msg.timestamp);
+        html += `
+          <div class="wa-date-pill">
+            <span>${escapeHtml(dividerLabel)}</span>
+          </div>
+        `;
+      }
 
       // Check if message is a document attachment
       let docCardHtml = '';
@@ -1938,10 +2027,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (lastMsgObj) {
         lastMsgText = (lastMsgObj.text || '').replace(/[\r\n]+/g, ' ').substring(0, 45);
-        lastMsgTime = formatTime(lastMsgObj.timestamp);
+        lastMsgTime = formatWhatsAppContactTime(lastMsgObj.timestamp);
         isOutgoing = lastMsgObj.role === 'assistant';
       } else if (c.createdAt) {
-        lastMsgTime = formatTime(c.createdAt);
+        lastMsgTime = formatWhatsAppContactTime(c.createdAt);
       }
 
       const initial = (c.name || 'C').trim().charAt(0).toUpperCase() || 'C';
@@ -2075,10 +2164,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderInboxChatStream(candidate) {
     if (!inboxChatStream) return;
 
-    const history = candidate.chatHistory || [];
+    let history = (candidate.chatHistory || []).slice();
+    history.sort((a, b) => {
+      const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return ta - tb;
+    });
 
     if (history.length === 0) {
       inboxChatStream.innerHTML = `
+        <div class="wa-date-pill"><span>TODAY</span></div>
         <div class="wa-msg-row incoming">
           <div class="wa-bubble incoming">
             <div class="wa-bubble-sender">${escapeHtml(candidate.name || 'Candidate')}</div>
@@ -2093,12 +2188,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let html = '';
+    let lastDateKey = null;
+
     history.forEach((msg) => {
       const isUser = msg.role === 'user';
       const rowClass = isUser ? 'incoming' : 'outgoing';
       const bubbleClass = isUser ? 'incoming' : 'outgoing';
       const senderLabel = isUser ? escapeHtml(candidate.name || 'Candidate') : 'BrandSetu HR';
       const timeStr = formatTime(msg.timestamp);
+
+      // WhatsApp Date Divider
+      const d = msg.timestamp ? new Date(msg.timestamp) : null;
+      const dateKey = (d && !isNaN(d.getTime())) ? `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}` : 'default';
+      if (dateKey !== lastDateKey) {
+        lastDateKey = dateKey;
+        const dividerLabel = getWhatsAppDateDividerLabel(msg.timestamp);
+        html += `
+          <div class="wa-date-pill">
+            <span>${escapeHtml(dividerLabel)}</span>
+          </div>
+        `;
+      }
 
       // Check for Document / Resume Attachment
       let docCardHtml = '';
