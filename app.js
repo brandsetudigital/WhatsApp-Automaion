@@ -674,6 +674,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const scheduleSendWhatsApp = document.getElementById('scheduleSendWhatsApp');
   const closeScheduleModal = document.getElementById('closeScheduleModal');
   const cancelScheduleBtn = document.getElementById('cancelScheduleBtn');
+  const modeInPersonRadio = document.getElementById('modeInPersonRadio');
+  const modeOnlineRadio = document.getElementById('modeOnlineRadio');
+  const scheduleMeetLinkGroup = document.getElementById('scheduleMeetLinkGroup');
+  const scheduleMeetLink = document.getElementById('scheduleMeetLink');
+  const generateMeetLinkBtn = document.getElementById('generateMeetLinkBtn');
+  const scheduleInPersonLocationNote = document.getElementById('scheduleInPersonLocationNote');
+  const scheduleCandidateOnlineNote = document.getElementById('scheduleCandidateOnlineNote');
+  const scheduleCandidateOnlineNoteText = document.getElementById('scheduleCandidateOnlineNoteText');
+  const countOnline = document.getElementById('countOnline');
+  const inboxFilterOnlineCount = document.getElementById('inboxFilterOnlineCount');
 
   const addCandidateBtn = document.getElementById('addCandidateBtn');
   const addCandidateModal = document.getElementById('addCandidateModal');
@@ -725,7 +735,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (kpiToday) kpiToday.textContent = stats.scheduledToday || 0;
     if (kpiScheduled) kpiScheduled.textContent = stats.interviewScheduled || 0;
 
+    const onlineCount = candidatesList.filter(c => c.status === 'Online Requested' || (c.interviewMode === 'online' && !c.interviewDateTime)).length;
     if (countAll) countAll.textContent = candidatesList.length;
+    if (countOnline) countOnline.textContent = onlineCount;
+    if (inboxFilterOnlineCount) inboxFilterOnlineCount.textContent = onlineCount;
     if (countPending) countPending.textContent = candidatesList.filter(c => !c.resumeReceived).length;
     if (countScheduled) countScheduled.textContent = candidatesList.filter(c => c.status === 'Interview Scheduled').length;
     if (countCompleted) countCompleted.textContent = candidatesList.filter(c => ['Completed', 'Selected', 'Rejected', 'On Hold', 'Hired'].includes(c.status)).length;
@@ -747,6 +760,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!matchSearch) return false;
 
       // 2. Tab Filter
+      if (currentCandidateFilter === 'online') return c.status === 'Online Requested' || c.interviewMode === 'online';
       if (currentCandidateFilter === 'pending') return !c.resumeReceived;
       if (currentCandidateFilter === 'scheduled') return c.status === 'Interview Scheduled';
       if (currentCandidateFilter === 'completed') return ['Completed', 'Selected', 'Rejected', 'On Hold', 'Hired'].includes(c.status);
@@ -796,7 +810,13 @@ document.addEventListener('DOMContentLoaded', () => {
             dateStyle: 'medium',
             timeStyle: 'short'
           });
-          interviewText = `<strong class="text-white">${formatted}</strong>`;
+          const modeTag = c.interviewMode === 'online'
+            ? `<div class="text-info mt-1" style="font-size:0.72rem;"><i class="fa-solid fa-video"></i> Online (Google Meet)</div>`
+            : `<div class="text-dim mt-1" style="font-size:0.72rem;"><i class="fa-solid fa-building"></i> In-Person Office</div>`;
+          const meetUrlLink = (c.interviewMode === 'online' && c.meetLink)
+            ? `<a href="${c.meetLink}" target="_blank" class="text-primary d-block mt-1" style="font-size:0.7rem;"><i class="fa-solid fa-link"></i> Join Meet</a>`
+            : '';
+          interviewText = `<strong class="text-white">${formatted}</strong>${modeTag}${meetUrlLink}`;
         } catch (e) {
           interviewText = c.interviewDateTime;
         }
@@ -804,7 +824,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Status Badge
       let statusClass = 'badge-status-pending';
+      let statusExtra = '';
       if (c.status === 'Interview Scheduled') statusClass = 'badge-status-scheduled';
+      else if (c.status === 'Online Requested') {
+        statusClass = 'badge-status-online';
+        if (c.requestedOnlineTime) {
+          statusExtra = `<div class="text-warning mt-1" style="font-size:0.68rem;"><i class="fa-solid fa-clock"></i> Pref: ${escapeHtml(c.requestedOnlineTime)}</div>`;
+        }
+      }
       else if (c.status === 'Resume Received') statusClass = 'badge-status-received';
       else if (c.status === 'Completed' || c.status === 'Selected') statusClass = 'badge-status-completed';
       else if (c.status === 'Rejected') statusClass = 'badge-status-rejected';
@@ -842,6 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </td>
           <td>
             <span class="badge-status ${statusClass}">${escapeHtml(c.status || 'Applied')}</span>
+            ${statusExtra}
           </td>
           <td>
             ${remindersInfo.join('<br>')}
@@ -889,6 +917,62 @@ document.addEventListener('DOMContentLoaded', () => {
     attachCandidateRowEvents();
   }
 
+  function generateRandomGoogleMeetUrl() {
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const randPart = (len) => Array.from({ length: len }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+    return `https://meet.google.com/${randPart(3)}-${randPart(4)}-${randPart(3)}`;
+  }
+
+  function openScheduleModalForCandidate(cand, forcedMode = null) {
+    if (!cand) return;
+    scheduleCandidateId.value = cand.id;
+    scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
+    scheduleRole.value = cand.role || 'Video Editor';
+
+    const isCandidateOnline = forcedMode === 'online' || cand.status === 'Online Requested' || cand.interviewMode === 'online';
+
+    if (isCandidateOnline) {
+      if (modeOnlineRadio) modeOnlineRadio.checked = true;
+      if (scheduleMeetLinkGroup) scheduleMeetLinkGroup.style.display = 'block';
+      if (scheduleInPersonLocationNote) scheduleInPersonLocationNote.style.display = 'none';
+      if (scheduleMeetLink) {
+        scheduleMeetLink.value = cand.meetLink || generateRandomGoogleMeetUrl();
+      }
+    } else {
+      if (modeInPersonRadio) modeInPersonRadio.checked = true;
+      if (scheduleMeetLinkGroup) scheduleMeetLinkGroup.style.display = 'none';
+      if (scheduleInPersonLocationNote) scheduleInPersonLocationNote.style.display = 'block';
+    }
+
+    if (cand.status === 'Online Requested' || cand.requestedOnlineTime) {
+      if (scheduleCandidateOnlineNote) scheduleCandidateOnlineNote.style.display = 'block';
+      if (scheduleCandidateOnlineNoteText) {
+        scheduleCandidateOnlineNoteText.textContent = cand.requestedOnlineTime
+          ? `Candidate requested Online Interview slot: ${cand.requestedOnlineTime}`
+          : `Candidate requested Online / Remote (Google Meet) interview.`;
+      }
+    } else {
+      if (scheduleCandidateOnlineNote) scheduleCandidateOnlineNote.style.display = 'none';
+    }
+
+    // Pre-fill Date & Time
+    if (cand.interviewDateTime) {
+      const d = new Date(cand.interviewDateTime);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      scheduleDateTime.value = d.toISOString().slice(0, 16);
+    } else {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      if (tomorrow.getDay() === 0) tomorrow.setDate(tomorrow.getDate() + 1); // Skip Sunday
+      tomorrow.setHours(10, 30, 0, 0);
+      tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+      scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
+    }
+
+    scheduleNotes.value = cand.notes || '';
+    scheduleModal.style.display = 'flex';
+  }
+
   function attachCandidateRowEvents() {
     // Open WhatsApp Chat on candidate row button or name click
     document.querySelectorAll('.open-chat-cand-btn, .cand-name-clickable').forEach(el => {
@@ -904,26 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
         const cand = candidatesList.find(c => c.id === id);
-        if (!cand) return;
-
-        scheduleCandidateId.value = cand.id;
-        scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
-        scheduleRole.value = cand.role || 'Video Editor';
-
-        // Pre-fill tomorrow 11:00 AM if not scheduled
-        if (cand.interviewDateTime) {
-          const d = new Date(cand.interviewDateTime);
-          d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-          scheduleDateTime.value = d.toISOString().slice(0, 16);
-        } else {
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(10, 30, 0, 0);
-          tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
-          scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
-        }
-        scheduleNotes.value = cand.notes || '';
-        scheduleModal.style.display = 'flex';
+        if (cand) openScheduleModalForCandidate(cand);
       });
     });
 
@@ -1106,6 +1171,31 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeScheduleModal) closeScheduleModal.addEventListener('click', () => scheduleModal.style.display = 'none');
   if (cancelScheduleBtn) cancelScheduleBtn.addEventListener('click', () => scheduleModal.style.display = 'none');
 
+  if (modeInPersonRadio) {
+    modeInPersonRadio.addEventListener('change', () => {
+      if (modeInPersonRadio.checked) {
+        if (scheduleMeetLinkGroup) scheduleMeetLinkGroup.style.display = 'none';
+        if (scheduleInPersonLocationNote) scheduleInPersonLocationNote.style.display = 'block';
+      }
+    });
+  }
+  if (modeOnlineRadio) {
+    modeOnlineRadio.addEventListener('change', () => {
+      if (modeOnlineRadio.checked) {
+        if (scheduleMeetLinkGroup) scheduleMeetLinkGroup.style.display = 'block';
+        if (scheduleInPersonLocationNote) scheduleInPersonLocationNote.style.display = 'none';
+        if (scheduleMeetLink && !scheduleMeetLink.value.trim()) {
+          scheduleMeetLink.value = generateRandomGoogleMeetUrl();
+        }
+      }
+    });
+  }
+  if (generateMeetLinkBtn) {
+    generateMeetLinkBtn.addEventListener('click', () => {
+      if (scheduleMeetLink) scheduleMeetLink.value = generateRandomGoogleMeetUrl();
+    });
+  }
+
   if (scheduleForm) {
     scheduleForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1114,10 +1204,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const role = scheduleRole.value;
       const notes = scheduleNotes.value.trim();
       const sendWhatsApp = scheduleSendWhatsApp.checked;
+      const mode = (modeOnlineRadio && modeOnlineRadio.checked) ? 'online' : 'in_person';
+      const meetLink = scheduleMeetLink ? scheduleMeetLink.value.trim() : '';
 
       if (!dateTime) {
         alert('Please select Interview Date & Time');
         return;
+      }
+
+      if (mode === 'online' && !meetLink) {
+        if (!confirm('Aapne Google Meet link nahi daali hai. Kya aap automatic Meet link generate karke continue karna chahte hain?')) {
+          if (scheduleMeetLink) scheduleMeetLink.focus();
+          return;
+        }
       }
 
       try {
@@ -1129,14 +1228,16 @@ document.addEventListener('DOMContentLoaded', () => {
             interviewDateTime: new Date(dateTime).toISOString(),
             role,
             notes,
-            sendInstantConfirmation: sendWhatsApp
+            sendInstantConfirmation: sendWhatsApp,
+            mode,
+            meetLink: meetLink || (mode === 'online' ? generateRandomGoogleMeetUrl() : '')
           })
         });
 
         const data = await res.json();
         if (data.success) {
           scheduleModal.style.display = 'none';
-          alert('Interview scheduled successfully! WhatsApp confirmation has been dispatched.');
+          alert('✅ Interview scheduled successfully! ' + (mode === 'online' ? 'Google Meet link & confirmation' : 'In-person office invitation') + ' has been dispatched to candidate on WhatsApp.');
           loadCandidates();
         } else {
           alert('Error: ' + data.error);
@@ -1494,27 +1595,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Header Schedule button -> open schedule modal
   if (waHdrScheduleBtn) {
     waHdrScheduleBtn.addEventListener('click', () => {
-      if (!activeMobileCandidateId) return;
-      const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
-      if (!cand) return;
-      
-      scheduleCandidateId.value = cand.id;
-      scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
-      scheduleRole.value = cand.role || 'Video Editor';
-
-      if (cand.interviewDateTime) {
-        const d = new Date(cand.interviewDateTime);
-        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-        scheduleDateTime.value = d.toISOString().slice(0, 16);
-      } else {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(10, 30, 0, 0);
-        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
-        scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
+      if (!activeMobileCandidateId) {
+        alert('Kripya pehle kisi candidate ko select karein.');
+        return;
       }
-      scheduleNotes.value = cand.notes || '';
-      scheduleModal.style.display = 'flex';
+      const cand = candidatesList.find(c => c.id === activeMobileCandidateId);
+      if (cand) openScheduleModalForCandidate(cand);
     });
   }
 
@@ -1889,7 +1975,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const template = chip.dataset.template;
       let textToSend = '';
 
-      if (template === 'address') {
+      if (template === 'online-meet') {
+        openScheduleModalForCandidate(cand, 'online');
+        return;
+      } else if (template === 'address') {
         textToSend = `📍 *BrandSetu Digital Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\nGoogle Maps: https://maps.google.com/?q=Orange+Business+Park+Indore`;
       } else if (template === 'resume') {
         textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;
@@ -1964,6 +2053,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const inboxActiveName = document.getElementById('inboxActiveName');
   const inboxActiveRoleTag = document.getElementById('inboxActiveRoleTag');
   const inboxActivePhone = document.getElementById('inboxActivePhone');
+  const inboxActivePhoneLink = document.getElementById('inboxActivePhoneLink');
+  const inboxInfoPhonePill = document.getElementById('inboxInfoPhonePill');
+  const inboxInfoPhoneText = document.getElementById('inboxInfoPhoneText');
   const inboxInfoResume = document.getElementById('inboxInfoResume');
   const inboxInfoInterview = document.getElementById('inboxInfoInterview');
   const inboxInfoStatus = document.getElementById('inboxInfoStatus');
@@ -2041,29 +2133,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (inboxScheduleBtn) {
     inboxScheduleBtn.addEventListener('click', () => {
-      if (!selectedInboxCandidateId) return;
-      const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
-      if (!cand) return;
-      
-      scheduleCandidateId.value = cand.id;
-      scheduleCandidateInfo.value = `${cand.name} (+${cand.phone})`;
-      scheduleRole.value = cand.role || 'Video Editor';
-
-      if (cand.interviewDateTime) {
-        const d = new Date(cand.interviewDateTime);
-        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-        scheduleDateTime.value = d.toISOString().slice(0, 16);
-      } else {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(10, 30, 0, 0);
-        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
-        scheduleDateTime.value = tomorrow.toISOString().slice(0, 16);
+      if (!selectedInboxCandidateId) {
+        alert('Kripya pehle kisi candidate ko select karein.');
+        return;
       }
-      scheduleNotes.value = cand.notes || '';
-      scheduleModal.style.display = 'flex';
+      const cand = candidatesList.find(c => c.id === selectedInboxCandidateId);
+      if (cand) openScheduleModalForCandidate(cand);
     });
   }
+
+
 
   /**
    * Render conversation cards in the left inbox sidebar
@@ -2097,6 +2176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 2. Filter Pills
       if (currentInboxFilter === 'with-history') return c.chatHistory && c.chatHistory.length > 0;
+      if (currentInboxFilter === 'online') return c.status === 'Online Requested' || c.interviewMode === 'online';
       if (currentInboxFilter === 'interviews') return c.status === 'Interview Scheduled';
       if (currentInboxFilter === 'pending-resume') return !c.resumeReceived;
 
@@ -2156,7 +2236,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="wa-chat-item-content">
             <div class="wa-chat-item-header">
-              <span class="wa-chat-item-name">${escapeHtml(c.name || 'Candidate')}</span>
+              <span class="wa-chat-item-name">${escapeHtml(c.name || 'Candidate')}${c.phone ? ` <span class="text-success" style="font-weight:500; font-size:0.74rem;">(+${c.phone})</span>` : ''}</span>
               <span class="wa-chat-item-time">${lastMsgTime}</span>
             </div>
             <div class="wa-chat-item-lastmsg">
@@ -2226,6 +2306,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inboxActiveAvatar) inboxActiveAvatar.textContent = initial;
     if (inboxActiveName) inboxActiveName.textContent = cand.name || 'Candidate';
     if (inboxActivePhone) inboxActivePhone.textContent = `+${cand.phone}`;
+    if (inboxActivePhoneLink) {
+      inboxActivePhoneLink.href = `https://wa.me/${cand.phone}`;
+      inboxActivePhoneLink.title = `Call or WhatsApp +${cand.phone}`;
+    }
+    if (inboxInfoPhoneText) inboxInfoPhoneText.textContent = `+${cand.phone}`;
+    if (inboxInfoPhonePill) {
+      inboxInfoPhonePill.href = `https://wa.me/${cand.phone}`;
+      inboxInfoPhonePill.title = `Open chat with +${cand.phone}`;
+    }
     if (inboxActiveRoleTag) {
       inboxActiveRoleTag.textContent = cand.role || 'Applicant';
       inboxActiveRoleTag.className = `badge-role ${
@@ -2244,16 +2333,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cand.interviewDateTime) {
         try {
           const d = new Date(cand.interviewDateTime);
-          inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-check text-success"></i> Interview: ${d.toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+          const modeTag = cand.interviewMode === 'online' ? '<span class="text-info ms-1">[Online Meet]</span>' : '';
+          inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-check text-success"></i> Interview: ${d.toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} ${modeTag}`;
         } catch (e) {
           inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-check"></i> Interview: Scheduled`;
         }
+      } else if (cand.status === 'Online Requested') {
+        inboxInfoInterview.innerHTML = `<i class="fa-solid fa-video text-warning"></i> Online Meet: Pending HR Schedule`;
       } else {
         inboxInfoInterview.innerHTML = `<i class="fa-solid fa-calendar-xmark text-muted"></i> Interview: Not Set`;
       }
     }
     if (inboxInfoStatus) {
-      inboxInfoStatus.innerHTML = `<i class="fa-solid fa-tag text-info"></i> Status: ${escapeHtml(cand.status || 'Applied')}`;
+      if (cand.status === 'Online Requested') {
+        inboxInfoStatus.innerHTML = `<i class="fa-solid fa-video text-warning"></i> Status: <strong class="text-warning">Online Requested</strong>`;
+      } else {
+        inboxInfoStatus.innerHTML = `<i class="fa-solid fa-tag text-info"></i> Status: ${escapeHtml(cand.status || 'Applied')}`;
+      }
     }
 
     // Render Chat Messages
@@ -2420,7 +2516,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const template = chip.dataset.template;
       let textToSend = '';
 
-      if (template === 'address') {
+      if (template === 'online-meet') {
+        openScheduleModalForCandidate(cand, 'online');
+        return;
+      } else if (template === 'address') {
         textToSend = `📍 *BrandSetu Digital Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Transport Nagar, Indore (M.P.) - 452014\n\nGoogle Maps: https://maps.google.com/?q=Orange+Business+Park+Indore`;
       } else if (template === 'resume') {
         textToSend = `Hello ${cand.name || 'Candidate'}! 😊 Please share your updated *Resume (PDF)* or Portfolio/Drive link here so we can proceed with your application! 📄💼`;

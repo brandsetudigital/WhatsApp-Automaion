@@ -442,9 +442,6 @@
               <button id="refreshInboxBtn" class="btn btn-outline-secondary btn-sm">
                 <i class="fa-solid fa-rotate"></i> Refresh
               </button>
-              <button id="inboxPopMobileBtn" class="btn btn-outline-success btn-sm">
-                <i class="fa-solid fa-mobile-screen-button"></i> Mobile Phone View
-              </button>
             </div>
           </div>
 
@@ -463,6 +460,7 @@
                   <div class="wa-inbox-filter-pills mt-2">
                     <button class="inbox-filter-pill active" data-filter="all">All (<span id="inboxFilterAllCount">0</span>)</button>
                     <button class="inbox-filter-pill" data-filter="with-history">Active (<span id="inboxFilterMsgCount">0</span>)</button>
+                    <button class="inbox-filter-pill" data-filter="online">💻 Online Req (<span id="inboxFilterOnlineCount">0</span>)</button>
                     <button class="inbox-filter-pill" data-filter="interviews">Interviews (<span id="inboxFilterSchedCount">0</span>)</button>
                     <button class="inbox-filter-pill" data-filter="pending-resume">Missing Resume (<span id="inboxFilterResumeCount">0</span>)</button>
                   </div>
@@ -508,26 +506,29 @@
                       <button class="inbox-back-to-list-btn" id="inboxBackToListBtn" title="Back to Contact List">
                         <i class="fa-solid fa-arrow-left"></i>
                       </button>
-                      <div class="wa-inbox-avatar" id="inboxActiveAvatar">M</div>
+                      <div class="wa-inbox-avatar" id="inboxActiveAvatar">C</div>
                       <div class="wa-inbox-meta">
-                        <h4 id="inboxActiveName">Candidate Name</h4>
+                        <div class="wa-inbox-title-row">
+                          <h4 id="inboxActiveName">Candidate Name</h4>
+                          <span id="inboxActiveRoleTag" class="badge-role badge-role-seo">Role</span>
+                        </div>
                         <div class="wa-inbox-sub" id="inboxActiveSub">
-                          <span class="wa-online-dot"></span> online • <span id="inboxActiveRoleTag" class="badge-role badge-role-seo">SEO Expert</span> • <span id="inboxActivePhone">+91 0000000000</span>
+                          <a href="#" id="inboxActivePhoneLink" class="wa-header-phone" target="_blank" title="Call / WhatsApp Candidate">
+                            <i class="fa-solid fa-phone text-success"></i> <span id="inboxActivePhone">+91 0000000000</span>
+                          </a>
+                          <span class="wa-online-indicator"><span class="wa-online-dot"></span> online</span>
                         </div>
                       </div>
                     </div>
 
                     <div class="wa-inbox-actions">
                       <button class="btn-icon-action" id="inboxFeedbackBtn" title="Interview Evaluation & Feedback (Internal Excel Save - No WhatsApp)">
-                        <i class="fa-solid fa-clipboard-check text-info"></i> <span class="d-none d-md-inline">Evaluation</span>
+                        <i class="fa-solid fa-clipboard-check text-info"></i> <span class="btn-action-text">Evaluation</span>
                       </button>
                       <button class="btn-icon-action" id="inboxScheduleBtn" title="Schedule Interview">
-                        <i class="fa-solid fa-calendar-plus"></i> <span class="d-none d-md-inline">Schedule</span>
+                        <i class="fa-solid fa-calendar-plus text-primary"></i> <span class="btn-action-text">Schedule</span>
                       </button>
-                      <button class="btn-icon-action" id="inboxOpenMobileBtn" title="Open in Mobile Phone Frame">
-                        <i class="fa-solid fa-mobile-screen-button"></i> <span class="d-none d-md-inline">Phone View</span>
-                      </button>
-                      <button class="btn-icon-action" id="inboxCallBtn" title="WhatsApp Call">
+                      <button class="btn-icon-action btn-wa-chat" id="inboxCallBtn" title="Open in WhatsApp">
                         <i class="fa-brands fa-whatsapp text-success"></i>
                       </button>
                     </div>
@@ -535,6 +536,9 @@
 
                   <!-- Quick Candidate Info Strip -->
                   <div class="wa-inbox-info-strip" id="inboxInfoStrip">
+                    <a href="#" id="inboxInfoPhonePill" class="info-pill info-pill-phone" target="_blank" title="Call Candidate">
+                      <i class="fa-solid fa-phone text-success"></i> <strong id="inboxInfoPhoneText">+91 0000000000</strong>
+                    </a>
                     <div class="info-pill" id="inboxInfoResume"><i class="fa-solid fa-file-pdf"></i> Resume: Pending</div>
                     <div class="info-pill" id="inboxInfoInterview"><i class="fa-solid fa-calendar-check"></i> Interview: Not Set</div>
                     <div class="info-pill" id="inboxInfoStatus"><i class="fa-solid fa-tag"></i> Status: Applied</div>
@@ -554,6 +558,9 @@
                   <!-- Quick Action Template Chips -->
                   <div class="wa-inbox-quick-chips">
                     <div class="wa-chips-scroll">
+                      <button class="wa-quick-chip inbox-quick-chip" data-template="online-meet" title="Schedule Online Google Meet Interview with Meeting Link">
+                        <i class="fa-solid fa-video text-primary"></i> Schedule Online (Meet)
+                      </button>
                       <button class="wa-quick-chip inbox-quick-chip" data-template="address">
                         <i class="fa-solid fa-location-dot"></i> Send Office Location
                       </button>
@@ -668,6 +675,7 @@
             <div class="hiring-filter-tabs mb-3 flex-between flex-wrap gap-2">
               <div class="filter-pills flex gap-2">
                 <button class="pill-btn active" data-filter="all">All Candidates (<span id="countAll">0</span>)</button>
+                <button class="pill-btn" data-filter="online"><i class="fa-solid fa-video"></i> Online Req (<span id="countOnline">0</span>)</button>
                 <button class="pill-btn" data-filter="pending">Missing Resume (<span id="countPending">0</span>)</button>
                 <button class="pill-btn" data-filter="scheduled">Interviews (<span id="countScheduled">0</span>)</button>
                 <button class="pill-btn" data-filter="completed">Decided / Hired (<span id="countCompleted">0</span>)</button>
@@ -747,7 +755,7 @@
 
   <!-- Schedule Interview Modal -->
   <div id="scheduleModal" class="modal-backdrop" style="display: none;">
-    <div class="modal-box glass-card">
+    <div class="modal-box glass-card" style="max-width: 540px;">
       <div class="modal-header flex-between">
         <h3><i class="fa-solid fa-calendar-plus"></i> Schedule Interview</h3>
         <button class="close-btn" id="closeScheduleModal">&times;</button>
@@ -759,6 +767,44 @@
             <label class="form-label">Candidate Name & Phone</label>
             <input type="text" id="scheduleCandidateInfo" class="form-control" readonly>
           </div>
+
+          <!-- Note if candidate requested online / custom slot -->
+          <div id="scheduleCandidateOnlineNote" class="alert alert-warning mb-3" style="display: none; font-size: 0.88rem; padding: 8px 12px; border-radius: 6px;">
+            <i class="fa-solid fa-laptop-code"></i> <span id="scheduleCandidateOnlineNoteText">Candidate requested Online / Remote interview</span>
+          </div>
+
+          <!-- Interview Mode Selector -->
+          <div class="form-group mb-3">
+            <label class="form-label">Interview Mode *</label>
+            <div class="flex gap-3" style="background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+              <label class="radio-container" style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <input type="radio" name="scheduleModeRadio" value="in_person" checked id="modeInPersonRadio">
+                <span>🏢 In-Person (Indore Office)</span>
+              </label>
+              <label class="radio-container" style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <input type="radio" name="scheduleModeRadio" value="online" id="modeOnlineRadio">
+                <span>💻 Online (Google Meet)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Google Meet Link input (visible when mode=online) -->
+          <div class="form-group mb-3" id="scheduleMeetLinkGroup" style="display: none;">
+            <div class="flex-between mb-1">
+              <label class="form-label mb-0"><i class="fa-solid fa-video text-primary"></i> Google Meet Link *</label>
+              <button type="button" class="btn btn-outline-primary btn-xs" id="generateMeetLinkBtn" style="font-size: 0.75rem; padding: 2px 8px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Link
+              </button>
+            </div>
+            <input type="url" id="scheduleMeetLink" placeholder="https://meet.google.com/xxx-yyyy-zzz" class="form-control">
+            <small class="form-hint" style="color: #94a3b8; font-size: 0.8rem;">Candidate will receive this Google Meet link directly on WhatsApp with scheduled date & time.</small>
+          </div>
+
+          <!-- Office Location Note (visible when mode=in_person) -->
+          <div id="scheduleInPersonLocationNote" class="alert alert-secondary mb-3" style="font-size: 0.82rem; padding: 8px 12px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+            <i class="fa-solid fa-location-dot text-danger"></i> <strong>Indore Office:</strong> 103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore
+          </div>
+
           <div class="form-group mb-3">
             <label class="form-label">Role Applied</label>
             <select id="scheduleRole" class="form-control">
@@ -782,11 +828,11 @@
           <div class="form-group mb-3">
             <label class="form-label">Interview Date & Time *</label>
             <input type="datetime-local" id="scheduleDateTime" class="form-control" required>
-            <small class="form-hint">Candidate will automatically receive an instant confirmation on WhatsApp + a reminder 1 hour before the interview.</small>
+            <small class="form-hint">Candidate will receive instant official confirmation on WhatsApp with all details.</small>
           </div>
           <div class="form-group mb-3">
             <label class="form-label">Notes / Interviewer</label>
-            <input type="text" id="scheduleNotes" placeholder="e.g. In-office practical test / bring laptop" class="form-control">
+            <input type="text" id="scheduleNotes" placeholder="e.g. Google Meet link test / technical round" class="form-control">
           </div>
           <div class="form-check mb-3">
             <label class="checkbox-container">
@@ -1151,6 +1197,9 @@
             <!-- 5. Quick One-Tap Reply Action Chips -->
             <div class="wa-quick-replies-bar">
               <div class="wa-chips-scroll">
+                <button class="wa-quick-chip" data-template="online-meet" title="Schedule Online Google Meet Interview with Meeting Link">
+                  <i class="fa-solid fa-video text-primary"></i> Schedule Online (Meet)
+                </button>
                 <button class="wa-quick-chip" data-template="address">
                   <i class="fa-solid fa-location-dot"></i> Send Office Location
                 </button>

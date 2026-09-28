@@ -354,6 +354,8 @@ function generateExcelWorkbook(candidateList = []) {
       'Interview Feedback & Description': c.feedback || c.description || c.notes || '',
       'Work Mode': c.workType || 'Full-Time',
       'Interview Mode': c.interviewMode === 'online' ? 'Online (Google Meet)' : 'In-Person (Indore Office)',
+      'Google Meet Link': c.meetLink || '',
+      'Requested Online Time': c.requestedOnlineTime || '',
       'Resume Received': c.resumeReceived ? 'YES' : 'PENDING',
       'Portfolio / Drive / Social Link': c.portfolio || (c.socialHandle ? `Social: ${c.socialHandle} (${c.followers || 'N/A'})` : ''),
       'City': c.city || 'Indore',
@@ -618,6 +620,7 @@ function getHiringStats() {
   }).length;
 
   const completed = candidates.filter(c => c.status === 'Completed' || c.status === 'Selected').length;
+  const onlineRequested = candidates.filter(c => c.status === 'Online Requested').length;
 
   return {
     total,
@@ -625,7 +628,8 @@ function getHiringStats() {
     resumeReceived,
     interviewScheduled,
     scheduledToday,
-    completed
+    completed,
+    onlineRequested
   };
 }
 
@@ -1419,7 +1423,7 @@ function detectCandidateLang(text) {
 /**
  * Schedule Interview Date/Time for a candidate
  */
-async function scheduleInterview(candidateId, interviewDateTime, role, notes = '', sendInstantConfirmation = true, mode = 'in_person') {
+async function scheduleInterview(candidateId, interviewDateTime, role, notes = '', sendInstantConfirmation = true, mode = 'in_person', meetLink = '') {
   const candidate = candidates.find(c => c.id === candidateId || c.phone === cleanPhone(candidateId));
   if (!candidate) {
     throw new Error('Candidate not found');
@@ -1486,7 +1490,9 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
 
   const isRescheduled = !!candidate.interviewDateTime;
   candidate.interviewDateTime = interviewDate.toISOString();
-  candidate.interviewMode = (mode === 'online' || candidate.interviewMode === 'online') ? 'online' : 'in_person';
+  const finalMode = (mode === 'online' || candidate.interviewMode === 'online' || !!meetLink) ? 'online' : 'in_person';
+  candidate.interviewMode = finalMode;
+  if (meetLink) candidate.meetLink = String(meetLink).trim();
   candidate.status = 'Interview Scheduled';
   candidate.interviewReminderSent = false; // Reset 1-hr reminder for new schedule
   candidate.interviewReminderSentAt = null;
@@ -1530,14 +1536,18 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
         : '';
 
       if (isOnline) {
+        const meetUrl = candidate.meetLink || '';
+        const meetLineEn = meetUrl
+          ? `💻 Platform: Google Meet\n🔗 Meeting Link: ${meetUrl}`
+          : `💻 Platform: Google Meet (Online)\n📌 Important Note: You will receive the Google Meet joining link here on WhatsApp before the interview starts.`;
+        const meetLineHi = meetUrl
+          ? `💻 Platform: Google Meet\n🔗 Meeting Link: ${meetUrl}`
+          : `💻 Platform: Google Meet (Online)\n📌 Important Note: Interview start hone se pehle aapko WhatsApp par Google Meet joining link send kar di jayegi.`;
+
         if (isEnglish) {
-          confirmMsg = isRescheduled
-            ? `${salutationEn} 🔄\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been *rescheduled successfully*. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationEn} 🎉\n\nYour *Online Google Meet Interview* for the *${candidate.role || 'Job'}* position at *BrandSetu Digital* has been scheduled successfully. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* You will receive the Google Meet joining link here on WhatsApp 15 minutes before the interview starts.\n\nBest of luck! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+          confirmMsg = `Dear ${candidateDisplayName},\n\n${isRescheduled ? 'Your Online (Virtual) Interview at BrandSetu Digital has been rescheduled as requested.' : 'Congratulations! You have been shortlisted for the Online (Virtual) Interview round at BrandSetu Digital.'}\nWe are pleased to invite you for the next round of the selection process.\n\n💼 Role: ${candidate.role || 'Job'}\n📅 Date: ${dateFormatted}\n⏰ Time: ${timeFormatted}${sundayNotice}\n${meetLineEn}\n\nPlease make sure to join on time in a quiet environment with a working microphone and camera.\nFor any assistance, feel free to contact us.\n\nLooking forward to speaking with you!\n\nWarm regards,\nBrandSetu Digital`;
         } else {
-          confirmMsg = isRescheduled
-            ? `${salutationHi} 🔄\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* *reschedule* ho gaya hai. 💻✨\n\n📅 *Updated Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko WhatsApp par Google Meet joining link send kar di jayegi.\n\nSee you then! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`
-            : `${salutationHi} 🎉\n\nBrandSetu Digital me *${candidate.role || 'Job'}* position ke liye aapka *Online Google Meet Interview* schedule ho gaya hai. 💻✨\n\n📅 *Date & Time:* ${dateFormatted} at ${timeFormatted}${sundayNotice}\n🔗 *Platform:* Google Meet (Online)\n📌 *Important Note:* Interview start hone se *15 minute pehle* aapko isi WhatsApp chat par Google Meet joining link send kar di jayegi.\n\nAll the best! 👍\n- HR Team, BrandSetu Digital (+91 9329232025)`;
+          confirmMsg = `Dear ${candidateDisplayName},\n\n${isRescheduled ? 'BrandSetu Digital me aapka Online (Virtual) Interview reschedule ho gaya hai.' : 'Congratulations! BrandSetu Digital me aapka Online (Virtual) Interview schedule ho gaya hai.'}\nHum aage ke selection process ke liye aapko invite karte hain.\n\n💼 Role: ${candidate.role || 'Job'}\n📅 Date: ${dateFormatted}\n⏰ Time: ${timeFormatted}${sundayNotice}\n${meetLineHi}\n\nKripya scheduled time par quiet environment me camera aur mic on rakh kar join karein.\nKisi bhi assistance ke liye aap hume contact kar sakte hain.\n\nLooking forward to speaking with you!\n\nWarm regards,\nBrandSetu Digital`;
         }
       } else {
         // Standard In-Person Interview Invitation format (Indore Office)
@@ -1630,6 +1640,15 @@ async function sendResumeReminder(candidateId) {
  * Send Interview 1-Hour Reminder to Candidate AND HR (Language matched)
  */
 async function sendInterview1HrReminder(candidate) {
+  if (!candidate || !candidate.interviewDateTime) {
+    return candidate;
+  }
+  // Absolute protection: NEVER send reminders if status is Online Requested, Not Interested, Cancelled, etc.
+  if (candidate.status !== 'Interview Scheduled' || candidate.status === 'Online Requested') {
+    console.log(`⚠️ Aborting 1-hr reminder for ${candidate.name} (+${candidate.phone}) - status is "${candidate.status}"`);
+    return candidate;
+  }
+
   // Mark reminder as attempted/sent immediately to prevent repeated cron loops on error
   candidate.interviewReminderSent = true;
   candidate.interviewReminderSentAt = new Date().toISOString();
@@ -1652,15 +1671,22 @@ async function sendInterview1HrReminder(candidate) {
     const salutationEn = getCandidateSalutation(candidate, 'english');
     const salutationHi = getCandidateSalutation(candidate, 'hinglish');
 
+    const meetLinkLineEn = candidate.meetLink
+      ? `📌 *Google Meet Link:* ${candidate.meetLink}`
+      : `📌 *Joining Link:* You will receive the Google Meet link here on WhatsApp 15 minutes before the interview starts.`;
+    const meetLinkLineHi = candidate.meetLink
+      ? `📌 *Google Meet Link:* ${candidate.meetLink}`
+      : `📌 *Joining Link:* Interview shuru hone se 15 minute pehle aapko isi WhatsApp chat par Google Meet link mil jayegi.`;
+
     // 1. Send Reminder to Candidate (Strictly matched English / Hinglish)
     let candidateReminderMsg = '';
     if (isEnglish) {
       candidateReminderMsg = isOnline
-        ? `${salutationEn} 🔔 *Interview Reminder*\n\nYour *Online Google Meet Interview* for *${candidate.role}* at *Brand Setu Digital* is scheduled today at *${formattedTime}*. 💻\n\n📌 *Joining Link:* You will receive the Google Meet link here on WhatsApp 15 minutes before the interview starts.\n\n👉 Are you ready and available for the interview? Please confirm. 👍\n\n📞 Help: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`
+        ? `${salutationEn} 🔔 *Interview Reminder*\n\nYour *Online Google Meet Interview* for *${candidate.role}* at *Brand Setu Digital* is scheduled today at *${formattedTime}*. 💻\n\n${meetLinkLineEn}\n\n👉 Are you ready and available for the interview? Please confirm. 👍\n\n📞 Help: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`
         : `${salutationEn} 🔔 *Interview Reminder*\n\nYour in-person interview for *${candidate.role}* at *Brand Setu Digital* is scheduled today at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Are you on your way to our office for the interview? Please confirm. 👍\n\n📞 Help/Directions: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`;
     } else {
       candidateReminderMsg = isOnline
-        ? `${salutationHi} 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye *Online Google Meet Interview* scheduled hai at *${formattedTime}*. 💻\n\n📌 *Joining Link:* Interview shuru hone se 15 minute pehle aapko isi WhatsApp chat par Google Meet link mil jayegi.\n\n👉 Kya aap interview ke liye ready aur available hain? Kripya confirm karein. 👍\n\n📞 Help: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`
+        ? `${salutationHi} 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye *Online Google Meet Interview* scheduled hai at *${formattedTime}*. 💻\n\n${meetLinkLineHi}\n\n👉 Kya aap interview ke liye ready aur available hain? Kripya confirm karein. 👍\n\n📞 Help: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`
         : `${salutationHi} 🔔 *Interview Reminder*\n\nAaj aapka *Brand Setu Digital* me *${candidate.role}* ke liye interview scheduled hai at *${formattedTime}*.\n\n📍 *Office Address:*\n103 Orange Business Park, Bhawarkua Main Road, Near Apple Hospital, Indore (M.P.) - 452014\n\n👉 Kya aap interview ke liye office aa rahe hain? Kripya confirm karein. 👍\n\n📞 Help/Directions: +91 9329232025 / +91 9669765911\n- HR Team, Brand Setu Digital`;
     }
 
@@ -1679,7 +1705,7 @@ async function sendInterview1HrReminder(candidate) {
       if (hrPhone && cleanPhone(hrPhone) !== cleanPhone(candidate.phone)) {
         try {
           const hrAlertMsg = isOnline
-            ? `🔔 *HR ALERT: Online Google Meet Interview in 1 Hour!* ⏰\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Interview Time:* ${formattedTime}\n💻 *Mode:* Online (Google Meet)\n\n👉 *Action Required:* Kripya interview se 15 minute pehle candidate ko Google Meet link share karein.`
+            ? `🔔 *HR ALERT: Online Google Meet Interview in 1 Hour!* ⏰\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Interview Time:* ${formattedTime}\n💻 *Mode:* Online (Google Meet)${candidate.meetLink ? `\n🔗 *Link:* ${candidate.meetLink}` : ''}\n\n👉 *Action Required:* ${candidate.meetLink ? 'Kripya samay par meeting join karein.' : 'Kripya interview se 15 minute pehle candidate ko Google Meet link share karein.'}`
             : `🔔 *HR ALERT: Candidate Interview in 1 Hour!* ⏰\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Interview Time:* ${formattedTime}\n📍 *Location:* 103 Orange Business Park, Bhawarkua, Indore\n\n👉 Kripya interview assessment setup ready rakhein.`;
           await whatsappCloudService.sendWhatsAppText(hrPhone, hrAlertMsg);
           console.log(`📢 1-Hour HR Alert dispatched to HR (+${hrPhone}) for candidate ${candidate.name}`);
@@ -1706,7 +1732,7 @@ async function sendInterview1HrReminder(candidate) {
  * Send In-Person Interview Slot Proposal (10-15 mins after resume review)
  */
 async function sendInterviewSlotProposal(candidate) {
-  if (!candidate || candidate.interviewDateTime || candidate.status === 'Not Interested' || candidate.interviewSlotProposed) {
+  if (!candidate || candidate.interviewDateTime || candidate.status === 'Not Interested' || candidate.status === 'Online Requested' || candidate.interviewMode === 'online' || candidate.interviewSlotProposed) {
     return;
   }
 
@@ -1921,7 +1947,7 @@ function runHiringAutomationCheck() {
 
   candidates.forEach(candidate => {
     // 0. Exclude processed, hired, or inactive statuses completely from ANY automated messages
-    const EXCLUDED_STATUSES = ['Selected', 'Rejected', 'On Hold', 'Closed', 'Not Interested', 'Hired'];
+    const EXCLUDED_STATUSES = ['Selected', 'Rejected', 'On Hold', 'Closed', 'Not Interested', 'Hired', 'Online Requested'];
     if (EXCLUDED_STATUSES.includes(candidate.status)) return;
 
     // 1. Missed Interview (No-Show) Follow-Up:
@@ -2183,6 +2209,8 @@ module.exports = {
   executeHrDecision,
   sendMissedInterviewFollowUp,
   sendMissingStepFollowUp,
+  sendInterviewSlotProposal,
+  runHiringAutomationCheck,
   sendMessageToCandidate,
   deleteCandidate,
   getDeletedPhones,

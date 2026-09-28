@@ -23,7 +23,7 @@ function markCandidateMessagesRead(req, res) {
 
 async function scheduleCandidateInterview(req, res) {
   try {
-    const { candidateId, interviewDateTime, role, notes, sendInstantConfirmation } = req.body;
+    const { candidateId, interviewDateTime, role, notes, sendInstantConfirmation, mode, meetLink, googleMeetLink } = req.body;
     if (!candidateId || !interviewDateTime) {
       return res.status(400).json({ success: false, error: 'Candidate ID and interview date/time are required' });
     }
@@ -33,7 +33,9 @@ async function scheduleCandidateInterview(req, res) {
       interviewDateTime,
       role,
       notes,
-      sendInstantConfirmation !== false
+      sendInstantConfirmation !== false,
+      mode || (meetLink ? 'online' : 'in_person'),
+      meetLink || googleMeetLink || ''
     );
 
     res.json({ success: true, message: 'Interview scheduled and confirmation sent!', candidate });

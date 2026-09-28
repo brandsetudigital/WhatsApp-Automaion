@@ -516,7 +516,7 @@ function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
 function isVirtualOrRemoteInterviewQuery(rawText) {
   if (!rawText) return false;
   const text = String(rawText).toLowerCase().trim();
-  return /(?:virtual(?:\s*mode|\s*interview|\s*call|\s*round)?|online(?:\s*mode|\s*interview|\s*meet|\s*round)?|google\s*meet|zoom|video\s*call|remote(?:ly|\s*only|\s*interview)?|wfh|work\s*from\s*home|indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|ghar\s*se\s*interview)/i.test(text);
+  return /(?:virtual|google\s*meet|zoom|video\s*call|remote(?:ly|\s*only|\s*interview|\s*work)?|wfh|work\s*from\s*home|indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|ghar\s*se\s*(?:interview|kaam|de\s*sakta|kar\s*sakta|karna)?|online(?:\s*(?:mode|interview|call|round|meet|de|kar|ho|chalega|possible|available|work|karna|karu|de\s*du|hi))?|\bwork\s*online\b|\bworking\s*online\b|\bonline\b)/i.test(text);
 }
 
 /**
@@ -908,9 +908,18 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
 
   // 4. Check for Affirmative Confirmation (Only when interview slot was explicitly proposed by HR)
   const cleanTrimmed = text.replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
-  const hasConditionalOrRemote = /(?:but\b|lekin\b|kintu\b|parantu\b|par\s*(?:agar|lekin|kya|bhi)|agar\b|\bif\b|remote|wfh|work\s*from\s*home|online|virtual|ghar\s*se)/i.test(text);
-  if (hasConditionalOrRemote) {
-    return null; // Let the remote/virtual query handler manage it!
+  const hasConditional = /(?:but\b|lekin\b|kintu\b|parantu\b|par\s*(?:agar|lekin|kya|bhi)|agar\b|\bif\b)/i.test(text);
+  if (hasConditional) {
+    return null;
+  }
+
+  const isOnlineMode = /(?:remote|wfh|work\s*from\s*home|online|virtual|google\s*meet|zoom|ghar\s*se|bahar|out\s*of\s*indore)/i.test(text) || (candidate && (candidate.interviewMode === 'online' || candidate.status === 'Online Requested'));
+  if (isOnlineMode) {
+    return {
+      isScheduling: false,
+      isOnlineRequest: true,
+      interviewMode: 'online'
+    };
   }
 
   const isSlotProposed = candidate && candidate.interviewSlotProposed;
@@ -1041,13 +1050,28 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
 
   const isoStr = `${yyyy}-${mm}-${dd}T${hh}:${min}:00+05:30`;
 
-  const isOnlineMode = /(?:online|google\s*meet|meet|zoom|virtual|video\s*call|bahar|out\s*of\s*indore|not\s*in\s*indore)/i.test(text) || (candidate && candidate.interviewMode === 'online');
+  const isOnlineFinal = /(?:online|google\s*meet|meet|zoom|virtual|video\s*call|bahar|out\s*of\s*indore|not\s*in\s*indore|wfh|work\s*from\s*home|ghar\s*se)/i.test(text) || (candidate && (candidate.interviewMode === 'online' || candidate.status === 'Online Requested'));
+
+  const readableTime = `${dd}/${mm}/${yyyy} at ${hour > 12 ? hour - 12 : hour}:${min} ${hour >= 12 ? 'PM' : 'AM'}`;
+
+  // Strict business rule: NEVER auto-schedule Online interviews!
+  // Candidate will be notified that HR will connect and schedule with Google Meet link.
+  if (isOnlineFinal) {
+    return {
+      isScheduling: false,
+      isOnlineRequest: true,
+      requestedDateTimeIso: isoStr,
+      interviewMode: 'online',
+      readableFormattedTime: readableTime
+    };
+  }
 
   return {
     isScheduling: true,
+    isOnlineRequest: false,
     proposedDateTimeIso: isoStr,
-    interviewMode: isOnlineMode ? 'online' : 'in_person',
-    readableFormattedTime: `${dd}/${mm}/${yyyy} at ${hour > 12 ? hour - 12 : hour}:${min} ${hour >= 12 ? 'PM' : 'AM'}`
+    interviewMode: 'in_person',
+    readableFormattedTime: readableTime
   };
 }
 
@@ -1056,8 +1080,21 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
  */
 async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
   const localParsed = parseInterviewScheduleLocal(userMessage, candidate);
-  if (localParsed && localParsed.isScheduling) {
-    return localParsed;
+  if (localParsed) {
+    if (localParsed.isOnlineRequest) {
+      return localParsed;
+    }
+    if (localParsed.isScheduling) {
+      return localParsed;
+    }
+  }
+
+  // Pre-filter: If candidate asked for online/virtual/remote interview, do NOT auto-schedule!
+  if (isVirtualOrRemoteInterviewQuery(userMessage) || /(?:online|google\s*meet|zoom|virtual|video\s*call|wfh|work\s*from\s*home|indore\s*se\s*bahar|out\s*of\s*indore)/i.test(userMessage) || (candidate && (candidate.interviewMode === 'online' || candidate.status === 'Online Requested'))) {
+    return {
+      isScheduling: false,
+      isOnlineRequest: true
+    };
   }
 
   const hiringService = require('./hiring.service');
@@ -1464,10 +1501,38 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   const outOfIndorePattern = /(?:indore\s*se\s*bahar|out\s*of\s*indore|not\s*in\s*indore|bahar\s*hu|bahar\s*rehta|bhopal|delhi|ujjain|dewas|gwaliar|gwalior|jabalpur|raipur|jaipur|pune|mumbai|other\s*city|dusre\s*shehar|online\s*interview|google\s*meet|virtual\s*interview|video\s*call\s*interview|online\s*meet|online\s*kar\s*lo|online\s*ho\s*skta|online\s*ho\s*sakta|online\s*de\s*sakta|online\s*le\s*lo)/i;
   if (isVirtualOrRemoteInterviewQuery(text) || outOfIndorePattern.test(text)) {
     candidate.interviewMode = 'online';
+    candidate.status = 'Online Requested';
+    candidate.interviewSlotProposed = false;
+    if (candidate.interviewDateTime) {
+      try {
+        const prevDate = new Date(candidate.interviewDateTime);
+        if (!isNaN(prevDate.getTime())) {
+          candidate.requestedOnlineTime = prevDate.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+      } catch (err) {}
+      candidate.interviewDateTime = null;
+      candidate.interviewReminderSent = false;
+      candidate.interviewReminderSentAt = null;
+      candidate.missedInterviewFollowUpSent = false;
+      candidate.notes = (candidate.notes ? candidate.notes + ' | ' : '') + `In-person slot cancelled: Candidate requested online ("${text.substring(0, 35)}")`;
+    }
+    const hasResume = candidate && (candidate.resumeReceived || candidate.portfolio);
     if (isHinglish) {
-      return `${prefixHi}Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`;
+      return hasResume
+        ? `${prefixHi}Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
+        : `${prefixHi}Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`;
     } else {
-      return `${prefixEn}Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`;
+      return hasResume
+        ? `${prefixEn}Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
+        : `${prefixEn}Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`;
     }
   }
 
@@ -1703,15 +1768,44 @@ You are the professional, friendly HR & Recruitment Coordinator for Brand Setu D
   const isDocOrLink = messageData.messageType === 'document' ||
     (userMessage && /(?:https?:\/\/|\.pdf\b)/i.test(userMessage));
 
-  if (!isDocOrLink && !candidate.interviewDateTime) {
-    if (isVirtualOrRemoteInterviewQuery(userMessage)) {
-      console.log(`💻 Direct Virtual/Remote Interview Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
-      candidate.interviewMode = 'online';
-      const isHi = (lang === 'hinglish' || lang === 'hindi');
-      return isHi
-        ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`
-        : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`;
+  if (!isDocOrLink && isVirtualOrRemoteInterviewQuery(userMessage)) {
+    console.log(`💻 Direct Virtual/Remote Interview Query intercepted for ${candidateSummary.name}: "${userMessage}"`);
+    candidate.interviewMode = 'online';
+    candidate.status = 'Online Requested';
+    candidate.interviewSlotProposed = false;
+    if (candidate.interviewDateTime) {
+      try {
+        const prevDate = new Date(candidate.interviewDateTime);
+        if (!isNaN(prevDate.getTime())) {
+          candidate.requestedOnlineTime = prevDate.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+      } catch (err) {}
+      candidate.interviewDateTime = null;
+      candidate.interviewReminderSent = false;
+      candidate.interviewReminderSentAt = null;
+      candidate.missedInterviewFollowUpSent = false;
+      candidate.notes = (candidate.notes ? candidate.notes + ' | ' : '') + `In-person slot cancelled: Candidate requested online ("${userMessage.substring(0, 35)}")`;
     }
+    const hasResume = candidate && (candidate.resumeReceived || candidate.portfolio);
+    const isHi = (lang === 'hinglish' || lang === 'hindi');
+    return isHi
+      ? (hasResume
+          ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
+          : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`)
+      : (hasResume
+          ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
+          : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work sample links are shared here. 👍`);
+  }
+
+  if (!isDocOrLink && !candidate.interviewDateTime) {
 
     if (isInfluencerQuery(userMessage)) {
       if (candidate && (candidate.portfolio || candidate.resumeReceived || (candidate.experience && candidate.experience !== 'Influencer Profile'))) {

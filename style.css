@@ -2388,12 +2388,23 @@ select option {
   min-width: 0;
   flex: 1;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.wa-inbox-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .wa-inbox-meta h4 {
-  font-size: 0.94rem;
-  font-weight: 600;
-  color: #e9edef;
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #f8fafc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2402,20 +2413,45 @@ select option {
 }
 
 .wa-inbox-sub {
-  font-size: 0.72rem;
-  color: #8696a0;
+  font-size: 0.76rem;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
   margin-top: 2px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.wa-header-phone {
+  color: #25d366 !important;
+  font-weight: 700 !important;
+  font-size: 0.84rem !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.wa-header-phone:hover {
+  color: #4ade80 !important;
+  text-decoration: underline;
+}
+
+.wa-online-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #8696a0;
+  font-size: 0.72rem;
+  flex-shrink: 0;
 }
 
 .wa-online-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: #25d366;
   border-radius: 50%;
   display: inline-block;
@@ -2428,6 +2464,58 @@ select option {
   gap: 6px;
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.btn-icon-action {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-icon-action:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.btn-icon-action.btn-wa-chat {
+  background: rgba(37, 211, 102, 0.12);
+  border-color: rgba(37, 211, 102, 0.3);
+  color: #25d366;
+}
+
+.btn-icon-action.btn-wa-chat:hover {
+  background: rgba(37, 211, 102, 0.22);
+  color: #4ade80;
+}
+
+.info-pill-phone {
+  background: rgba(37, 211, 102, 0.15) !important;
+  color: #25d366 !important;
+  border: 1px solid rgba(37, 211, 102, 0.4) !important;
+  text-decoration: none !important;
+  font-weight: 700 !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.3px;
+}
+
+.info-pill-phone:hover {
+  background: rgba(37, 211, 102, 0.25) !important;
+  color: #4ade80 !important;
+}
+
+.info-pill-phone i {
+  color: #25d366 !important;
 }
 
 .wa-inbox-info-strip {
@@ -2492,51 +2580,76 @@ select option {
    Comprehensive Mobile & Tablet Responsiveness
    ========================================================================== */
 @media (max-width: 900px) {
-  /* Navbar */
+  /* Navbar: Sleek, compact single-line on mobile */
   .navbar {
-    padding: 0.6rem 1rem !important;
+    padding: 0.35rem 0.75rem !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+    gap: 0.4rem !important;
+    min-height: 48px !important;
   }
   
   .nav-brand {
     display: flex !important;
     align-items: center !important;
-    gap: 0.6rem !important;
+    gap: 0.45rem !important;
+    min-width: 0 !important;
   }
 
   .logo-icon {
-    width: 36px !important;
-    height: 36px !important;
-    font-size: 1.3rem !important;
-    border-radius: 10px !important;
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1.15rem !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
   }
 
   .brand-text h2 {
-    font-size: 1.05rem !important;
+    font-size: 0.92rem !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  .brand-text h2 span {
+    font-size: 0.62rem !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
   }
 
   .brand-text p {
-    font-size: 0.68rem !important;
+    display: none !important;
   }
 
   .nav-status {
     display: flex !important;
     align-items: center !important;
-    gap: 0.4rem !important;
+    gap: 0.35rem !important;
+    flex-shrink: 0 !important;
   }
 
   .status-badge {
-    padding: 0.25rem 0.6rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    border-radius: 12px !important;
+    white-space: nowrap !important;
+    gap: 0.3rem !important;
+  }
+
+  .status-dot {
+    width: 6px !important;
+    height: 6px !important;
   }
 
   #logoutBtn {
-    padding: 0.25rem 0.6rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+    gap: 0.25rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
   }
 
   /* App Layout: Vertical Stack */
@@ -2660,13 +2773,22 @@ select option {
   }
 
   /* WhatsApp Chats Tab Mobile Layout */
+  .wa-inbox-header {
+    display: none !important;
+  }
+
   .wa-inbox-card {
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
   .wa-inbox-layout {
-    height: calc(100vh - 190px);
-    min-height: 480px;
+    height: calc(100vh - 110px) !important;
+    min-height: 500px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
   }
 
   .wa-inbox-list-panel {
@@ -2690,6 +2812,90 @@ select option {
 
   .inbox-back-to-list-btn {
     display: inline-flex !important;
+  }
+
+  /* Chat Header Mobile Layout */
+  .wa-inbox-chat-header {
+    padding: 6px 10px !important;
+    min-height: 50px !important;
+    gap: 6px !important;
+  }
+
+  .wa-inbox-chat-user {
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .wa-inbox-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .wa-inbox-title-row {
+    gap: 4px !important;
+  }
+
+  .wa-inbox-meta h4 {
+    font-size: 0.88rem !important;
+    max-width: 140px !important;
+  }
+
+  .badge-role {
+    font-size: 0.62rem !important;
+    padding: 1px 5px !important;
+  }
+
+  .wa-header-phone {
+    font-size: 0.78rem !important;
+    gap: 3px !important;
+  }
+
+  .wa-inbox-sub {
+    font-size: 0.72rem !important;
+    gap: 6px !important;
+  }
+
+  .wa-online-indicator {
+    font-size: 0.68rem !important;
+  }
+
+  /* Action buttons on mobile: compact square icon buttons */
+  .wa-inbox-actions {
+    gap: 4px !important;
+  }
+
+  .wa-inbox-actions .btn-action-text {
+    display: none !important;
+  }
+
+  .wa-inbox-actions .btn-icon-action {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.9rem !important;
+  }
+
+  .wa-inbox-info-strip {
+    padding: 4px 10px !important;
+    gap: 6px !important;
+    font-size: 0.68rem !important;
+  }
+
+  .info-pill {
+    padding: 2px 7px !important;
+    font-size: 0.68rem !important;
+    border-radius: 6px !important;
+  }
+
+  .info-pill-phone {
+    font-size: 0.72rem !important;
+    padding: 2px 8px !important;
   }
 
   /* Hiring & Interviews Tab Mobile Layout */
@@ -2784,6 +2990,32 @@ select option {
     grid-template-columns: 1fr 1fr !important;
   }
 }
+
+/* Online Interview & Status Styling */
+.badge-status-online {
+  background: rgba(234, 179, 8, 0.18) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(234, 179, 8, 0.4) !important;
+}
+
+.radio-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #f1f5f9;
+  user-select: none;
+  font-weight: 500;
+}
+
+.radio-container input[type="radio"] {
+  cursor: pointer;
+  accent-color: #25d366;
+  width: 16px;
+  height: 16px;
+}
+
 
 
 

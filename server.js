@@ -518,17 +518,48 @@ async function processIncomingWhatsAppMessage(messageData) {
     return;
   }
 
-  // 1.76 Check for Remote / Virtual / Online Interview Request (User Rule: HR will connect directly)
+  // 1.76 Check for Remote / Virtual / Online Interview Request (User Rule: Never auto-schedule; HR will connect directly)
   if (candidate && messageText && aiService.isVirtualOrRemoteInterviewQuery(messageText)) {
     console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) requested Remote/Virtual/Online interview: "${messageText}"`);
     candidate.interviewMode = 'online';
     candidate.workType = candidate.workType || 'Work From Home';
+    candidate.status = 'Online Requested';
+    candidate.interviewSlotProposed = false;
+
+    // Critical: If candidate previously had an in-person or other interview scheduled, cancel that schedule immediately!
+    if (candidate.interviewDateTime) {
+      try {
+        const prevDate = new Date(candidate.interviewDateTime);
+        if (!isNaN(prevDate.getTime())) {
+          candidate.requestedOnlineTime = prevDate.toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        }
+      } catch (err) {}
+      candidate.interviewDateTime = null;
+      candidate.interviewReminderSent = false;
+      candidate.interviewReminderSentAt = null;
+      candidate.missedInterviewFollowUpSent = false;
+      candidate.notes = (candidate.notes ? candidate.notes + ' | ' : '') + `In-person slot cancelled: Candidate requested online ("${messageText.substring(0, 35)}")`;
+      console.log(`🚫 In-person interview schedule cleared for candidate ${candidate.name} (+${candidate.phone}) due to online request.`);
+    }
     candidate.updatedAt = new Date().toISOString();
 
     const isEnglish = (candidate.lang === 'english');
+    const hasResume = candidate.resumeReceived || candidate.portfolio;
     const remoteMsg = isEnglish
-      ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp / Call shortly to schedule and share the online meeting details. 🤝✨ Meanwhile, please ensure your updated Resume (PDF) and portfolio links are shared here. 👍`
-      : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur online meeting details share karegi. 🤝✨ Tab tak kripya apna updated Resume (PDF) aur work portfolio link yahan share kar dein. 👍`;
+      ? (hasResume
+          ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
+          : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work samples are shared here. 👍`)
+      : (hasResume
+          ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
+          : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`);
 
     try {
       const isMetaSource = messageData.source === 'meta';
@@ -545,7 +576,7 @@ async function processIncomingWhatsAppMessage(messageData) {
       const hrPhones = (process.env.HR_PHONE_NUMBER || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
       for (const hrPhone of hrPhones) {
         if (hrPhone && hrPhone !== candidate.phone) {
-          const hrMsg = `📢 *HR ALERT: Candidate Requested Remote / Online Interview* 💻\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🌐 *Preference:* Remote / Online (Virtual)\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n\n👉 Kripya candidate se WhatsApp / Call par connect karein. 👍`;
+          const hrMsg = `📢 *HR ALERT: Candidate Requested Remote / Online Interview* 💻\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🌐 *Preference:* Remote / Online (Virtual)\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n\n👉 Kripya candidate se WhatsApp / Call par connect karein aur Dashboard se Google Meet link ke sath schedule karein. 👍`;
           whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg).catch(err => console.error('HR alert error:', err.message));
         }
       }
@@ -730,19 +761,90 @@ async function processIncomingWhatsAppMessage(messageData) {
   if (isEligibleForScheduling && !isSickOrRefusal && messageText && messageText.length > 2 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
     try {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
-      if (scheduleIntent && scheduleIntent.isScheduling && scheduleIntent.proposedDateTimeIso) {
-        const isOnline = scheduleIntent.interviewMode === 'online' || candidate.interviewMode === 'online';
-        if (isOnline) candidate.interviewMode = 'online';
+      
+      // Strict rule: NEVER auto-schedule Online interviews! If candidate requested online/wfh, route to HR review flow
+      const hasOnlineRequest = (scheduleIntent && (scheduleIntent.interviewMode === 'online' || scheduleIntent.isOnlineRequest)) ||
+        candidate.interviewMode === 'online' ||
+        candidate.status === 'Online Requested' ||
+        aiService.isVirtualOrRemoteInterviewQuery(messageText);
 
-        console.log(`📅 Automatic Interview Schedule detected for ${candidate.name} (+${candidate.phone}): ${scheduleIntent.proposedDateTimeIso} (Mode: ${isOnline ? 'Online Google Meet' : 'In-Person'})`);
+      if (hasOnlineRequest) {
+        console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) has online/remote intent. Skipping auto-scheduling as HR must manually schedule Google Meet.`);
+        candidate.interviewMode = 'online';
+        candidate.status = 'Online Requested';
+        candidate.interviewSlotProposed = false;
+        if (scheduleIntent && scheduleIntent.readableFormattedTime) {
+          candidate.requestedOnlineTime = scheduleIntent.readableFormattedTime;
+        } else if (candidate.interviewDateTime) {
+          try {
+            const prevDate = new Date(candidate.interviewDateTime);
+            if (!isNaN(prevDate.getTime())) {
+              candidate.requestedOnlineTime = prevDate.toLocaleString('en-IN', {
+                timeZone: 'Asia/Kolkata',
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+              });
+            }
+          } catch (err) {}
+        }
+
+        // Cancel previous schedule if any
+        if (candidate.interviewDateTime) {
+          candidate.interviewDateTime = null;
+          candidate.interviewReminderSent = false;
+          candidate.interviewReminderSentAt = null;
+          candidate.missedInterviewFollowUpSent = false;
+          candidate.notes = (candidate.notes ? candidate.notes + ' | ' : '') + `In-person slot cancelled: Candidate requested online ("${messageText.substring(0, 35)}")`;
+        }
+
+        candidate.updatedAt = new Date().toISOString();
+        hiringService.saveCandidatesAndSyncExcel();
+
+        const isEnglish = (candidate.lang === 'english');
+        const hasResume = candidate.resumeReceived || candidate.portfolio;
+        const onlineMsg = isEnglish
+          ? (hasResume
+              ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
+              : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work samples are shared here. 👍`)
+          : (hasResume
+              ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
+              : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`);
+
+        const isMetaSource = messageData.source === 'meta';
+        await whatsappCloudService.sendWhatsAppText(replyRecipient, onlineMsg, isMetaSource);
+        hiringService.appendChatHistory(candidate, 'assistant', onlineMsg);
+        hiringService.saveCandidatesAndSyncExcel();
+        io.emit('hiring-updated', {
+          candidates: hiringService.getCandidates(),
+          stats: hiringService.getHiringStats(),
+          candidateId: candidate.id
+        });
+
+        // Alert HR Phone
+        const hrPhones = (process.env.HR_PHONE_NUMBER || '919329232025').split(',').map(p => p.trim()).filter(Boolean);
+        for (const hrPhone of hrPhones) {
+          if (hrPhone && hrPhone !== candidate.phone) {
+            const hrMsg = `📢 *HR ALERT: Candidate Requested Remote / Online Interview* 💻\n\n👤 *Candidate:* ${candidate.name}\n📞 *Phone:* +${candidate.phone}\n💼 *Role:* ${candidate.role}\n🕒 *Requested Slot:* ${candidate.requestedOnlineTime || messageText}\n📄 *Resume:* ${candidate.resumeReceived ? '✅ Received' : '⚠️ Pending'}\n\n👉 Kripya candidate se contact karein aur Dashboard se Date, Time aur Google Meet link daal kar interview schedule karein. 👍`;
+            whatsappCloudService.sendWhatsAppText(hrPhone, hrMsg).catch(err => console.error('HR alert error:', err.message));
+          }
+        }
+        return; // Complete! Wait for HR manual scheduling.
+      }
+
+      if (scheduleIntent && scheduleIntent.isScheduling && scheduleIntent.proposedDateTimeIso) {
+        console.log(`📅 Automatic Interview Schedule detected for ${candidate.name} (+${candidate.phone}): ${scheduleIntent.proposedDateTimeIso} (Mode: In-Person)`);
         
         await hiringService.scheduleInterview(
           candidate.id,
           scheduleIntent.proposedDateTimeIso,
           candidate.role,
-          `Auto-scheduled via WhatsApp AI: "${messageText}" (${isOnline ? 'Online Google Meet' : 'In-Person'})`,
+          `Auto-scheduled via WhatsApp AI: "${messageText}" (In-Person Indore Office)`,
           true,
-          isOnline ? 'online' : 'in_person'
+          'in_person'
         );
         interviewScheduledNow = true;
         return; // Confirmation already sent by scheduleInterview!
