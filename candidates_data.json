@@ -1,5 +1,43 @@
 [
   {
+    "id": "cand_1793439284112_tj4ri",
+    "phone": "919999900088",
+    "whatsappChatId": null,
+    "name": "Candidate",
+    "role": "Video Editor",
+    "workType": "Full-Time",
+    "city": "Indore",
+    "lang": "english",
+    "experience": "",
+    "portfolio": "",
+    "socialHandle": "",
+    "followers": "",
+    "resumeReceived": true,
+    "resumeFileName": "",
+    "status": "Interview Scheduled",
+    "interviewDateTime": "2026-11-02T05:30:00.000Z",
+    "notes": "Sunday rollover test",
+    "resumeReminderSent": false,
+    "resumeReminderSentAt": null,
+    "interviewReminderSent": false,
+    "interviewReminderSentAt": null,
+    "createdAt": "2026-10-31T09:34:44.103Z",
+    "updatedAt": "2026-10-31T09:34:44.291Z",
+    "lastMessage": "I want to apply for Video Editor",
+    "justSelectedRole": true,
+    "justAnsweredExperience": false,
+    "chatHistory": [
+      {
+        "role": "user",
+        "text": "I want to apply for Video Editor",
+        "timestamp": "2026-10-31T09:34:44.112Z"
+      }
+    ],
+    "unreadCount": 1,
+    "interviewMode": "in_person",
+    "missedInterviewFollowUpSent": false
+  },
+  {
     "phone": "918827304710",
     "chatHistory": [
       {
@@ -9824,18 +9862,23 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-10-31T08:07:02.499Z",
-    "updatedAt": "2026-10-31T08:07:02.499Z",
+    "updatedAt": "2026-10-31T09:35:19.673Z",
     "lastMessage": "I have 1 year experience in BDE and field sales",
     "justSelectedRole": false,
-    "justAnsweredExperience": true,
+    "justAnsweredExperience": false,
     "chatHistory": [
       {
         "role": "user",
         "text": "I have 1 year experience in BDE and field sales",
         "timestamp": "2026-10-31T08:07:02.499Z"
+      },
+      {
+        "role": "user",
+        "text": "I have 1 year experience in BDE and field sales",
+        "timestamp": "2026-10-31T09:35:19.674Z"
       }
     ],
-    "unreadCount": 1
+    "unreadCount": 2
   },
   {
     "id": "cand_1793434022435_52y42",
@@ -9846,7 +9889,7 @@
     "workType": "Full-Time",
     "city": "Indore",
     "lang": "hinglish",
-    "experience": "",
+    "experience": "mujhe lead generation aur field marketing ki job karni hai",
     "portfolio": "",
     "socialHandle": "",
     "followers": "",
@@ -9860,18 +9903,23 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-10-31T08:07:02.431Z",
-    "updatedAt": "2026-10-31T08:07:02.431Z",
+    "updatedAt": "2026-10-31T09:35:19.070Z",
     "lastMessage": "mujhe lead generation aur field marketing ki job karni hai",
-    "justSelectedRole": true,
-    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "justAnsweredExperience": true,
     "chatHistory": [
       {
         "role": "user",
         "text": "mujhe lead generation aur field marketing ki job karni hai",
         "timestamp": "2026-10-31T08:07:02.435Z"
+      },
+      {
+        "role": "user",
+        "text": "mujhe lead generation aur field marketing ki job karni hai",
+        "timestamp": "2026-10-31T09:35:19.087Z"
       }
     ],
-    "unreadCount": 1
+    "unreadCount": 2
   },
   {
     "id": "cand_1793434022358_7kqw1",
@@ -9882,7 +9930,7 @@
     "workType": "Full-Time",
     "city": "Indore",
     "lang": "hinglish",
-    "experience": "",
+    "experience": "Hello sir, I want to apply for Field Marketing & Lead Generation",
     "portfolio": "",
     "socialHandle": "",
     "followers": "",
@@ -9896,18 +9944,23 @@
     "interviewReminderSent": false,
     "interviewReminderSentAt": null,
     "createdAt": "2026-10-31T08:07:02.353Z",
-    "updatedAt": "2026-10-31T08:07:02.353Z",
+    "updatedAt": "2026-10-31T09:35:18.785Z",
     "lastMessage": "Hello sir, I want to apply for Field Marketing & Lead Generation",
-    "justSelectedRole": true,
-    "justAnsweredExperience": false,
+    "justSelectedRole": false,
+    "justAnsweredExperience": true,
     "chatHistory": [
       {
         "role": "user",
         "text": "Hello sir, I want to apply for Field Marketing & Lead Generation",
         "timestamp": "2026-10-31T08:07:02.358Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello sir, I want to apply for Field Marketing & Lead Generation",
+        "timestamp": "2026-10-31T09:35:18.793Z"
       }
     ],
-    "unreadCount": 1
+    "unreadCount": 2
   },
   {
     "phone": "919876543211",

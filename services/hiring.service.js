@@ -1486,9 +1486,9 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
   }).formatToParts(interviewDate);
   const partMap = {};
   istParts.forEach(p => partMap[p.type] = p.value);
-  const iYear = partMap.year;
-  const iMonth = partMap.month;
-  const iDay = partMap.day;
+  let iYear = partMap.year;
+  let iMonth = partMap.month;
+  let iDay = partMap.day;
   let iHour = parseInt(partMap.hour, 10);
   let iMinute = parseInt(partMap.minute, 10);
 
@@ -1572,7 +1572,7 @@ async function scheduleInterview(candidateId, interviewDateTime, role, notes = '
 
       const candidateDisplayName = (candidate && candidate.name && candidate.name !== 'Candidate' && candidate.name !== 'General Applicant') ? candidate.name : 'Candidate';
       const sundayNotice = rolledFromSunday
-        ? (isEnglish ? '\n\n📌 *Note:* Our office is closed on Sundays, so your interview is scheduled for Monday.' : '\n\n📌 *Note:* Hamara office Sunday ko off rehta hai, isliye aapka interview Monday ke liye schedule kiya gaya hai.')
+        ? (isEnglish ? '\n\n📌 *Note:* Our office is closed on Sundays, so your interview is scheduled for Monday.' : '\n\n📌 *Note:* Hamara office Sunday ko closed rehta hai, isliye aapka interview agle din (Monday) ke liye schedule kiya gaya hai.')
         : '';
 
       if (isOnline) {
@@ -1784,9 +1784,25 @@ async function sendInterviewSlotProposal(candidate) {
   const candName = getCandidateDisplayName(candidate);
   const greeting = candName && candName !== 'Candidate' ? `Hello ${candName}! 😊` : 'Hello! 😊';
 
-  const proposalMsg = isEnglish
-    ? `${greeting}\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`
-    : `${greeting}\n\nAapki profile aur portfolio HR team dwara shortlist kar li gayi hai. 👏✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+  // Check if today is Saturday or Sunday in IST
+  const istDayOfWeek = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short' }).format(new Date());
+  const isSaturday = (istDayOfWeek === 'Sat');
+  const isSunday = (istDayOfWeek === 'Sun');
+
+  let proposalMsg = '';
+  if (isSaturday) {
+    proposalMsg = isEnglish
+      ? `${greeting}\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n📌 *Sunday Office Off:* Our office is closed on Sundays, so in-person interviews are arranged for **Monday**.\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) on **Monday morning between 10:00 AM and 12:00 PM**? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`
+      : `${greeting}\n\nAapki profile aur portfolio HR team dwara shortlist kar li gayi hai. 👏✨\n\n📌 *Sunday Office Off:* Hamara office Sunday ko closed rehta hai, isliye in-person interview **Monday** ke liye arrange kiya gaya hai.\n\n👉 Kya aap agle din (**Monday morning me 10:00 AM se 12:00 PM** ke beech) hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+  } else if (isSunday) {
+    proposalMsg = isEnglish
+      ? `${greeting}\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) tomorrow (**Monday morning**) between *10:00 AM and 12:00 PM* for an in-person practical interview? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`
+      : `${greeting}\n\nAapki profile aur portfolio HR team dwara shortlist kar li gayi hai. 👏✨\n\n👉 Kya aap kal (**Monday morning**) me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+  } else {
+    proposalMsg = isEnglish
+      ? `${greeting}\n\nGreat news! Your profile and portfolio have been shortlisted by our HR team. 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for an in-person practical interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`
+      : `${greeting}\n\nAapki profile aur portfolio HR team dwara shortlist kar li gayi hai. 👏✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) in-person interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
+  }
 
   const recipient = candidate.whatsappChatId || candidate.phone;
   try {

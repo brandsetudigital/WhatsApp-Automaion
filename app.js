@@ -1212,6 +1212,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Sunday Office Off Rule: If selected day is Sunday, automatically roll to Monday
+      let scheduleDateObj = new Date(dateTime);
+      if (scheduleDateObj.getDay() === 0) {
+        scheduleDateObj.setDate(scheduleDateObj.getDate() + 1); // Roll to Monday
+        alert('📌 Sunday Office Off Notice:\nBrandSetu Digital Sunday ko band rehta hai. Interview automatically agle din (Monday) ke liye set kiya ja raha hai.');
+      }
+
       if (mode === 'online' && !meetLink) {
         if (!confirm('Aapne Google Meet link nahi daali hai. Kya aap automatic Meet link generate karke continue karna chahte hain?')) {
           if (scheduleMeetLink) scheduleMeetLink.focus();
@@ -1225,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             candidateId: id,
-            interviewDateTime: new Date(dateTime).toISOString(),
+            interviewDateTime: scheduleDateObj.toISOString(),
             role,
             notes,
             sendInstantConfirmation: sendWhatsApp,

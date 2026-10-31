@@ -522,6 +522,36 @@ function isVirtualOrRemoteInterviewQuery(rawText) {
 /**
  * Detect short greeting
  */
+/**
+ * Detect queries about coming on Sunday / Sunday interview availability
+ */
+function isSundayQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  const hasSunday = /(?:sunday|ravivar|itwar|itvaar)/i.test(text);
+  if (!hasSunday) return false;
+  return /(?:aa\s*sakta|aa\s*sakti|open|interview|schedule|timing|kab|aau|aana|off|chhutti|chutti|chalega|aaye|possible|available|time)/i.test(text) ||
+    /^(?:sunday|on\s*sunday|sunday\s*ko|sunday\s*chalega)$/i.test(text);
+}
+
+function getProposedSlotPhrase(lang = 'hinglish') {
+  const istDay = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', weekday: 'short' }).format(new Date());
+  const isEnglish = (lang === 'english');
+  if (istDay === 'Sat') {
+    return isEnglish
+      ? 'on Monday morning between *10:00 AM and 12:00 PM* (as our office is closed on Sundays)'
+      : 'Monday morning me *10:00 AM se 12:00 PM* ke beech (Sunday ko hamara office off rehta hai)';
+  } else if (istDay === 'Sun') {
+    return isEnglish
+      ? 'tomorrow morning (Monday) between *10:00 AM and 12:00 PM*'
+      : 'kal Monday morning me *10:00 AM se 12:00 PM* ke beech';
+  } else {
+    return isEnglish
+      ? 'tomorrow morning between *10:00 AM and 12:00 PM*'
+      : 'kal morning me *10:00 AM se 12:00 PM* ke beech';
+  }
+}
+
 function isGreetingMessage(rawText) {
   if (!rawText) return false;
   const clean = String(rawText).toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -1421,6 +1451,15 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  // 0.35 SUNDAY QUERY CHECK: BrandSetu Digital is strictly CLOSED on Sundays!
+  if (isSundayQuery(text)) {
+    if (isHinglish) {
+      return `${prefixHi}📌 *Sunday Office Off:*\nHamara office Sunday ko strictly closed (off) rehta hai. Interviews Monday to Saturday (10:00 AM se 6:00 PM) ke beech conduct hote hain. 👍\n\n👉 Kya aap agle din (**Monday**) morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? Kripya confirm karein. 🏢`;
+    } else {
+      return `${prefixEn}📌 *Sunday Office Off:*\nOur office is strictly closed on Sundays. Interviews are held Monday to Saturday (10:00 AM to 6:00 PM). 👍\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) on the next day (**Monday**) morning between *10:00 AM and 12:00 PM*? Please confirm. 🏢`;
+    }
+  }
+
   // 0.3 PURE REFUSAL / NO TO INTERVIEW PROPOSAL
   if (isSlotRefusalMessage(text)) {
     if (isHinglish) {
@@ -2064,5 +2103,6 @@ module.exports = {
   isCompanyInfoQuery,
   getCompanyInfoResponse,
   isGreetingOrFestivalMessage,
+  isSundayQuery,
   isFeedbackOrStatusQuery
 };
