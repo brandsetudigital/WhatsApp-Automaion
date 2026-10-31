@@ -813,11 +813,22 @@ function getCandidateSalutation(candidate, lang = 'english') {
  * Welcome & Roles Response (Step 0 -> Step 1: Initial Ad click / Greeting / Inquiry)
  */
 function getWelcomeRolesReply(lang = 'english') {
-  const isHi = (lang === 'hinglish' || lang === 'hindi');
-  if (isHi) {
-    return `Brand Setu Digital me aapka swagat hai! 🎉\n\nHum in active positions aur collaborations ke liye onboarding kar rahe hain:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* Agar aap kisi anya *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) ke liye apply karna chahte hain, toh aap uska naam bhi likh sakte hain.\n\n👉 Aap **kis position ya collaboration** ke liye apply/connect kar rahe hain? (1 to 7 number ya role ka naam likhein) 📝`;
-  }
-  return `Welcome to Brand Setu Digital! 🎉\n\nWe are actively onboarding for these positions and collaborations:\n1️⃣ 🎬 *Video Editor*\n2️⃣ 🤖 *AI Video Expert*\n3️⃣ 🎨 *Graphic Designer*\n4️⃣ 🔎 *SEO & AEO Expert*\n5️⃣ 📱 *Social Media Manager*\n6️⃣ 📢 *Digital Marketing Manager*\n7️⃣ ✨ *Influencer Collaboration!*\n\n💼 *Note:* If you are applying for any other *Digital Marketing Role* (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.), you can also reply with your role name.\n\n👉 Which **position or collaboration** would you like to apply for? (Please reply with number 1 to 7 or the name) 📝`;
+  return `🎉 Welcome to BrandSetu Digital!
+
+Thank you for your interest in joining our team! 👋
+
+We are a Digital Marketing & Technology Agency, and currently hiring for multiple positions across different departments.
+
+💼 Opportunities are available for Freshers, Experienced Professionals, Interns & Freelancers.
+
+👉 **Which position or role would you like to apply for?**
+
+Please reply with your preferred job role, and our HR team will share the further details.
+
+📩 We look forward to connecting with you!
+
+**Team BrandSetu Digital** 🌐
+https://brandsetudigital.com`;
 }
 
 /**
@@ -829,6 +840,18 @@ function getRoleSelectedReply(role, lang = 'english') {
   // Special Track: Influencer Collaboration
   if (role === 'Influencer Collaboration' || (role && role.toLowerCase().includes('influencer'))) {
     return `Influencer Collaboration! ✨\n\nWe’d love to know a little more about you and your content before taking the collaboration forward.\n\nPlease fill out this short form with your basic details, social media profile, audience insights & collaboration information:\n\n1️⃣ Aap kis prakar ke video/content banate hain? (Niche: Tech, Lifestyle, Comedy, Fashion, Education, etc.)\n2️⃣ Aapka Instagram / YouTube profile link ya handle (@username) kya hai?\n3️⃣ Instagram par aapke kitne followers hain aur average views kitne aate hain?\n4️⃣ Aap kis type ki collaboration prefer karte hain? (Paid Reel, Barter, Campaign, Brand Ambassador) 🤝`;
+  }
+
+  // Tailored Track: Field Marketing & Lead Generation
+  if (role === 'Field Marketing & Lead Generation' || (role && (
+    role.toLowerCase().includes('field marketing') ||
+    role.toLowerCase().includes('lead generation') ||
+    role.toLowerCase().includes('field sales')
+  ))) {
+    if (isHi) {
+      return `Bahut badiya! Aapne *Field Marketing & Lead Generation* select kiya hai. 💼🎯\n\nKripya batayein:\n1️⃣ Aapka field sales / marketing ya lead generation me kitna experience hai (Fresher / Experienced)?\n2️⃣ Aapke paas two-wheeler / bike available hai field visits ke liye? 🛵\n3️⃣ Aapki core skills aur communication language (Hindi / English) kaisi hai? 📝`;
+    }
+    return `Great! You have selected *Field Marketing & Lead Generation*. 💼🎯\n\nPlease let us know:\n1️⃣ How much experience do you have in field marketing / sales or lead generation (Fresher / Experienced)?\n2️⃣ Do you have a two-wheeler / bike for field visits? 🛵\n3️⃣ What are your core skills and languages known? 📝`;
   }
 
   // Tailored Track: Video Editor
@@ -900,6 +923,10 @@ function getExperienceAnsweredReply(candidate, lang = 'english') {
     return isHi
       ? `Excellent${candName ? ` ${candName}` : ''}! 📢 ${wfhPrefixHi}Kripya apna updated *Resume (PDF)* aur Ad campaign / ROAS case studies yahan share karein. 📄💼`
       : `Excellent${candName ? ` ${candName}` : ''}! 📢 ${wfhPrefixEn}Please share your updated *Resume (PDF)* and your Ad campaign / ROAS case studies here. 📄💼`;
+  } else if (role === 'Field Marketing & Lead Generation' || role.includes('Field Marketing') || role.includes('Lead Generation')) {
+    return isHi
+      ? `Bahut badiya${candName ? ` ${candName}` : ''}! 💼🎯 ${wfhPrefixHi}Kripya apna updated *Resume (PDF)* yahan share karein taaki hamari HR team aapki profile evaluate kar sake aur interview schedule karein. 📄✨`
+      : `Great${candName ? ` ${candName}` : ''}! 💼🎯 ${wfhPrefixEn}Please share your updated *Resume (PDF)* here so our HR team can evaluate your profile and schedule your interview. 📄✨`;
   } else if (role === 'Video Editor') {
     return isHi
       ? `Bahut badiya${candName ? ` ${candName}` : ''}! 🎬 ${wfhPrefixHi}Kripya apna updated *Resume (PDF)* aur Video Editing ka *Portfolio / Google Drive link* yahan share karein taaki hum aapke best work samples evaluate kar sakein. 📄🎥`
@@ -1128,6 +1155,19 @@ function trackCandidateFromMessage(messageData) {
       }
     } else if (cleanTrimmedForRole === '6' || cleanTrimmedForRole.startsWith('6 ') || lowerForRole.includes('performance marketing') || lowerForRole.includes('media buyer') || lowerForRole.includes('meta ads') || lowerForRole.includes('facebook ads') || lowerForRole.includes('google ads') || (lowerForRole.includes('digital marketing') && (lowerForRole.includes('manager') || lowerForRole.includes('lead') || lowerForRole.includes('head')))) {
       detectedRole = 'Digital Marketing Manager';
+    } else if (
+      lowerForRole.includes('field marketing') ||
+      lowerForRole.includes('lead generation') ||
+      lowerForRole.includes('lead gen') ||
+      lowerForRole.includes('field sales') ||
+      lowerForRole.includes('field work') ||
+      lowerForRole.includes('field executive') ||
+      lowerForRole.includes('bde') ||
+      lowerForRole.includes('business development') ||
+      lowerForRole.includes('client acquisition') ||
+      lowerForRole.includes('lead generator')
+    ) {
+      detectedRole = 'Field Marketing & Lead Generation';
     } else if (lowerForRole.includes('content writer') || lowerForRole.includes('copywriter') || lowerForRole.includes('content writing') || lowerForRole.includes('blog writer') || lowerForRole.includes('article writer') || lowerForRole.includes('script writer')) {
       detectedRole = 'Content Writer / Copywriter';
     } else if (lowerForRole.includes('web developer') || lowerForRole.includes('website developer') || lowerForRole.includes('wordpress') || lowerForRole.includes('frontend') || lowerForRole.includes('fullstack') || lowerForRole.includes('backend') || lowerForRole.includes('web development') || lowerForRole.includes('website designer')) {
@@ -1823,8 +1863,8 @@ async function sendMissingStepFollowUp(candidate, stepType) {
   } else {
     if (stepType === 'role') {
       followUpMsg = isEnglish
-        ? `Hello ${candName}! 😊 We noticed you connected with BrandSetu Digital regarding open positions. Could you please let us know which position or collaboration you would like to apply for? (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager) 📝`
-        : `Hello ${candName}! 😊 Aapne BrandSetu Digital me job ke liye connect kiya tha. Kripya batayein aap inme se kis position ke liye apply karna chahte hain? (1. Video Editor, 2. AI Video Expert, 3. Graphic Designer, 4. SEO & AEO Expert, 5. Social Media Manager, 6. Digital Marketing Manager) 📝`;
+        ? `Hello ${candName}! 😊 We noticed you connected with BrandSetu Digital regarding open positions. Could you please let us know which position or collaboration you would like to apply for? (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager, Field Marketing & Lead Generation) 📝`
+        : `Hello ${candName}! 😊 Aapne BrandSetu Digital me job ke liye connect kiya tha. Kripya batayein aap inme se kis position ke liye apply karna chahte hain? (1. Video Editor, 2. AI Video Expert, 3. Graphic Designer, 4. SEO & AEO Expert, 5. Social Media Manager, 6. Digital Marketing Manager, 7. Field Marketing & Lead Generation) 📝`;
     } else if (stepType === 'experience') {
       followUpMsg = isEnglish
         ? `Hello ${candName}! 😊 Regarding your application for *${candidate.role}* at BrandSetu Digital: Could you please let us know if you are applying as a Fresher or Experienced? And what are your core tools/skills? 💼`

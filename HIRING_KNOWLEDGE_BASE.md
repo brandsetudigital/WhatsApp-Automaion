@@ -249,3 +249,18 @@
 | `documents`, `kya lana hai`, `what to bring` | Interview Docs | Resume (PDF), Portfolio link, ID proof. |
 | `outside indore`, `bhopal`, `online`, `google meet` | Remote Candidate | Google Meet online round available; joining onsite. |
 | `select <number>`, `reject <number>`, `hold <number>` | HR Admin Control | Triggers official candidate decision & notification via WhatsApp. |
+
+
+### 7. 🎯 Role: Field Marketing & Lead Generation (Active Hiring)
+- **Primary Function:** Direct B2B field outreach, meeting local business owners, merchants, clinics, stores, and institutions across Indore to generate high-intent digital marketing and software leads.
+- **Key Responsibilities:**
+  1. Conducting daily in-person visits to potential client businesses in commercial hubs of Indore (Vijay Nagar, Bhawarkua, Palasia, M.G. Road, Transport Nagar, etc.).
+  2. Pitching BrandSetu Digital's services: Social Media Marketing, Meta/Google Ads, SEO/AEO, Website Development, Video Production.
+  3. Collecting decision-maker contact details, understanding client requirements, and scheduling sales closing meetings for the core strategy team.
+  4. Daily pipeline logging and lead status updates.
+- **Requirements & Eligibility:**
+  - Fresher or Experienced candidates welcome.
+  - Good Hindi and working English communication skills.
+  - Must have a two-wheeler / bike and valid driving license for field mobility.
+- **Compensation & Perks:**
+  - Base Salary / Stipend + Attractive per-lead / conversion incentive structure + Travel & conveyance allowance.

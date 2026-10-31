@@ -646,8 +646,8 @@ async function processIncomingWhatsAppMessage(messageData) {
     console.log(`⚠️ Candidate +${customerPhone} pasted third-party forwarded job/interview invite`);
     const isEnglish = (candidate?.lang === 'english');
     const forwardMsg = isEnglish
-      ? `📌 *Notice:* This message appears to be a forwarded interview invitation from another organization / recruiter. 😊\n\nIf you would like to apply for open positions at *Brand Setu Digital* (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager), please share your updated **Resume (PDF)** here! 👍`
-      : `📌 *Notice:* Yeh message kisi dusri company / HR ka forwarded interview invite lag raha hai. 😊\n\nAgar aap *Brand Setu Digital* ke active job roles (Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager) ke liye apply karna chahte hain, toh kripya apna updated **Resume (PDF)** yahan share karein! 👍`;
+      ? `📌 *Notice:* This message appears to be a forwarded interview invitation from another organization / recruiter. 😊\n\nIf you would like to apply for open positions at *Brand Setu Digital* (Field Marketing & Lead Generation, Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager), please share your updated **Resume (PDF)** here! 👍`
+      : `📌 *Notice:* Yeh message kisi dusri company / HR ka forwarded interview invite lag raha hai. 😊\n\nAgar aap *Brand Setu Digital* ke active job roles (Field Marketing & Lead Generation, Video Editor, AI Video Expert, Graphic Designer, SEO & AEO Expert, Social Media Manager, Digital Marketing Manager) ke liye apply karna chahte hain, toh kripya apna updated **Resume (PDF)** yahan share karein! 👍`;
 
     try {
       const isMetaSource = messageData.source === 'meta';

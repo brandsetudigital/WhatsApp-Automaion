@@ -92,6 +92,8 @@ function handleWebhookEvent(req, res, io, processIncomingFn) {
           let reason = title;
           if (code === 131047) {
             reason = 'User has not replied within 24 hours. Meta Cloud API strictly requires an approved WhatsApp Template for cold outreach messages, or the recipient must message your number first.';
+          } else if (code === 131042) {
+            reason = 'Business eligibility payment issue: Meta Business Suite / WhatsApp Account me payment method (Credit/Debit Card) linked nahi hai, bill pending hai, ya bank ne international/recurring payment block ki hai.';
           } else if (code === 131026) {
             reason = 'Message undeliverable (phone number may not be active on WhatsApp).';
           }

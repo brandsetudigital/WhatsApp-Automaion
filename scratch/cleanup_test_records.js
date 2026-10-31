@@ -1,5 +1,9 @@
 const hiringService = require('../services/hiring.service');
-const testPhones = ['919876543210', '919876543211'];
+const testPhones = [
+  '919876543210', '919876543211',
+  '919876543291', '919876543292', '919876543293',
+  '919999900001', '919999900002', '919999900003', '919999900009'
+];
 
 let candidates = hiringService.getCandidates();
 const beforeCount = candidates.length;

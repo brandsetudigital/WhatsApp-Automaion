@@ -1235,6 +1235,18 @@ function getDetailedJobDescription(role, experience, lang) {
     }
   }
 
+  if (role === 'Field Marketing & Lead Generation' || (role && (role.toLowerCase().includes('field marketing') || role.toLowerCase().includes('lead generation') || role.toLowerCase().includes('field sales')))) {
+    if (isFresher) {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Field Marketing & Lead Generation (Fresher / Trainee):*\n• Scope: Local Indore business visits, B2B digital services marketing, direct client acquisition, lead generation aur brand awareness.\n• Requirements: Good communication, energetic attitude & two-wheeler for field visits.\n• Benefits: Base salary/stipend + handsome performance incentives & travel allowances.`
+        : `📋 *Job Description (JD) — Field Marketing & Lead Generation (Full-Time):*\n• Scope: On-field business development, B2B digital marketing presentation, relationship building, qualified lead generation & sales deal closing.\n• Requirements: Proven experience in field sales/marketing/lead generation, strong communication skills & two-wheeler.\n• Mode: On-field (Indore).`;
+    } else {
+      return isHinglish
+        ? `📋 *Job Description (JD) — Field Marketing & Lead Generation:*\n• Scope: B2B client visits, digital marketing pitch & presentations, high-quality lead generation, deal pipeline closing & local business networking.\n• Requirements: Prior experience in field sales/marketing/B2B lead generation, strong negotiation skills & two-wheeler.\n• Mode: On-field (Indore).`
+        : `📋 *Job Description (JD) — Field Marketing & Lead Generation:*\n• Scope: On-field business development, B2B digital services presentation, relationship building, qualified lead generation & sales conversion.\n• Requirements: Proven track record in field sales/marketing, excellent networking skills & two-wheeler conveyance.\n• Mode: On-field (Indore).`;
+    }
+  }
+
   if (role === 'Video Editor') {
     if (isFresher) {
       return isHinglish
@@ -1454,7 +1466,9 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   if (isExcludedRole) {
     const textLower = text.toLowerCase();
     let mentionedRole = 'Digital Marketing Role';
-    if (/(?:tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales)/i.test(textLower) || (/\b(?:calling|caller)\b/i.test(textLower) && textLower.includes('sales'))) {
+    if (/(?:field\s*marketing|field\s*sales|field\s*work|lead\s*generation|lead\s*gen|client\s*acquisition)/i.test(textLower)) {
+      mentionedRole = 'Field Marketing & Lead Generation';
+    } else if (/(?:tele\s*col[le]r|tele\s*call(?:er|ing)?|tele\s*sales|inside\s*sales)/i.test(textLower) || (/\b(?:calling|caller)\b/i.test(textLower) && textLower.includes('sales'))) {
       mentionedRole = textLower.includes('sales') ? 'Telecaller / Sales Executive' : 'Telecaller / Inside Sales';
     } else if (/(?:sales\s*executive|sales\s*manager|sales\s*job|sales\s*role|\bsales\b|bde|bda|business\s*development)/i.test(textLower)) {
       mentionedRole = 'Sales Executive';
@@ -1616,7 +1630,7 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET (Or requested fresh start) ──
   if (!candidate.role || candidate.role === 'General Applicant') {
     const hiringService = require('./hiring.service');
-    return `${prefixHi}${hiringService.getWelcomeRolesReply(lang)}`;
+    return hiringService.getWelcomeRolesReply(lang);
   }
 
   // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER / QUALIFICATION NOT PROVIDED YET ──
@@ -1888,7 +1902,8 @@ Present the open positions & influencer collaborations:
 4️⃣ 🔎 SEO & AEO Expert (Search & AI Search Optimization)
 5️⃣ 📱 Social Media Manager (Growth & Strategy)
 6️⃣ 📢 Digital Marketing Manager (Performance Marketing & Ads)
-7️⃣ ✨ Influencer Collaboration!
+7️⃣ 🎯 Field Marketing & Lead Generation (B2B Client Visits, Lead Generation & Sales)
+8️⃣ ✨ Influencer Collaboration!
 
 Note: Candidates for other Digital Marketing Roles (SEO, SMM, Lead Gen, Content Writer, Web Developer, Telecaller, etc.) can also apply by mentioning their role.
 Ask which position or collaboration they are applying for (reply 1 to 7 or role name).
@@ -1909,6 +1924,8 @@ Ask which position or collaboration they are applying for (reply 1 to 7 or role 
   4. What type of collaboration do they prefer? (Paid Reel, Barter, Campaign, Brand Ambassador)
 - If candidate selected 💼 Other Digital Marketing Roles (Content Writer, Web Developer, Telecaller, etc.):
   CRITICAL: NEVER say "hiring nahi hai" or "no vacancy"! Warmly welcome them, ask about their experience, skills/tools.
+- If candidate selected 🎯 Field Marketing & Lead Generation:
+  Ask: 1. Experience in field sales/marketing/lead gen (Fresher/Experienced)? 2. Do they have a two-wheeler / bike? 3. Languages known?
 - If candidate selected other roles (Graphic Designer, AI Video, SEO, Social Media, Digital Marketing):
   Ask if Fresher or Experienced, and their core skills/tools.
 
