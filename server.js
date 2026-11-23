@@ -518,6 +518,99 @@ async function processIncomingWhatsAppMessage(messageData) {
     return;
   }
 
+  // 1.751 If candidate asks about bringing laptop / system / machine
+  if (candidate && messageText && aiService.isLaptopQuery(messageText)) {
+    console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) asked about bringing laptop: "${messageText}"`);
+    const isEnglish = (candidate.lang === 'english');
+    const laptopMsg = isEnglish
+      ? `Yes, absolutely! You are welcome to bring your own laptop for the practical round or to showcase your portfolio. Computer workstations are also available at our office. 👍\n\n📌 *Office:* 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital), Indore.`
+      : `Ji bilkul! Aap practical round ya portfolio dikhane ke liye apna laptop la sakte hain. Hamare office me bhi computer systems available hain. 👍\n\n📌 *Office:* 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital), Indore.`;
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, laptopMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', laptopMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending laptop query reply:', e.message);
+    }
+    return;
+  }
+
+  // 1.752 If candidate asks if interview is today or asks for confirmation ("Today's my interview or not", "aaj interview hai ya nahi")
+  if (candidate && messageText && aiService.isInterviewScheduleStatusQuery(messageText)) {
+    console.log(`📅 Candidate ${candidate.name} (+${candidate.phone}) asked about interview schedule / today: "${messageText}"`);
+    hiringService.syncInterviewFromChat(candidate);
+    const isEnglish = (candidate.lang === 'english');
+
+    let schedMsg = '';
+    if (candidate.interviewDateTime) {
+      let isToday = false;
+      let timeStr = '10:30 AM';
+      let dateStr = '';
+      try {
+        const schedDate = new Date(candidate.interviewDateTime);
+        const parts = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).formatToParts(schedDate);
+        const pMap = {};
+        parts.forEach(p => pMap[p.type] = p.value);
+        dateStr = `${pMap.day}/${pMap.month}/${pMap.year}`;
+        timeStr = `${pMap.hour}:${pMap.minute} ${pMap.dayPeriod ? pMap.dayPeriod.toUpperCase() : ''}`.trim();
+
+        const nowIstParts = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).formatToParts(new Date());
+        const nowMap = {};
+        nowIstParts.forEach(p => nowMap[p.type] = p.value);
+        isToday = (nowMap.day === pMap.day && nowMap.month === pMap.month && nowMap.year === pMap.year);
+      } catch (err) {}
+
+      if (isToday) {
+        schedMsg = isEnglish
+          ? `Yes, your interview is confirmed for today at *${timeStr}*! 🏢\n\n📍 *Office Address:*\n103, Orange Business Park, 1st Floor, Bhawarkua Main Road (Near Apple Hospital, McDonald's Building), Indore\n🗺️ *Location:* https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nLooking forward to meeting you, please arrive on time with your updated Resume! 👍✨`
+          : `Ji haan! Aapka interview aaj *${timeStr}* par confirmed hai. 🏢\n\n📍 *Office Address:*\n103, Orange Business Park, 1st Floor, Bhawarkua Main Road (Near Apple Hospital, McDonald's Building), Indore\n🗺️ *Location:* https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nHum aapka wait kar rahe hain, please reach on time with your updated Resume! 👍✨`;
+      } else {
+        schedMsg = isEnglish
+          ? `Your interview is scheduled for *${dateStr}* at *${timeStr}* at our Indore office (*103 Orange Business Park, Bhawarkua*). 👍`
+          : `Aapka interview *${dateStr}* ko *${timeStr}* par scheduled hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) me. 👍`;
+      }
+    } else {
+      schedMsg = isEnglish
+        ? `Your interview is not scheduled yet. Our HR team is reviewing profiles and will share the next steps and interview slot with you shortly! 👍`
+        : `Abhi aapka interview schedule nahi hua hai. Agar aapne Resume bhej diya hai toh HR team review karke aapko slot share karegi. 👍`;
+    }
+
+    try {
+      const isMetaSource = messageData.source === 'meta';
+      await whatsappCloudService.sendWhatsAppText(replyRecipient, schedMsg, isMetaSource);
+      hiringService.appendChatHistory(candidate, 'assistant', schedMsg);
+      hiringService.saveCandidatesAndSyncExcel();
+      io.emit('hiring-updated', {
+        candidates: hiringService.getCandidates(),
+        stats: hiringService.getHiringStats(),
+        candidateId: candidate.id
+      });
+    } catch (e) {
+      console.error('Error sending interview status reply:', e.message);
+    }
+    return;
+  }
+
   // 1.76 Check for Remote / Virtual / Online Interview Request (User Rule: Never auto-schedule; HR will connect directly)
   if (candidate && messageText && aiService.isVirtualOrRemoteInterviewQuery(messageText)) {
     console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) requested Remote/Virtual/Online interview: "${messageText}"`);
@@ -758,7 +851,7 @@ async function processIncomingWhatsAppMessage(messageData) {
   let interviewScheduledNow = false;
   const isEligibleForScheduling = candidate && (candidate.resumeReceived || candidate.interviewSlotProposed);
   const isSickOrRefusal = aiService.isUnableToAttendOrSickMessage(messageText) || aiService.isSlotRefusalMessage(messageText);
-  if (isEligibleForScheduling && !isSickOrRefusal && messageText && messageText.length > 2 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
+  if (isEligibleForScheduling && !isSickOrRefusal && messageText && String(messageText).trim().length > 0 && !hiringService.isThirdPartyRecruitmentForward(messageText)) {
     try {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
       

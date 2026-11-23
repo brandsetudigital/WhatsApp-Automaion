@@ -28,6 +28,16 @@ async function scheduleCandidateInterview(req, res) {
       return res.status(400).json({ success: false, error: 'Candidate ID and interview date/time are required' });
     }
 
+    const d = new Date(interviewDateTime);
+    if (isNaN(d.getTime())) {
+      return res.status(400).json({ success: false, error: 'Invalid interview date and time' });
+    }
+
+    // Check past date (allow 10 mins margin for clock drift)
+    if (d.getTime() < Date.now() - 10 * 60 * 1000) {
+      return res.status(400).json({ success: false, error: 'Interview date and time cannot be in the past' });
+    }
+
     const candidate = await hiringService.scheduleInterview(
       candidateId,
       interviewDateTime,
@@ -40,7 +50,8 @@ async function scheduleCandidateInterview(req, res) {
 
     res.json({ success: true, message: 'Interview scheduled and confirmation sent!', candidate });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    const status = err.message === 'Candidate not found' ? 404 : 400;
+    res.status(status).json({ success: false, error: err.message });
   }
 }
 
@@ -92,6 +103,18 @@ function updateCandidate(req, res) {
       description
     } = req.body;
 
+    const VALID_STATUSES = [
+      'Applied', 'Resume Pending', 'Resume Received', 'Interview Scheduled',
+      'Selected', 'Rejected', 'On Hold', 'Closed', 'Not Interested',
+      'Online Requested', 'Reschedule Requested', 'Campaign Sent'
+    ];
+    if (status !== undefined && !VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status "${status}". Allowed values: ${VALID_STATUSES.join(', ')}`
+      });
+    }
+
     if (name !== undefined) candidate.name = name;
     if (role !== undefined) candidate.role = role;
     if (city !== undefined) candidate.city = city;
@@ -127,21 +150,21 @@ function createCandidate(req, res) {
       return res.status(400).json({ success: false, error: 'Phone number is required' });
     }
 
-    const candidate = hiringService.trackCandidateFromMessage({
-      customerPhone: phone,
-      customerName: name || 'Candidate',
-      messageText: `Manual Entry: Role ${role || 'SEO / Video Editor'}, Portfolio: ${portfolio || 'N/A'}`
-    });
-
-    if (candidate) {
-      if (role) candidate.role = role;
-      if (city) candidate.city = city;
-      if (experience) candidate.experience = experience;
-      if (portfolio) candidate.portfolio = portfolio;
-      if (resumeReceived !== undefined) candidate.resumeReceived = !!resumeReceived;
-      if (notes) candidate.notes = notes;
-      hiringService.saveCandidatesAndSyncExcel();
+    const cleanedPhone = hiringService.cleanPhone ? hiringService.cleanPhone(phone) : phone.replace(/[^0-9]/g, '');
+    if (!cleanedPhone || cleanedPhone.length < 10) {
+      return res.status(400).json({ success: false, error: 'Please provide a valid 10 to 12 digit phone number' });
     }
+
+    const candidate = hiringService.createCandidateManually({
+      name,
+      phone: cleanedPhone,
+      role,
+      city,
+      experience,
+      portfolio,
+      resumeReceived,
+      notes
+    });
 
     res.json({ success: true, message: 'Candidate added successfully', candidate });
   } catch (err) {
@@ -292,7 +315,23 @@ async function executeCandidateHrDecision(req, res) {
   }
 }
 
+
+function getCandidateById(req, res) {
+  try {
+    const { id } = req.params;
+    const candidates = hiringService.getCandidates();
+    const candidate = candidates.find(c => c.id === id || c.phone === id);
+    if (!candidate) {
+      return res.status(404).json({ success: false, error: 'Candidate not found' });
+    }
+    res.json({ success: true, candidate });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 module.exports = {
+  getCandidateById,
   getCandidates,
   markCandidateMessagesRead,
   scheduleCandidateInterview,

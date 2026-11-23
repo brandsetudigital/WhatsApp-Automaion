@@ -5,6 +5,9 @@ const hiringController = require('../controllers/hiring.controller');
 // Get all candidates & hiring stats
 router.get('/candidates', hiringController.getCandidates);
 
+// Get single candidate by ID or Phone
+router.get('/candidate/:id', hiringController.getCandidateById);
+
 // Mark a candidate's incoming WhatsApp messages as read
 router.post('/candidate/:id/read', hiringController.markCandidateMessagesRead);
 

@@ -184,24 +184,26 @@ function isAcknowledgementMessage(rawText) {
   if (!clean) return false;
 
   const directPhrases = [
-    'ok', 'okay', 'thik h', 'thik hai', 'theek hai', 'theek h', 'haa thik h', 'ha thik h',
+    'ok', 'okay', 'okh', 'ohk', 'oki', 'okie', 'okies', 'thik h', 'thik hai', 'theek hai', 'theek h', 'haa thik h', 'ha thik h',
     'haa theek h', 'ha theek h', 'haa theek hai', 'ha theek hai', 'haa thik', 'ha thik',
     'haa', 'ha', 'haan', 'yes', 'yep', 'yeah', 'done', 'ji', 'ji sir', 'sir', 'sure',
     'alright', 'all right', 'thanks', 'thank you', 'shukriya', 'got it', 'confirm',
     'hmm', 'hm', 'hmmm', 'hmmmm', 'acha', 'accha', 'achha', 'acha ji', 'accha ji',
     'sahi h', 'sahi hai', 'k', 'kk', 'okk', 'okey', 'okay sir', 'ok sir', 'done sir',
     'yes sir', 'ha sir', 'haa sir', 'haan sir', 'thik hai sir', 'thik h sir', 'thik h ji',
-    'bilkul', 'bilkul sir', 'see you', 'bye', 'good', 'nice', 'great', 'perfect', 'hm ji'
+    'bilkul', 'bilkul sir', 'see you', 'bye', 'good', 'nice', 'great', 'perfect', 'hm ji',
+    'tq', 'thx', 'ty'
   ];
 
   if (directPhrases.includes(clean)) return true;
 
   const tokens = clean.split(' ').filter(Boolean);
   const ackVocab = new Set([
-    'ok', 'okay', 'okk', 'okey', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks',
+    'ok', 'okay', 'okh', 'ohk', 'oki', 'okie', 'okies', 'okk', 'okey', 'sir', 'done', 'thik', 'theek', 'hai', 'h', 'thanks',
     'thank', 'you', 'shukriya', 'ji', 'alright', 'sure', 'yes', 'ha', 'haa', 'haan',
     'confirm', 'got', 'it', 'hm', 'hmm', 'hmmm', 'hmmmm', 'acha', 'accha', 'achha',
-    'sahi', 'bye', 'good', 'nice', 'great', 'k', 'kk', 'bilkul', 'perfect', 'see'
+    'sahi', 'bye', 'good', 'nice', 'great', 'k', 'kk', 'bilkul', 'perfect', 'see',
+    'tq', 'thx', 'ty'
   ]);
 
   return tokens.length > 0 && tokens.every(t => ackVocab.has(t));
@@ -314,7 +316,7 @@ function getShortNavigationResponse(lang = 'hinglish') {
 }
 
 /**
- * Detect candidate arrival or on-the-way status
+ * Detect candidate arrival or on-the-way status (e.g. "I'll be there at 1 PM", "gate par hu", "traffic me hu")
  */
 function isArrivalStatusMessage(rawText) {
   if (!rawText) return false;
@@ -322,11 +324,73 @@ function isArrivalStatusMessage(rawText) {
 
   // Exclude pre-arrival call notice, cancellations, or future scheduled days
   if (isPreArrivalCallNotice(text)) return false;
-  if (/(?:before\s*coming|not\s*coming|can'?t\s*come|cannot\s*come|kal\b|tomorrow|parso|monday|tuesday|wednesday|thursday|friday|saturday)/i.test(text)) {
+  if (/(?:before\s*coming|not\s*coming|can'?t\s*come|cannot\s*come|kal\b|tomorrow|parso|monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i.test(text)) {
+    return false;
+  }
+  // Exclude question forms ("can i come", "should i come", "when can i come", "kya main aa sakta hu")
+  if (/(?:can\s*i|could\s*i|should\s*i|when\s*can|kya\s*(?:main|hum|me)|kab\s*aana)/i.test(text)) {
     return false;
   }
 
-  return /(?:aa\s*raha|a\s*rha|aa\s*rahi|a\s*rhi|aa\s*rahe|a\s*rhe|on\s*the\s*way|i\s*am\s*coming\s*(?:now)?|reception|office\s*ke\s*bahar|office\s*me\s*hu|gate\s*par|pahunch\s*gaya|pahunch\s*gayi|pahuch\s*gaya|pahuch\s*gayi|be\s*there\s*in|there\s*in\s*\d+|reaching\s*in|arriving\s*in|wait\s*\d+\s*min|traffic\s*(?:me|jam)|\b\d{1,2}\s*(?:min|mins|minutes)\b.*(?:aa|pahuch|reach|there)|building\s*ke\s*pass|lift\s*me\s*hu|parking\s*me\s*hu)/i.test(text);
+  return /(?:aa\s*raha|a\s*rha|aa\s*rahi|a\s*rhi|aa\s*rahe|a\s*rhe|on\s*the\s*way|i\s*(?:will|'ll)?\s*(?:be\s*there|reach|arrive)|i\s*(?:am|'m)?\s*coming\s*(?:now)?|reception|office\s*ke\s*bahar|office\s*me\s*hu|gate\s*par|pahunch|pahuch|be\s*there\s*(?:at|by|in)|there\s*(?:at|by|in)\s*\d+|reaching\s*(?:at|by|in)|arriving\s*(?:at|by|in)|wait\s*\d+\s*min|traffic\s*(?:me|jam)|\b\d{1,2}(?::\d{2})?\s*(?:min|mins|minutes)\b.*(?:aa|pahuch|reach|there)|\b\d{1,2}(?::\d{2})?\s*(?:am|pm|baje)\s*(?:tak|par|around)?\s*(?:aa|pahuch|reach|there|aunga|aaungi|aayenge)|there\s*at\s*\d+|\b\d{1,2}\s*(?:baje|pm|am)\s*tak\b|building\s*ke\s*pass|lift\s*me\s*hu|parking\s*me\s*hu)/i.test(text);
+}
+
+/**
+ * Detect questions about bringing own laptop / computer / system
+ */
+function isLaptopQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:laptop|system|pc\b|computer|machine|own\s*laptop|bring.*laptop|laptop.*bring|laptop.*allowed|laptop.*lana|apna\s*laptop|laptop\s*lekar|laptop\s*la\s*sakt)/i.test(text);
+}
+
+/**
+ * Detect queries asking whether today is their interview or confirming interview schedule time
+ */
+function isInterviewScheduleStatusQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:today'?s?\s*(?:my\s*)?interview\s*(?:or\s*not|\?)|is\s*my\s*interview\s*today|aaj\s*(?:mera\s*)?interview\s*(?:hai\s*(?:ya\s*nahi|h\s*ya\s*nhi)?|\?)|aaj\s*interview\s*hai|mera\s*interview\s*kab\s*hai|when\s*is\s*my\s*interview|interview\s*(?:timing|time|date|schedule)\s*(?:kya|kab)|interview\s*confirm\s*hai\s*kya|interview\s*h\s*kya\s*aaj)/i.test(text);
+}
+
+/**
+ * Extract scheduled interview details from candidate chat history if candidate.interviewDateTime is missing
+ */
+function extractInterviewFromChatHistory(chatHistory) {
+  if (!chatHistory || !Array.isArray(chatHistory)) return null;
+  for (let i = chatHistory.length - 1; i >= 0; i--) {
+    const text = chatHistory[i].text || '';
+    if (chatHistory[i].role === 'assistant' && (
+      text.includes('shortlisted for the interview at BrandSetu Digital') ||
+      text.includes('📅 Date:') ||
+      text.includes('your interview is scheduled for') ||
+      text.includes('interview is confirmed for')
+    )) {
+      const dateMatch = text.match(/Date:\s*(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/i);
+      const timeMatch = text.match(/Time:\s*(\d{1,2}):(\d{2})\s*(am|pm)/i) || text.match(/at\s*(\d{1,2}):(\d{2})\s*(am|pm)/i);
+      if (dateMatch && timeMatch) {
+        const day = parseInt(dateMatch[1], 10);
+        const month = parseInt(dateMatch[2], 10) - 1;
+        const year = parseInt(dateMatch[3], 10);
+        let hours = parseInt(timeMatch[1], 10);
+        const minutes = parseInt(timeMatch[2], 10);
+        const ampm = timeMatch[3].toLowerCase();
+        if (ampm === 'pm' && hours < 12) hours += 12;
+        if (ampm === 'am' && hours === 12) hours = 0;
+        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00+05:30`;
+        const time12 = `${timeMatch[1]}:${timeMatch[2]} ${ampm.toUpperCase()}`;
+        const dateFormatted = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+
+        // Check if date matches today in IST
+        const now = new Date();
+        const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+        const isToday = (istNow.getUTCFullYear() === year && istNow.getUTCMonth() === month && istNow.getUTCDate() === day);
+
+        return { iso, dateFormatted, timeFormatted: time12, isToday };
+      }
+    }
+  }
+  return null;
 }
 
 /**
@@ -418,11 +482,31 @@ function isFeedbackOrStatusQuery(rawText) {
 }
 
 /**
+ * Detect queries about salary, package, stipend, or compensation
+ */
+function isSalaryOrStipendQuery(rawText) {
+  if (!rawText) return false;
+  const text = String(rawText).toLowerCase().trim();
+  return /(?:salary|package|stipend|paise|kitna\s*milega|ctc\b|pay\b|per\s*month)/i.test(text);
+}
+
+/**
  * Deduplication & Anti-Robotic Engine:
  * Prevents repeating identical or robotic templates back-to-back.
  */
 function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
   if (!candidate || !candidate.chatHistory || candidate.chatHistory.length === 0) {
+    return proposedText;
+  }
+
+  // Never overwrite direct answers to specific queries (laptop, arrival, interview status, directions)
+  if (
+    isLaptopQuery(userMessage) ||
+    isInterviewScheduleStatusQuery(userMessage) ||
+    isArrivalStatusMessage(userMessage) ||
+    isOfficeDirectionsOrContactQuery(userMessage) ||
+    isSalaryOrStipendQuery(userMessage)
+  ) {
     return proposedText;
   }
 
@@ -440,13 +524,17 @@ function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
 
   // 1. Candidate sends simple acknowledgment ("ok", "thik h", "thank you", "ji", "👍")
   if (isAcknowledgementMessage(userMessage)) {
-    const isScheduled = !!(candidate && candidate.interviewDateTime);
+    const isScheduled = !!(candidate && (candidate.interviewDateTime || extractInterviewFromChatHistory(candidate.chatHistory)));
     if (!isScheduled) {
-      // CANDIDATE DOES NOT HAVE AN INTERVIEW SCHEDULED! NEVER say "See you at the interview"!
+      if (candidate && candidate.interviewSlotProposed) {
+        return isEnglish
+          ? `Great! Looking forward to seeing you at our office. Please reach on time! 👍`
+          : `Bahut badiya! Interview ke liye scheduled time par office pahunch jaiye. All the best! 👍`;
+      }
       if (candidate && candidate.resumeReceived) {
         return isEnglish
-          ? `We have your details and our team is reviewing them. We will update you shortly! 👍`
-          : `Aapki details hamare paas hain aur HR team review kar rahi hai. Hum jald update karenge! 👍`;
+          ? `You're welcome! 👍`
+          : `Welcome! 👍`;
       }
       if (candidate && candidate.role && candidate.role !== 'General Applicant') {
         return isEnglish
@@ -477,6 +565,8 @@ function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
       }
       return isEnglish ? `You're welcome! See you at the interview. 👍` : `Bilkul! Interview me milte hain. 👍`;
     }
+
+    return isEnglish ? `Great! Looking forward to seeing you at the interview. 👍 All the best! 😊` : `Bahut badiya! Interview me milte hain. 👍 All the best! 😊`;
   }
 
   // 2. Candidate asks for directions / office location / entrance
@@ -495,16 +585,7 @@ function getDeduplicatedOrHumanResponse(candidate, proposedText, userMessage) {
     if (isAcknowledgementMessage(userMessage)) {
       return isEnglish ? `See you then! 👍` : `Bilkul, see you! 👍`;
     }
-    if (candidate.status === 'Resume Received' || candidate.resumeReceived) {
-      return isEnglish
-        ? `We have your details and our team is reviewing them. We will update you shortly! 👍`
-        : `Aapki details hamare paas hain aur team review kar rahi hai. Hum jald update karenge! 👍`;
-    }
-    if (!candidate.role || candidate.role === 'General Applicant') {
-      return isEnglish
-        ? `Please let us know which role you are interested in so we can proceed. 👍`
-        : `Aap kis role me interested hain kripya batayein taaki hum aage badhein! 👍`;
-    }
+    return isEnglish ? `Got it! 👍` : `Bilkul! 👍`;
   }
 
   return proposedText;
@@ -952,13 +1033,14 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
     };
   }
 
-  const isSlotProposed = candidate && candidate.interviewSlotProposed;
+  const hasConditionalOrRemote = hasConditional || isOnlineMode;
+  const isSlotProposed = candidate && (candidate.interviewSlotProposed || candidate.resumeReceived);
   const isPureAckWord = /^(?:ok|okay|sure|done|theek|thik|thik\s*h|thik\s*hai|thanks|thank\s*you)$/i.test(cleanTrimmed);
   if (isPureAckWord && !isSlotProposed) {
     return null; // A pure "ok/okay" when no interview slot was proposed is just an acknowledgement, NEVER an interview schedule!
   }
 
-  const affirmativePattern = /^(?:ha|haan|haa|yes|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow)(?:[\s,!.].*)?$/i;
+  const affirmativePattern = /^(?:h|ha|haan|haa|haji|ha\s*ji|ji|ji\s*haan|ji\s*ha|ji\s*sir|yes|y|yep|yeah|ok|okay|sure|done|theek|thik|theek\s*hai|thik\s*h|thik\s*hai|sahi\s*hai|bilkul|aunga|aungi|aa\s*jaunga|aa\s*jaungi|aa\s*sakta\s*hu|aa\s*sakti\s*hu|aa\s*skta\s*hu|aa\s*skti\s*hu|chalega|confirm|yes\s*sir|ha\s*sir|ha\s*aa\s*jaunga|kal\s*aa\s*jaunga|kal\s*aa\s*sakta\s*hu|ha\s*kal|yes\s*tomorrow|ready\s*hu|ready|schedule\s*kar\s*do|kar\s*do|kar\s*dijiye)(?:[\s,!.].*)?$/i;
   const isAffirmative = (!candidate || !candidate.interviewDateTime) && isSlotProposed && !hasConditionalOrRemote && affirmativePattern.test(text);
 
   // If message contains a multi-day month range (e.g. "between 18-20 sep"), let date range handler prompt for specific time
@@ -981,25 +1063,29 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   let targetDate = new Date(istNow);
   let dayOffset = 1; // Default to tomorrow for affirmative responses
 
-  if (schedulingText.includes('day after tomorrow') || schedulingText.includes('parso') || schedulingText.includes('parson')) {
-    dayOffset = 2;
-  } else if (schedulingText.includes('tomorrow') || schedulingText.includes('kal') || isAffirmative) {
-    dayOffset = 1;
-    // If tomorrow is Sunday, roll over to Monday
-    const tomorrowDay = (istNow.getUTCDay() + 1) % 7;
-    if (tomorrowDay === 0) dayOffset = 2;
-  } else if (schedulingText.includes('today') || schedulingText.includes('aaj')) {
-    dayOffset = 0;
-  } else {
-    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const currentDay = istNow.getUTCDay();
-    for (let i = 0; i < days.length; i++) {
-      if (schedulingText.includes(days[i])) {
-        let diff = i - currentDay;
-        if (diff <= 0) diff += 7;
-        dayOffset = diff;
-        break;
-      }
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const currentDay = istNow.getUTCDay();
+  let matchedNamedDay = false;
+  for (let i = 0; i < days.length; i++) {
+    if (schedulingText.includes(days[i])) {
+      let diff = i - currentDay;
+      if (diff <= 0) diff += 7;
+      dayOffset = diff;
+      matchedNamedDay = true;
+      break;
+    }
+  }
+
+  if (!matchedNamedDay) {
+    if (schedulingText.includes('day after tomorrow') || schedulingText.includes('parso') || schedulingText.includes('parson')) {
+      dayOffset = 2;
+    } else if (schedulingText.includes('today') || schedulingText.includes('aaj')) {
+      dayOffset = 0;
+    } else if (schedulingText.includes('tomorrow') || schedulingText.includes('kal') || isAffirmative) {
+      dayOffset = 1;
+      // If tomorrow is Sunday, roll over to Monday
+      const tomorrowDay = (istNow.getUTCDay() + 1) % 7;
+      if (tomorrowDay === 0) dayOffset = 2;
     }
   }
 
@@ -1015,7 +1101,7 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
   let minute = 30;
 
   // Check for time ranges like "between 12 and 1", "between 11 and 1", "between 11 AM and 1 PM", "12 to 1", "between 12 and 1 o'clock"
-  const rangeMatch = schedulingText.match(/(?:between\s*)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:and|to|-)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
+  const rangeMatch = schedulingText.match(/(?:between\s*)?(\d{1,2})(?:\s*:\s*(\d{2}))?\s*(am|pm)?\s*(?:and|to|-)\s*(\d{1,2})(?:\s*:\s*(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
   if (rangeMatch && !/(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(schedulingText)) {
     let startH = parseInt(rangeMatch[1], 10);
     const startM = rangeMatch[2] ? parseInt(rangeMatch[2], 10) : 0;
@@ -1035,8 +1121,8 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
       minute = startM;
     }
   } else {
-    // Single time match e.g. "12 o'clock", "12:30 pm", "2 baje", "3 pm", "10 am"
-    const timeMatch = schedulingText.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
+    // Single time match e.g. "12 o'clock", "12:30 pm", "2 baje", "3 pm", "10 am", "12 : 00"
+    const timeMatch = schedulingText.match(/(\d{1,2})(?:\s*:\s*(\d{2}))?\s*(am|pm|baje|o'?clock)?/i);
     if (timeMatch) {
       let rawHour = parseInt(timeMatch[1], 10);
       const rawMin = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
@@ -1109,14 +1195,18 @@ function parseInterviewScheduleLocal(userMessage, candidate = null) {
  * Detect Interview Date/Time from candidate message (Hybrid: Fast Local + Gemini)
  */
 async function parseInterviewScheduleWithGemini(userMessage, candidate = null) {
-  const localParsed = parseInterviewScheduleLocal(userMessage, candidate);
-  if (localParsed) {
-    if (localParsed.isOnlineRequest) {
-      return localParsed;
+  try {
+    const localParsed = parseInterviewScheduleLocal(userMessage, candidate);
+    if (localParsed) {
+      if (localParsed.isOnlineRequest) {
+        return localParsed;
+      }
+      if (localParsed.isScheduling) {
+        return localParsed;
+      }
     }
-    if (localParsed.isScheduling) {
-      return localParsed;
-    }
+  } catch (localErr) {
+    console.error('Error in parseInterviewScheduleLocal:', localErr.message || localErr);
   }
 
   // Pre-filter: If candidate asked for online/virtual/remote interview, do NOT auto-schedule!
@@ -1382,6 +1472,15 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
   const prefixEn = isInitialGreeting ? (firstName ? `Hello ${firstName}! 😊\n\n` : `Hello! 😊\n\n`) : '';
   const prefixHi = isInitialGreeting ? (firstName ? `Namaste ${firstName}! 🙏\n\n` : `Namaste! 🙏\n\n`) : '';
 
+  // Auto-resolve scheduled interview if candidate.interviewDateTime is missing but invite exists in chatHistory
+  const chatInterview = extractInterviewFromChatHistory(candidate.chatHistory);
+  if (!candidate.interviewDateTime && chatInterview) {
+    candidate.interviewDateTime = chatInterview.iso;
+    if (candidate.status === 'Resume Received' || candidate.status === 'Applied' || !candidate.status) {
+      candidate.status = 'Interview Scheduled';
+    }
+  }
+
   let interviewFormatted = '';
   if (candidate.interviewDateTime) {
     try {
@@ -1397,6 +1496,79 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
       });
     } catch (e) {
       interviewFormatted = candidate.interviewDateTime;
+    }
+  }
+
+  // ── UNIVERSAL FAQ: LAPTOP / EQUIPMENT QUERY ──
+  if (isLaptopQuery(text)) {
+    if (isHinglish) {
+      return `Ji bilkul! Aap practical round ya portfolio dikhane ke liye apna laptop la sakte hain. Hamare office me bhi computer systems available hain. 👍\n\n📌 *Office:* 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital), Indore.`;
+    } else {
+      return `Yes, absolutely! You are welcome to bring your own laptop for the practical round or to showcase your portfolio. Computer workstations are also available at our office. 👍\n\n📌 *Office:* 103 Orange Business Park, Bhawarkua Main Road (Near Apple Hospital), Indore.`;
+    }
+  }
+
+  // ── UNIVERSAL FAQ: INTERVIEW SCHEDULE STATUS / "TODAY'S MY INTERVIEW OR NOT" ──
+  if (isInterviewScheduleStatusQuery(text)) {
+    if (candidate.interviewDateTime) {
+      let isToday = false;
+      let timeStr = '10:30 AM';
+      let dateStr = '';
+      try {
+        const schedDate = new Date(candidate.interviewDateTime);
+        const parts = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        }).formatToParts(schedDate);
+        const pMap = {};
+        parts.forEach(p => pMap[p.type] = p.value);
+        dateStr = `${pMap.day}/${pMap.month}/${pMap.year}`;
+        timeStr = `${pMap.hour}:${pMap.minute} ${pMap.dayPeriod ? pMap.dayPeriod.toUpperCase() : ''}`.trim();
+
+        const nowIstParts = new Intl.DateTimeFormat('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).formatToParts(new Date());
+        const nowMap = {};
+        nowIstParts.forEach(p => nowMap[p.type] = p.value);
+        isToday = (nowMap.day === pMap.day && nowMap.month === pMap.month && nowMap.year === pMap.year);
+      } catch (err) {}
+
+      if (isToday) {
+        if (isHinglish) {
+          return `Ji haan! Aapka interview aaj *${timeStr}* par confirmed hai. 🏢\n\n📍 *Office Address:*\n103, Orange Business Park, 1st Floor, Bhawarkua Main Road (Near Apple Hospital, McDonald's Building), Indore\n🗺️ *Location:* https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nHum aapka wait kar rahe hain, please reach on time with your updated Resume! 👍✨`;
+        } else {
+          return `Yes, your interview is confirmed for today at *${timeStr}*! 🏢\n\n📍 *Office Address:*\n103, Orange Business Park, 1st Floor, Bhawarkua Main Road (Near Apple Hospital, McDonald's Building), Indore\n🗺️ *Location:* https://maps.app.goo.gl/M6kv6SPc4rKMwj887?g_st=ic\n\nLooking forward to meeting you, please arrive on time with your updated Resume! 👍✨`;
+        }
+      } else {
+        if (isHinglish) {
+          return `Aapka interview *${dateStr}* ko *${timeStr}* par scheduled hai hamare Indore office (*103 Orange Business Park, Bhawarkua*) me. 👍`;
+        } else {
+          return `Your interview is scheduled for *${dateStr}* at *${timeStr}* at our Indore office (*103 Orange Business Park, Bhawarkua*). 👍`;
+        }
+      }
+    } else {
+      if (isHinglish) {
+        return `Abhi aapka interview schedule nahi hua hai. Agar aapne Resume bhej diya hai toh HR team review karke aapko slot share karegi. 👍`;
+      } else {
+        return `Your interview is not scheduled yet. Our HR team is reviewing profiles and will share the next steps and interview slot with you shortly! 👍`;
+      }
+    }
+  }
+
+  // ── UNIVERSAL FAQ: ARRIVAL / DELAY / ON THE WAY ("I'll be there at 1 PM") ──
+  if (isArrivalStatusMessage(text)) {
+    if (isHinglish) {
+      return `Bahut badiya, noted! 👍 Aap aaram se safely aaiye. Office 103 Orange Business Park, 1st Floor par pahunch kar reception par check-in kar lijiye. All the best! 😊📍`;
+    } else {
+      return `Got it, noted! 👍 Please travel safely. Please head up to the 1st floor (Office No. 103) and check in at the reception upon arrival. Our team is waiting for you! All the best! 😊📍`;
     }
   }
 
@@ -1666,34 +1838,47 @@ function generateContextualFallbackResponse(candidate, userMessage, lang) {
     }
   }
 
+  const hasResumeOrInvite = !!(candidate.resumeReceived || candidate.interviewDateTime || chatInterview);
+
   // ── STEP 1: CANDIDATE HAS NOT SELECTED A ROLE YET (Or requested fresh start) ──
-  if (!candidate.role || candidate.role === 'General Applicant') {
+  if ((!candidate.role || candidate.role === 'General Applicant') && !hasResumeOrInvite) {
     const hiringService = require('./hiring.service');
     return hiringService.getWelcomeRolesReply(lang);
   }
 
   // ── STEP 2: ROLE IS SELECTED, BUT EXPERIENCE / FRESHER / QUALIFICATION NOT PROVIDED YET ──
-  if (!candidate.experience || candidate.experience === '') {
+  if ((!candidate.experience || candidate.experience === '') && !hasResumeOrInvite) {
     const hiringService = require('./hiring.service');
     return hiringService.getRoleSelectedReply(candidate.role, lang);
   }
 
   // ── STEP 3: EXPERIENCE PROVIDED, BUT RESUME / PORTFOLIO PENDING ──
-  if (!candidate.resumeReceived) {
+  if (!candidate.resumeReceived && !hasResumeOrInvite) {
     const hiringService = require('./hiring.service');
     return `${prefixHi}${hiringService.getExperienceAnsweredReply(candidate, lang)}`;
   }
 
   // ── STEP 4: RESUME / PORTFOLIO RECEIVED (Immediate acknowledgment, HR review) ──
   if (candidate.resumeReceived && !candidate.interviewDateTime) {
+    const isAskingAboutInterview = /(?:interview|schedule|timing|kab|date|milna|office|aana|time|slot|yes|ha|haan|ok|ready)/i.test(text);
+    if (isAskingAboutInterview || candidate.interviewSlotProposed) {
+      candidate.interviewSlotProposed = true;
+      if (isHinglish) {
+        return `Aapki profile shortlist kar li gayi hai! 👏✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna convenient time batayein). 👍`;
+      } else {
+        return `Your profile has been shortlisted! 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
+      }
+    }
+
     const hasAlreadyAcknowledged = (candidate.chatHistory || []).some(m =>
       m.role === 'assistant' && (m.text.includes('receive ho gaya') || m.text.includes('reviewing your profile') || m.text.includes('sharing your resume'))
     );
     if (hasAlreadyAcknowledged) {
+      candidate.interviewSlotProposed = true;
       if (isHinglish) {
-        return `Aapka resume & portfolio hamari HR team ke paas hai aur review chal raha hai. Jald hi aapko interview schedule ke liye update kiya jayega. Agar aapka koi specific sawal hai toh batayein! 👍`;
+        return `Aapka resume & portfolio review kar liya gaya hai! 👏✨\n\n👉 Kya aap kal morning me *10:00 AM se 12:00 PM* ke beech hamare Indore office (*103 Orange Business Park, Bhawarkua*) interview ke liye aa sakte hain? 🏢\n\nKripya confirm karein (Haan / Nahi ya apna suitable time batayein). 👍`;
       } else {
-        return `Our HR team has your resume & portfolio under review. We will update you shortly for the next steps and interview schedule! Feel free to ask if you have any questions! 👍`;
+        return `Our HR team has reviewed your profile! 👏✨\n\n👉 Are you available to visit our Indore office (*103 Orange Business Park, Bhawarkua*) for your interview tomorrow morning between *10:00 AM and 12:00 PM*? 🏢\n\nPlease confirm (Yes / No or share your preferred time). 👍`;
       }
     }
     if (isHinglish) {
@@ -2104,5 +2289,8 @@ module.exports = {
   getCompanyInfoResponse,
   isGreetingOrFestivalMessage,
   isSundayQuery,
-  isFeedbackOrStatusQuery
+  isFeedbackOrStatusQuery,
+  isLaptopQuery,
+  isInterviewScheduleStatusQuery,
+  extractInterviewFromChatHistory
 };
