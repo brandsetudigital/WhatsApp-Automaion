@@ -1881,22 +1881,86 @@ select option {
 }
 
 /* Quick One-Tap Reply Chips */
-.wa-quick-replies-bar {
+.wa-quick-replies-bar,
+.wa-inbox-quick-chips {
   background: #182229;
   padding: 6px 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .wa-chips-scroll {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  scrollbar-width: none;
+  overflow-y: hidden;
+  flex: 1;
+  min-width: 0;
+  cursor: grab;
+  scroll-behavior: smooth;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  padding-bottom: 2px;
+}
+
+.wa-chips-scroll.grabbing {
+  cursor: grabbing;
 }
 
 .wa-chips-scroll::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.wa-chips-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wa-chips-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+}
+
+.wa-chips-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 211, 102, 0.6);
+}
+
+/* Nav chevron buttons for horizontal scrolling on PC */
+.chips-nav-btn {
+  background: #202c33;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #aebac1;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  z-index: 2;
+}
+
+.chips-nav-btn:hover {
+  background: rgba(37, 211, 102, 0.2);
+  color: #25d366;
+  border-color: #25d366;
+  transform: scale(1.08);
+}
+
+.chips-nav-btn:active {
+  transform: scale(0.95);
 }
 
 .wa-quick-chip {
@@ -1912,6 +1976,7 @@ select option {
   align-items: center;
   gap: 5px;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .wa-quick-chip i {
@@ -2611,12 +2676,6 @@ select option {
   background: rgba(255, 255, 255, 0.38);
 }
 
-.wa-inbox-quick-chips {
-  background: #182229;
-  padding: 6px 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  flex-shrink: 0;
-}
 
 .wa-inbox-input-bar {
   background: #202c33;

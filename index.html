@@ -557,7 +557,10 @@
 
                   <!-- Quick Action Template Chips -->
                   <div class="wa-inbox-quick-chips">
-                    <div class="wa-chips-scroll">
+                    <button class="chips-nav-btn chips-nav-prev" id="inboxChipsPrev" title="Scroll Left (Previous Templates)" type="button">
+                      <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="wa-chips-scroll" id="inboxChipsScroll">
                       <button class="wa-quick-chip inbox-quick-chip" data-template="online-meet" title="Schedule Online Google Meet Interview with Meeting Link">
                         <i class="fa-solid fa-video text-primary"></i> Schedule Online (Meet)
                       </button>
@@ -583,6 +586,9 @@
                         <i class="fa-solid fa-user-xmark text-danger"></i> Reject (HR)
                       </button>
                     </div>
+                    <button class="chips-nav-btn chips-nav-next" id="inboxChipsNext" title="Scroll Right (More Templates)" type="button">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                   </div>
 
                   <!-- Bottom Chat Input Bar -->
@@ -1204,7 +1210,10 @@
 
             <!-- 5. Quick One-Tap Reply Action Chips -->
             <div class="wa-quick-replies-bar">
-              <div class="wa-chips-scroll">
+              <button class="chips-nav-btn chips-nav-prev" id="mobileChipsPrev" title="Scroll Left" type="button">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <div class="wa-chips-scroll" id="mobileChipsScroll">
                 <button class="wa-quick-chip" data-template="online-meet" title="Schedule Online Google Meet Interview with Meeting Link">
                   <i class="fa-solid fa-video text-primary"></i> Schedule Online (Meet)
                 </button>
@@ -1230,6 +1239,9 @@
                   <i class="fa-solid fa-user-xmark text-danger"></i> Reject
                 </button>
               </div>
+              <button class="chips-nav-btn chips-nav-next" id="mobileChipsNext" title="Scroll Right" type="button">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
             </div>
 
             <!-- 6. WhatsApp Bottom Message Input Bar -->

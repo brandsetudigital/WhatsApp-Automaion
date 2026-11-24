@@ -2601,6 +2601,91 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  /**
+   * Enables desktop mouse wheel scrolling, drag-to-scroll, and navigation arrows for chips
+   */
+  function setupHorizontalChipsScroll(containerId, prevBtnId, nextBtnId) {
+    const container = document.getElementById(containerId);
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+    if (!container) return;
+
+    // 1. Mouse wheel horizontal scrolling on PC / Desktop
+    container.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY * 1.5;
+      }
+    }, { passive: false });
+
+    // 2. Navigation chevron buttons
+    if (prevBtn) {
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        container.scrollBy({ left: -220, behavior: 'smooth' });
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        container.scrollBy({ left: 220, behavior: 'smooth' });
+      });
+    }
+
+    // 3. Desktop Drag to Scroll (Mouse Pan)
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let moved = false;
+
+    container.addEventListener('mousedown', (e) => {
+      isDown = true;
+      moved = false;
+      container.classList.add('grabbing');
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDown) {
+        isDown = false;
+        container.classList.remove('grabbing');
+      }
+    });
+
+    container.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      if (Math.abs(walk) > 5) moved = true;
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // Prevent accidental button triggering when user was dragging
+    container.addEventListener('click', (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    }, true);
+  }
+
+  // Initialize Horizontal Chips Navigation on Desktop / PC
+  setupHorizontalChipsScroll('inboxChipsScroll', 'inboxChipsPrev', 'inboxChipsNext');
+  setupHorizontalChipsScroll('mobileChipsScroll', 'mobileChipsPrev', 'mobileChipsNext');
+
+  // Also enable wheel horizontal scroll for all .wa-chips-scroll, info strip, and candidate summary strips
+  document.querySelectorAll('.wa-chips-scroll, .wa-inbox-info-strip, .wa-candidate-summary-bar').forEach(el => {
+    el.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY * 1.5;
+      }
+    }, { passive: false });
+  });
+
   // Initial Load Calls
   loadAutoReplyRules();
   loadAiConfig();
