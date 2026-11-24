@@ -1650,9 +1650,12 @@ select option {
 
 /* WhatsApp Chat Canvas */
 .wa-chat-canvas {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  padding: 12px 10px;
+  overflow-x: hidden;
+  padding: 12px 10px 20px 10px;
   background-color: #0b141a;
   background-image: 
     radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
@@ -1660,16 +1663,27 @@ select option {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .wa-chat-canvas::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+}
+
+.wa-chat-canvas::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .wa-chat-canvas::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 4px;
+}
+
+.wa-chat-canvas::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.38);
 }
 
 /* End-to-End Encryption Notice */
@@ -1725,6 +1739,15 @@ select option {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-height: min-content;
+  padding-bottom: 24px;
+}
+
+.wa-messages-container::after {
+  content: '';
+  display: block;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 /* Message Rows */
@@ -2255,8 +2278,10 @@ select option {
 
 /* Right Panel: Chat Conversation Canvas (Spacious) */
 .wa-inbox-chat-panel {
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: #0b141a;
@@ -2327,8 +2352,11 @@ select option {
 .wa-inbox-active-chat {
   display: flex;
   flex-direction: column;
+  flex: 1 1 0%;
   height: 100%;
+  min-height: 0;
   min-width: 0;
+  overflow: hidden;
 }
 
 .wa-inbox-chat-header {
@@ -2547,9 +2575,12 @@ select option {
 
 /* Chat Messages Stream */
 .wa-inbox-chat-canvas {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  padding: 14px 16px;
+  overflow-x: hidden;
+  padding: 14px 16px 20px 16px;
   background-color: #0b141a;
   background-image: 
     radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
@@ -2557,7 +2588,27 @@ select option {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.wa-inbox-chat-canvas::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wa-inbox-chat-canvas::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wa-inbox-chat-canvas::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+}
+
+.wa-inbox-chat-canvas::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.38);
 }
 
 .wa-inbox-quick-chips {
@@ -2808,6 +2859,22 @@ select option {
   .wa-inbox-layout.show-chat .wa-inbox-chat-panel {
     display: flex !important;
     width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .wa-inbox-layout.show-chat .wa-inbox-active-chat {
+    display: flex !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .wa-inbox-layout.show-chat .wa-inbox-chat-canvas {
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
   }
 
   .inbox-back-to-list-btn {

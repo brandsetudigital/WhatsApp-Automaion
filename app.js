@@ -1487,11 +1487,11 @@ document.addEventListener('DOMContentLoaded', () => {
       renderInboxConversationsList();
       if (activeMobileCandidateId) {
         const updated = candidatesList.find(c => c.id === activeMobileCandidateId);
-        if (updated) renderCandidateWhatsAppChat(updated);
+        if (updated) renderCandidateWhatsAppChat(updated, false);
       }
       if (selectedInboxCandidateId) {
         const updated = candidatesList.find(c => c.id === selectedInboxCandidateId);
-        if (updated) renderInboxChatStream(updated);
+        if (updated) renderInboxChatStream(updated, false);
       }
     }
   });
@@ -1505,19 +1505,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (activeMobileCandidateId) {
         const updated = candidatesList.find(c => c.id === activeMobileCandidateId);
         if (updated) {
-          renderCandidateWhatsAppChat(updated);
-          if (waChatCanvas) {
-            waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
-          }
+          renderCandidateWhatsAppChat(updated, true);
+          scrollChatCanvasToBottom(waChatCanvas, true);
         }
       }
       if (selectedInboxCandidateId) {
         const updated = candidatesList.find(c => c.id === selectedInboxCandidateId);
         if (updated) {
-          renderInboxChatStream(updated);
-          if (inboxChatCanvas) {
-            inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
-          }
+          renderInboxChatStream(updated, true);
+          scrollChatCanvasToBottom(inboxChatCanvas, true);
         }
       }
     }
@@ -1545,6 +1541,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const openMobilePreviewBtn = document.getElementById('openMobilePreviewBtn');
   const waHdrScheduleBtn = document.getElementById('waHdrScheduleBtn');
   const waHdrCallBtn = document.getElementById('waHdrCallBtn');
+
+  /**
+   * Reliable scroll to bottom for WhatsApp Chat Canvases
+   * Triggers immediately and in subsequent animation frames to handle DOM layout reflow
+   */
+  function scrollChatCanvasToBottom(canvas, force = true) {
+    if (!canvas) return;
+    const isNearBottom = canvas.scrollHeight - canvas.scrollTop - canvas.clientHeight < 160;
+    if (!force && !isNearBottom) return;
+
+    const performScroll = () => {
+      try {
+        canvas.scrollTop = canvas.scrollHeight;
+      } catch (err) {}
+    };
+
+    performScroll();
+    requestAnimationFrame(() => {
+      performScroll();
+      setTimeout(performScroll, 40);
+      setTimeout(performScroll, 160);
+    });
+  }
 
   function updatePhoneClock() {
     if (waPhoneClock) {
@@ -1760,7 +1779,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Render Conversation Bubbles
-    renderCandidateWhatsAppChat(candidate);
+    renderCandidateWhatsAppChat(candidate, true);
 
     // Show Modal
     if (waMobileModal) {
@@ -1768,10 +1787,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Auto scroll chat to bottom
+    scrollChatCanvasToBottom(waChatCanvas, true);
     setTimeout(() => {
-      if (waChatCanvas) {
-        waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
-      }
       if (waPhoneInput) {
         waPhoneInput.focus();
       }
@@ -1781,7 +1798,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Render candidate conversation bubbles into mobile phone screen
    */
-  function renderCandidateWhatsAppChat(candidate) {
+  function renderCandidateWhatsAppChat(candidate, autoScroll = true) {
     if (!waPhoneChatStream) return;
 
     let history = (candidate.chatHistory || []).slice();
@@ -1864,6 +1881,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     waPhoneChatStream.innerHTML = html;
+    if (autoScroll) {
+      scrollChatCanvasToBottom(waChatCanvas, true);
+    }
   }
 
   /**
@@ -1885,11 +1905,8 @@ document.addEventListener('DOMContentLoaded', () => {
       timestamp: new Date().toISOString()
     };
     cand.chatHistory.push(newMsg);
-    renderCandidateWhatsAppChat(cand);
-    
-    if (waChatCanvas) {
-      waChatCanvas.scrollTop = waChatCanvas.scrollHeight;
-    }
+    renderCandidateWhatsAppChat(cand, true);
+    scrollChatCanvasToBottom(waChatCanvas, true);
 
     if (waPhoneInput) waPhoneInput.value = '';
 
@@ -2360,11 +2377,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Render Chat Messages
-    renderInboxChatStream(cand);
+    renderInboxChatStream(cand, true);
+    scrollChatCanvasToBottom(inboxChatCanvas, true);
 
     // Auto focus input
     setTimeout(() => {
-      if (inboxChatCanvas) inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
       if (inboxMessageInput) inboxMessageInput.focus();
     }, 40);
   }
@@ -2372,7 +2389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /**
    * Render chat stream for active inbox conversation
    */
-  function renderInboxChatStream(candidate) {
+  function renderInboxChatStream(candidate, autoScroll = true) {
     if (!inboxChatStream) return;
 
     let history = (candidate.chatHistory || []).slice();
@@ -2455,6 +2472,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     inboxChatStream.innerHTML = html;
+    if (autoScroll) {
+      scrollChatCanvasToBottom(inboxChatCanvas, true);
+    }
   }
 
   /**
@@ -2476,10 +2496,10 @@ document.addEventListener('DOMContentLoaded', () => {
       timestamp: new Date().toISOString()
     };
     cand.chatHistory.push(newMsg);
-    renderInboxChatStream(cand);
+    renderInboxChatStream(cand, true);
     renderInboxConversationsList();
+    scrollChatCanvasToBottom(inboxChatCanvas, true);
 
-    if (inboxChatCanvas) inboxChatCanvas.scrollTop = inboxChatCanvas.scrollHeight;
     if (inboxMessageInput) inboxMessageInput.value = '';
 
     try {

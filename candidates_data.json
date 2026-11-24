@@ -36,6 +36,11 @@
         "role": "user",
         "text": "I have 1 year experience in BDE and field sales",
         "timestamp": "2026-11-23T12:47:14.077Z"
+      },
+      {
+        "role": "user",
+        "text": "I have 1 year experience in BDE and field sales",
+        "timestamp": "2026-11-24T07:35:29.732Z"
       }
     ],
     "city": "Indore",
@@ -60,8 +65,8 @@
     "role": "Field Marketing & Lead Generation",
     "socialHandle": "",
     "status": "Applied",
-    "unreadCount": 6,
-    "updatedAt": "2026-11-23T12:47:14.077Z",
+    "unreadCount": 7,
+    "updatedAt": "2026-11-24T07:35:29.732Z",
     "whatsappChatId": null,
     "workType": "Full-Time",
     "followUpCount": 1,
@@ -104,6 +109,11 @@
         "role": "user",
         "text": "mujhe lead generation aur field marketing ki job karni hai",
         "timestamp": "2026-11-23T12:47:13.804Z"
+      },
+      {
+        "role": "user",
+        "text": "mujhe lead generation aur field marketing ki job karni hai",
+        "timestamp": "2026-11-24T07:35:29.611Z"
       }
     ],
     "city": "Indore",
@@ -128,8 +138,8 @@
     "role": "Field Marketing & Lead Generation",
     "socialHandle": "",
     "status": "Applied",
-    "unreadCount": 6,
-    "updatedAt": "2026-11-23T12:47:13.798Z",
+    "unreadCount": 7,
+    "updatedAt": "2026-11-24T07:35:29.607Z",
     "whatsappChatId": null,
     "workType": "Full-Time",
     "followUpCount": 1,
@@ -172,6 +182,11 @@
         "role": "user",
         "text": "Hello sir, I want to apply for Field Marketing & Lead Generation",
         "timestamp": "2026-11-23T12:47:13.555Z"
+      },
+      {
+        "role": "user",
+        "text": "Hello sir, I want to apply for Field Marketing & Lead Generation",
+        "timestamp": "2026-11-24T07:35:29.383Z"
       }
     ],
     "city": "Indore",
@@ -196,8 +211,8 @@
     "role": "Field Marketing & Lead Generation",
     "socialHandle": "",
     "status": "Applied",
-    "unreadCount": 6,
-    "updatedAt": "2026-11-23T12:47:13.543Z",
+    "unreadCount": 7,
+    "updatedAt": "2026-11-24T07:35:29.375Z",
     "whatsappChatId": null,
     "workType": "Full-Time",
     "followUpCount": 1,
@@ -2770,6 +2785,11 @@
       },
       {
         "role": "assistant",
+        "text": "Great! We will schedule your interview accordingly. If a physical interview in December works best for you, our HR team will connect with you then, or share the Google Meet link if an online slot opens sooner. 👍",
+        "timestamp": "2026-11-21T19:56:34.847Z"
+      },
+      {
+        "role": "assistant",
         "text": "Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨",
         "timestamp": "2026-11-21T19:56:34.847Z"
       },
@@ -2777,6 +2797,11 @@
         "role": "user",
         "text": "Ok thank you",
         "timestamp": "2026-11-21T20:00:20.275Z"
+      },
+      {
+        "role": "assistant",
+        "text": "You are most welcome! Feel free to reach out if you have any questions. All the best! 😊👍",
+        "timestamp": "2026-11-21T20:00:21.772Z"
       },
       {
         "role": "assistant",
@@ -22848,6 +22873,11 @@
         "role": "user",
         "text": "I want to apply for Video Editor",
         "timestamp": "2026-11-23T12:47:49.160Z"
+      },
+      {
+        "role": "user",
+        "text": "I want to apply for Video Editor",
+        "timestamp": "2026-11-24T07:35:35.581Z"
       }
     ],
     "city": "Indore",
@@ -22874,8 +22904,8 @@
     "role": "Video Editor",
     "socialHandle": "",
     "status": "Interview Scheduled",
-    "unreadCount": 4,
-    "updatedAt": "2026-11-23T12:47:51.855Z",
+    "unreadCount": 5,
+    "updatedAt": "2026-11-24T07:35:35.732Z",
     "whatsappChatId": null,
     "workType": "Full-Time",
     "missedInterviewFollowUpSentAt": "2026-11-02T07:30:32.362Z"

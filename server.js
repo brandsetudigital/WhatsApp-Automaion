@@ -856,10 +856,9 @@ async function processIncomingWhatsAppMessage(messageData) {
       const scheduleIntent = await aiService.parseInterviewScheduleWithGemini(messageText, candidate);
       
       // Strict rule: NEVER auto-schedule Online interviews! If candidate requested online/wfh, route to HR review flow
-      const hasOnlineRequest = (scheduleIntent && (scheduleIntent.interviewMode === 'online' || scheduleIntent.isOnlineRequest)) ||
-        candidate.interviewMode === 'online' ||
-        candidate.status === 'Online Requested' ||
-        aiService.isVirtualOrRemoteInterviewQuery(messageText);
+      const isOnlineQueryInMsg = aiService.isVirtualOrRemoteInterviewQuery(messageText);
+      const scheduleIntentIsOnline = scheduleIntent && (scheduleIntent.interviewMode === 'online' || scheduleIntent.isOnlineRequest);
+      const hasOnlineRequest = scheduleIntentIsOnline || isOnlineQueryInMsg;
 
       if (hasOnlineRequest) {
         console.log(`💻 Candidate ${candidate.name} (+${candidate.phone}) has online/remote intent. Skipping auto-scheduling as HR must manually schedule Google Meet.`);
@@ -897,15 +896,29 @@ async function processIncomingWhatsAppMessage(messageData) {
         candidate.updatedAt = new Date().toISOString();
         hiringService.saveCandidatesAndSyncExcel();
 
+        // Check if candidate was ALREADY sent the remote interview notice recently so we don't repeat endlessly
+        const recentAssistantMsgs = (candidate.chatHistory || [])
+          .filter(m => m.role === 'assistant')
+          .slice(-3)
+          .map(m => m.text || '');
+        const alreadyNotifiedOnline = recentAssistantMsgs.some(t => t.includes('Google Meet link'));
+
         const isEnglish = (candidate.lang === 'english');
         const hasResume = candidate.resumeReceived || candidate.portfolio;
-        const onlineMsg = isEnglish
-          ? (hasResume
-              ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
-              : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work samples are shared here. 👍`)
-          : (hasResume
-              ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
-              : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`);
+        let onlineMsg = '';
+        if (alreadyNotifiedOnline) {
+          onlineMsg = isEnglish
+            ? `Hello! We have noted your online/remote interview request. Our HR team is reviewing the available meeting slots and will share your Google Meet link shortly. Thank you! 👍`
+            : `Namaste! Aapka online interview request note ho chuka hai. Hamari HR team available slot check karke Google Meet link jald hi share karegi. Dhanyawad! 👍`;
+        } else {
+          onlineMsg = isEnglish
+            ? (hasResume
+                ? `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call and share the Google Meet link. Thank you! 🤝✨`
+                : `Certainly! For Remote / Work From Home and Online (Virtual) interviews, our HR team will directly connect with you via WhatsApp or Call shortly and share the Google Meet link. 🤝✨\n\nMeanwhile, please ensure your updated *Resume (PDF)* and portfolio / work samples are shared here. 👍`)
+            : (hasResume
+                ? `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse WhatsApp ya Call par directly connect karegi aur Google Meet link share karegi. Dhanyawad! 🤝✨`
+                : `Ji bilkul! Remote / Work From Home aur Online (Virtual) interview ke liye hamari HR team aapse jald hi WhatsApp / Call par directly connect karegi aur Google Meet link share karegi. 🤝✨\n\nTab tak kripya apna updated *Resume (PDF)* aur work portfolio / sample link yahan share kar dein. 👍`);
+        }
 
         const isMetaSource = messageData.source === 'meta';
         await whatsappCloudService.sendWhatsAppText(replyRecipient, onlineMsg, isMetaSource);
